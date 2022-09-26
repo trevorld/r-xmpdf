@@ -1,0 +1,94 @@
+#' Number of pages in a document
+#'
+#' `n_pages()` returns the number of pages in the (pdf) file(s).
+#'
+#' `n_pages()` will try to use the following helper functions in the following order:
+#'
+#' 1. `n_pages_qpdf()` which wraps [qpdf::pdf_length()].
+#' 2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
+#' 3. `n_pages_gs()` which wraps `ghostscript` command-line tool
+#'
+#' @param filename Character vector of filenames.
+#' @param use_names If `TRUE` (default) use `filename` as the names of the result.
+#' @examples
+#' if (piecepackr.metadata:::supports_n_pages() && require("grid", quietly = TRUE)) {
+#'   f <- tempfile(fileext = ".pdf")
+#'   pdf(f, onefile = TRUE)
+#'   grid.text("Page 1")
+#'   grid.newpage()
+#'   grid.text("Page 2")
+#'   invisible(dev.off())
+#'   print(n_pages(f))
+#'   unlink(f)
+#' }
+#' @return An integer vector of number of pages within each file.
+#' @export
+n_pages <- function(filename, use_names = TRUE) {
+    if (requireNamespace("qpdf", quietly = TRUE)) {
+        np <- n_pages_qpdf(filename, use_names = use_names)
+    } else if (has_cmd("pdftk")) {
+        np <- n_pages_pdftk(filename, use_names = use_names)
+    # } else if (has_cmd("pdfinfo")) {
+    #     np <- n_pages_pdfinfo(filename, use_names = use_names)
+    } else if (has_gs()) {
+        np <- n_pages_gs(filename, use_names = use_names)
+    } else {
+        msg <- c("You'll need to install a suggested package or command to use 'n_pages'.",
+                 i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
+                 i = "Or install `pdftk` command",
+                 i = "Or install `ghostscript` command"
+        )
+        abort(msg, class = "piecepackr_suggested_package")
+    }
+    np
+}
+
+#' @rdname n_pages
+#' @export
+n_pages_qpdf <- function(filename, use_names = TRUE) {
+    assert_suggested("qpdf")
+    filename <- normalizePath(filename)
+    sapply(filename, USE.NAMES = use_names, FUN = function(f) qpdf::pdf_length(f))
+}
+
+# #' @rdname n_pages
+# #' @export
+# n_pages_pdfinfo <- function(filename, use_names = TRUE) {
+#     cmd <- get_cmd("pdfinfo")
+#     filename <- shQuote(normalizePath(filename))
+#     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+#         pdfinfo <- system2(cmd, f, stdout=TRUE)
+#         pdfinfo <- grep("^Pages:", pdfinfo, value=TRUE)
+#         as.integer(strsplit(pdfinfo, " +")[[1]][2])
+#     })
+# }
+
+supports_n_pages <- function() {
+    requireNamespace("qpdf", quietly = TRUE) || has_cmd("pdfinfo") || has_gs()
+}
+
+#' @rdname n_pages
+#' @export
+n_pages_pdftk <- function(filename, use_names = TRUE) {
+    cmd <- get_cmd("pdftk")
+    filename <- shQuote(normalizePath(filename))
+    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+        args <- c(f, "dump_data_utf8")
+        pdfinfo <- system2(cmd, args, stdout=TRUE)
+        pdfinfo <- grep("^NumberOfPages:", pdfinfo, value=TRUE)
+        as.integer(strsplit(pdfinfo, ":")[[1]][2])
+    })
+}
+
+#' @rdname n_pages
+#' @export
+n_pages_gs <- function(filename, use_names = TRUE) {
+    cmd <- gs()
+    filename <- normalizePath(filename, winslash="/")
+    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+        args <- c("-q", "-dNODISPLAY", "-dNOSAFER", "-c",
+                  paste(paste0('"(', f, ")"),
+                        "(r)", "file", "runpdfbegin", "pdfpagecount", "=", 'quit"'))
+        as.integer(system2(cmd, args, stdout=TRUE))
+    })
+}
