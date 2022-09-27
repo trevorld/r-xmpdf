@@ -1,12 +1,8 @@
-#' Document info dictionary
+#' Set/get pdf document info dictionary
 #'
 #' `docinfo()` creates an object of pdf document info dictionary information from scratch.
 #' `get_docinfo()` gets pdf document info from a file.
 #' `set_docinfo()` sets pdf document info for a file.
-#'
-#' Currently does not support arbitrary info dictionary entries.
-#' Currently only supports date year, month, and day for `CreationDate` and `ModDate` entries
-#' (does not support hours, minutes, seconds and relation to GMT).
 #'
 #' `get_docinfo()` will try to use the following helper functions in the following order:
 #'
@@ -29,12 +25,25 @@
 #'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
 #' @param filename Filename (pdf) to extract info dictionary entries from.
 #'                 Any such entries will be overridden by any manually set entries in [docinfo()].
+#' @param docinfo A "docinfo" object (as returned by [docinfo()] or [get_docinfo()]).
+#' @param input Input pdf filename.
+#' @param output Output pdf filename.
 #' @return `docinfo()` and `get_docinfo()` returns a "docinfo" R6 class.
+#'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section `docinfo` R6 Class Methods:\describe{
-#'   \item{`pdfmark()`}{Return a string of pdfmark info for use with `ghostscript`.}
-#'   \item{`pdftk()`}{Return a string of pdfmark metadata for use with `pdftk`.}
-#'   \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.
+#'     \item{`pdfmark()`}{Return a string of pdfmark info for use with `ghostscript`.}
+#'     \item{`pdftk()`}{Return a string of pdfmark metadata for use with `pdftk`.}
+#'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.}
 #' }
+#' @section Known limitations:
+#'
+#'   * Currently does not support arbitrary info dictionary entries.
+#'   * Currently only supports date year, month, and day for `CreationDate` and `ModDate` entries
+#'     (does not support hours, minutes, seconds and relation to GMT).
+#'   * `set_docinfo_pdftk()` won't update any previously set XPN metadata.
+#'     Some pdf viewers will preferentially use the previously set document title from XPN metadata
+#'     if it exists instead of using the documentation info dictionary entry.
+#'
 #' @examples
 #' if (piecepackr.metadata:::supports_set_docinfo() &&
 #'     piecepackr.metadata:::supports_get_docinfo() &&
@@ -106,17 +115,16 @@ get_pdftk_metadata <- function(filename) {
 #' @export
 get_docinfo <- function(filename) {
     if (requireNamespace("pdftools", quietly = TRUE)) {
-        di <- get_docinfo_pdftools(filename)
+        get_docinfo_pdftools(filename)
     } else if (has_cmd("pdftk")) {
-        di <- get_docinfo_pdftk(filename)
+        get_docinfo_pdftk(filename)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
                  i = "Use 'install.packages(\"pdftools\")' to install {pdftools}",
-                 i = "Or install `pdftk` command",
+                 i = "Or install `pdftk` command"
         )
         abort(msg, class = "piecepackr_suggested_package")
     }
-    di
 }
 
 #' @rdname docinfo
@@ -170,16 +178,15 @@ get_docinfo_pdftk <- function(filename) {
 #' @export
 set_docinfo <- function(docinfo, input, output = input) {
     if (has_gs()) {
-        di <- set_docinfo_gs(docinfo, input, output)
+        set_docinfo_gs(docinfo, input, output)
     } else if (has_cmd("pdftk")) {
-        di <- set_docinfo_pdftk(docinfo, input, output)
+        set_docinfo_pdftk(docinfo, input, output)
     } else {
         msg <- c("You'll need to install a command to use 'set_docinfo'.",
-                 i = "Install `pdftk` command",
+                 i = "Install `pdftk` command"
         )
         abort(msg, class = "piecepackr_suggested_package")
     }
-    di
 }
 
 #' @rdname docinfo
@@ -236,7 +243,7 @@ set_docinfo_pdftk <- function(docinfo, input, output = input) {
     invisible(output)
 }
 
-DocInfo <- R6::R6Class("docinfo",
+DocInfo <- R6Class("docinfo",
     public = list(
         initialize = function(author = NULL, creation_date = NULL,
                               creator = NULL, producer = NULL,
@@ -394,8 +401,8 @@ DocInfo <- R6::R6Class("docinfo",
 keyword_split <- function(x) {
     if (length(x) > 1) {
         x
-    } else if (x == "") {
-        x
+    } else if (length(x) == 0 || x == "") {
+        ""
     } else {
         strsplit(x, ",[[:blank:]]*")[[1]]
     }

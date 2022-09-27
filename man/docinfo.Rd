@@ -8,7 +8,7 @@
 \alias{set_docinfo}
 \alias{set_docinfo_gs}
 \alias{set_docinfo_pdftk}
-\title{Document info dictionary}
+\title{Set/get pdf document info dictionary}
 \usage{
 docinfo(
   author = NULL,
@@ -54,9 +54,16 @@ If left \code{NULL} will default to \code{Sys.Date()} when used to set documenta
 
 \item{filename}{Filename (pdf) to extract info dictionary entries from.
 Any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}}.}
+
+\item{docinfo}{A "docinfo" object (as returned by \code{\link[=docinfo]{docinfo()}} or \code{\link[=get_docinfo]{get_docinfo()}}).}
+
+\item{input}{Input pdf filename.}
+
+\item{output}{Output pdf filename.}
 }
 \value{
 \code{docinfo()} and \code{get_docinfo()} returns a "docinfo" R6 class.
+\code{set_docinfo()} returns the (output) filename invisibly.
 }
 \description{
 \code{docinfo()} creates an object of pdf document info dictionary information from scratch.
@@ -64,10 +71,6 @@ Any such entries will be overridden by any manually set entries in \code{\link[=
 \code{set_docinfo()} sets pdf document info for a file.
 }
 \details{
-Currently does not support arbitrary info dictionary entries.
-Currently only supports date year, month, and day for \code{CreationDate} and \code{ModDate} entries
-(does not support hours, minutes, seconds and relation to GMT).
-
 \code{get_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{get_docinfo_pdftools()} which wraps \code{\link[pdftools:pdftools]{pdftools::pdf_info()}}
@@ -84,7 +87,19 @@ Currently only supports date year, month, and day for \code{CreationDate} and \c
 \describe{
 \item{\code{pdfmark()}}{Return a string of pdfmark info for use with \code{ghostscript}.}
 \item{\code{pdftk()}}{Return a string of pdfmark metadata for use with \code{pdftk}.}
-\item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.
+\item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.}
+}
+}
+
+\section{Known limitations}{
+
+\itemize{
+\item Currently does not support arbitrary info dictionary entries.
+\item Currently only supports date year, month, and day for \code{CreationDate} and \code{ModDate} entries
+(does not support hours, minutes, seconds and relation to GMT).
+\item \code{set_docinfo_pdftk()} won't update any previously set XPN metadata.
+Some pdf viewers will preferentially use the previously set document title from XPN metadata
+if it exists instead of using the documentation info dictionary entry.
 }
 }
 
@@ -99,16 +114,16 @@ if (piecepackr.metadata:::supports_set_docinfo() &&
   grid.text("Page 2")
   invisible(dev.off())
 
-  di_get <- get_docinfo(f)
-  print(di_get$title)
-  print(di_get$author)
+  di_get1 <- get_docinfo(f)
+  print(di_get1$title)
+  print(di_get1$author)
 
   di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
-  set_docinfo(di, f)
+  set_docinfo(di_set, f)
 
-  di_get <- get_docinfo(f)
-  print(di_get$title)
-  print(di_get$author)
+  di_get2 <- get_docinfo(f)
+  print(di_get2$title)
+  print(di_get2$author)
   unlink(f)
 }
 }

@@ -25,13 +25,13 @@
 #' @export
 n_pages <- function(filename, use_names = TRUE) {
     if (requireNamespace("qpdf", quietly = TRUE)) {
-        np <- n_pages_qpdf(filename, use_names = use_names)
+        n_pages_qpdf(filename, use_names = use_names)
     } else if (has_cmd("pdftk")) {
-        np <- n_pages_pdftk(filename, use_names = use_names)
+        n_pages_pdftk(filename, use_names = use_names)
     # } else if (has_cmd("pdfinfo")) {
-    #     np <- n_pages_pdfinfo(filename, use_names = use_names)
+    #     n_pages_pdfinfo(filename, use_names = use_names)
     } else if (has_gs()) {
-        np <- n_pages_gs(filename, use_names = use_names)
+        n_pages_gs(filename, use_names = use_names)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'n_pages'.",
                  i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
@@ -40,7 +40,6 @@ n_pages <- function(filename, use_names = TRUE) {
         )
         abort(msg, class = "piecepackr_suggested_package")
     }
-    np
 }
 
 #' @rdname n_pages

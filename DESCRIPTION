@@ -2,7 +2,7 @@ Encoding: UTF-8
 Package: piecepackr.metadata
 Type: Package
 Title: Add metadata to media files
-Version: 0.1.0
+Version: 0.1.0-0
 Description: Add bookmarks and docinfo to pdf files.
              Can detect and use either 'pdftk' or 'ghostscript' commands.
              Can calculate and add appropriate bookmarks when merging multiple pdf files.
@@ -14,8 +14,10 @@ BugReports: https://github.com/piecepackr/piecepackr.metadata/issues
 LazyLoad: yes
 Imports:
     R6,
+    purrr,
     rlang,
-    tools
+    tools,
+    utils
 Suggests:
     grid,
     qpdf,

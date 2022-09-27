@@ -30,6 +30,12 @@ test_that("docinfo_pdftk", {
     di_get <- get_docinfo_pdftk(f2)
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
+
+    di_set <- docinfo(filename = f2)
+    set_docinfo_pdftk(di_set, f1, f2)
+    di_get <- get_docinfo_pdftk(f2)
+    expect_equal(di_get$title, "Two Boring Pages")
+    expect_equal(di_get$author, "John Doe")
 })
 
 test_that("set_docinfo_gs", {

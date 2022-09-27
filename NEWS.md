@@ -1,8 +1,18 @@
-piecepackr.metadata (development)
-=================================
+piecepackr.metadata 0.1.0 (development)
+=======================================
 
 Initial features
 ----------------
+
+* `get_bookmarks()` returns a data frame with pdf bookmarks information.
+  `get_bookmarks()` will try to use the following helper functions in the following order:
+
+  1. `get_bookmarks_pdftk()` which wraps `pdftk` command-line tool
+
+* `set_bookmarks()` sets (replaces) pdf bookmarks information (#2).
+  `set_bookmarks()` will try to use the following helper functions in the following order:
+
+  1. `set_bookmarks_pdftk()` which wraps `pdftk` command-line tool
 
 * `docinfo()` provides an `{R6}` object to represent pdf documentation info entries.
 * `get_docinfo()` reads in pdf documentation info entries from a pdf file.
