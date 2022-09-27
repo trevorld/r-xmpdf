@@ -2,3 +2,4 @@
 ^README.Rmd$
 ^_pkgdown.yml$
 ^tmp$
+^\.github$
