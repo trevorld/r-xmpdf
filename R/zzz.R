@@ -1,2 +1,2 @@
-#' @importFrom rlang abort
+#' @importFrom rlang abort warn %||%
 NULL

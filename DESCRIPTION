@@ -13,11 +13,13 @@ License: MIT + file LICENSE
 BugReports: https://github.com/piecepackr/piecepackr.metadata/issues
 LazyLoad: yes
 Imports:
+    R6,
     rlang,
     tools
 Suggests:
     grid,
     qpdf,
+    pdftools,
     testthat (>= 3.0.0)
 SystemRequirements: 'ghostscript' or 'pdftk'
 Roxygen: list(markdown = TRUE)

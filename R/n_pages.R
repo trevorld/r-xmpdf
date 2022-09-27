@@ -4,7 +4,7 @@
 #'
 #' `n_pages()` will try to use the following helper functions in the following order:
 #'
-#' 1. `n_pages_qpdf()` which wraps [qpdf::pdf_length()].
+#' 1. `n_pages_qpdf()` which wraps [qpdf::pdf_length()]
 #' 2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
 #' 3. `n_pages_gs()` which wraps `ghostscript` command-line tool
 #'
@@ -47,7 +47,7 @@ n_pages <- function(filename, use_names = TRUE) {
 #' @export
 n_pages_qpdf <- function(filename, use_names = TRUE) {
     assert_suggested("qpdf")
-    filename <- normalizePath(filename)
+    filename <- normalizePath(filename, mustWork = TRUE)
     sapply(filename, USE.NAMES = use_names, FUN = function(f) qpdf::pdf_length(f))
 }
 
@@ -55,7 +55,7 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 # #' @export
 # n_pages_pdfinfo <- function(filename, use_names = TRUE) {
 #     cmd <- get_cmd("pdfinfo")
-#     filename <- shQuote(normalizePath(filename))
+#     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
 #     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
 #         pdfinfo <- system2(cmd, f, stdout=TRUE)
 #         pdfinfo <- grep("^Pages:", pdfinfo, value=TRUE)
@@ -64,14 +64,14 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 # }
 
 supports_n_pages <- function() {
-    requireNamespace("qpdf", quietly = TRUE) || has_cmd("pdfinfo") || has_gs()
+    requireNamespace("qpdf", quietly = TRUE) || has_cmd("pdftk") || has_gs()
 }
 
 #' @rdname n_pages
 #' @export
 n_pages_pdftk <- function(filename, use_names = TRUE) {
     cmd <- get_cmd("pdftk")
-    filename <- shQuote(normalizePath(filename))
+    filename <- shQuote(normalizePath(filename, mustWork = TRUE))
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         args <- c(f, "dump_data_utf8")
         pdfinfo <- system2(cmd, args, stdout=TRUE)
@@ -84,7 +84,7 @@ n_pages_pdftk <- function(filename, use_names = TRUE) {
 #' @export
 n_pages_gs <- function(filename, use_names = TRUE) {
     cmd <- gs()
-    filename <- normalizePath(filename, winslash="/")
+    filename <- normalizePath(filename, winslash="/", mustWork = TRUE)
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         args <- c("-q", "-dNODISPLAY", "-dNOSAFER", "-c",
                   paste(paste0('"(', f, ")"),
