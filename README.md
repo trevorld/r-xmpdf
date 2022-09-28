@@ -22,16 +22,31 @@ In the future we plan to add support for getting/setting Extensible Metadata Pla
 
 
 ```r
-remotes::install_github("trevorld/bittermelon")
+remotes::install_github("piecepackr/piecepackr.metadata")
 ```
 
 Depending on what you'd like to do you'll need to install some additional R packages and/or command-line tools:
 
-* To get pdf documentation info entries you'll either need [{pdftools}](https://docs.ropensci.org/pdftools/) or the command-line tool [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
-* To set pdf documentation info entries you'll either need the command-line tool [ghostscript](https://www.ghostscript.com/) or the command-line tool [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
-* To get pdf bookmarks you'll need the command-line tool [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
-* To set pdf bookmarks you'll either need the command-line tool [ghostscript](https://www.ghostscript.com/) or the command-line tool [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
-* To get the number of pages in a pdf you'll either need [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html), the command-line tool [ghostscript](https://www.ghostscript.com/), or the command-line tool [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
+* **[{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)** can be used to get the number of pages in a pdf.  Note currently a dependency of [{pdftools}](https://docs.ropensci.org/pdftools/).
+
+  + `install.packages("qpdf")`
+
+* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries.
+  Currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
+
+  + `install.packages("pdftools")` will probably install {qpdf} as well
+
+* **[exiftool](https://exiftool.org/)** can be used to get number of pages in a pdf.
+
+  + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
+
+* **[ghostscript](https://www.ghostscript.com/)** can be used to set pdf bookmarks and documentation info entries. Can also be used to get the number of pages in a pdf.
+
+  + `sudo apt-get install ghostscript` (Debian/Ubuntu)
+
+* **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** or **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** can be used to get/set pdf bookmarks and documentation info entries.  Can also be used to get the number of pages in a pdf.
+
+  + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
 
 ## <a name="examples">Examples</a>
 
