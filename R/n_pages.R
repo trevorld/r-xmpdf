@@ -1,4 +1,4 @@
-#' Number of pages in a document
+#' Get number of pages in a document
 #'
 #' `n_pages()` returns the number of pages in the (pdf) file(s).
 #'
@@ -7,6 +7,7 @@
 #' 1. `n_pages_qpdf()` which wraps [qpdf::pdf_length()]
 #' 2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
 #' 3. `n_pages_gs()` which wraps `ghostscript` command-line tool
+#' 4. `n_pages_exiftool()` which wraps `exiftool` command-line tool
 #'
 #' @param filename Character vector of filenames.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
@@ -33,6 +34,8 @@ n_pages <- function(filename, use_names = TRUE) {
     #     n_pages_pdfinfo(filename, use_names = use_names)
     } else if (supports_gs()) {
         n_pages_gs(filename, use_names = use_names)
+    } else if (supports_exiftool()) {
+        n_pages_exiftool(filename, use_names = use_names)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'n_pages'.",
                  i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
@@ -41,6 +44,16 @@ n_pages <- function(filename, use_names = TRUE) {
         )
         abort(msg, class = "piecepackr_suggested_package")
     }
+}
+
+#' @rdname n_pages
+#' @export
+n_pages_exiftool <- function(filename, use_names = TRUE) {
+    filename <- normalizePath(filename, mustWork = TRUE)
+    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+        md <- get_exiftool_metadata(f, "-pdf:pagecount")
+        as.integer(md$PageCount)
+    })
 }
 
 #' @rdname n_pages
@@ -62,7 +75,6 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 #         as.integer(strsplit(pdfinfo, " +")[[1]][2])
 #     })
 # }
-
 
 #' @rdname n_pages
 #' @export

@@ -7,6 +7,7 @@
 \alias{supports_get_docinfo}
 \alias{supports_set_docinfo}
 \alias{supports_n_pages}
+\alias{supports_exiftool}
 \alias{supports_gs}
 \alias{supports_pdftk}
 \title{Detect support for features}
@@ -21,6 +22,8 @@ supports_set_docinfo()
 
 supports_n_pages()
 
+supports_exiftool()
+
 supports_gs()
 
 supports_pdftk()
@@ -30,12 +33,17 @@ supports_pdftk()
 \code{supports_get_docinfo()}, \code{supports_set_docinfo()},
 and \code{supports_n_pages()}
 detects support for the functions
-\code{\link[=get_bookmarks]{get_bookmarks()}}, \code{\link[=set_bookmarks]{set_bookmarks()}}, \code{\link[=get_docinfo]{get_docinfo()}}, \code{\link[=set_docinfo]{set_docinfo()}}, and \code{\link[=n_pages]{n_pages()}} respectively.
-\code{supports_gs()} and \code{supports_pdftk()} detects support for the command-line tools
-\code{ghostscript} and \code{pdftk} respectively as used by various lower-level functions.
+\code{\link[=get_bookmarks]{get_bookmarks()}}, \code{\link[=set_bookmarks]{set_bookmarks()}},
+\code{\link[=get_docinfo]{get_docinfo()}}, \code{\link[=set_docinfo]{set_docinfo()}},
+and \code{\link[=n_pages]{n_pages()}} respectively.
+\code{supports_exiftool()}, \code{supports_gs()} and \code{supports_pdftk()}
+detects support for the command-line tools
+\code{exiftool}, \code{ghostscript} and \code{pdftk} respectively as used by various lower-level functions.
 }
 \details{
 \itemize{
+\item \code{supports_exiftool()} detects support for the command-line tool \code{exiftool} which is
+required for \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
 \item \code{supports_gs()} detects support for the command-line tool \code{ghostscript} which is
 required for \code{\link[=set_docinfo_gs]{set_docinfo_gs()}}, \code{\link[=set_bookmarks_gs]{set_bookmarks_gs()}}, and \code{\link[=n_pages_gs]{n_pages_gs()}}.
 \item \code{supports_pdftk()} detects support for the command-line tool \code{pdftk} which is

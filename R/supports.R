@@ -4,10 +4,15 @@
 #' `supports_get_docinfo()`, `supports_set_docinfo()`,
 #' and `supports_n_pages()`
 #' detects support for the functions
-#' [get_bookmarks()], [set_bookmarks()], [get_docinfo()], [set_docinfo()], and [n_pages()] respectively.
-#' `supports_gs()` and `supports_pdftk()` detects support for the command-line tools
-#' `ghostscript` and `pdftk` respectively as used by various lower-level functions.
+#' [get_bookmarks()], [set_bookmarks()],
+#' [get_docinfo()], [set_docinfo()],
+#'  and [n_pages()] respectively.
+#' `supports_exiftool()`, `supports_gs()` and `supports_pdftk()`
+#' detects support for the command-line tools
+#' `exiftool`, `ghostscript` and `pdftk` respectively as used by various lower-level functions.
 #'
+#' * `supports_exiftool()` detects support for the command-line tool `exiftool` which is
+#'   required for [n_pages_exiftool()].
 #' * `supports_gs()` detects support for the command-line tool `ghostscript` which is
 #'   required for [set_docinfo_gs()], [set_bookmarks_gs()], and [n_pages_gs()].
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
@@ -56,10 +61,28 @@ supports_set_docinfo <- function() {
     supports_pdftk() || supports_gs()
 }
 
+# #' @rdname supports
+# #' @export
+supports_get_xmp <- function() {
+    supports_exiftool()
+}
+
+# #' @rdname supports
+# #' @export
+supports_set_xmp <- function() {
+    supports_exiftool()
+}
+
 #' @rdname supports
 #' @export
 supports_n_pages <- function() {
-    supports_qpdf() || supports_pdftk() || supports_gs()
+    supports_exiftool() || supports_qpdf() || supports_pdftk() || supports_gs()
+}
+
+#' @rdname supports
+#' @export
+supports_exiftool <- function() {
+    find_exiftool_cmd() != ""
 }
 
 #' @rdname supports
@@ -71,7 +94,17 @@ supports_gs <- function() {
 #' @rdname supports
 #' @export
 supports_pdftk <- function() {
-    Sys.which("pdftk") != ""
+    find_pdftk_cmd() != ""
+}
+
+#### {exiftoolr} and {exifr} may have in-built binaries
+find_exiftool_cmd <- function() {
+    Sys.which("exiftool")
+}
+
+#### animation::pdftk() has an option
+find_pdftk_cmd <- function() {
+    Sys.which("pdftk")
 }
 
 supports_qpdf <- function() {
@@ -86,7 +119,11 @@ gs <- function() {
 }
 
 pdftk <- function() {
-    get_cmd("pdftk", function() Sys.which("pdftk"))
+    get_cmd("pdftk", find_pdftk_cmd)
+}
+
+exiftool <- function() {
+    get_cmd("exiftool", find_exiftool_cmd)
 }
 
 get_cmd <- function(name, cmd_fn = function() Sys.which(name)) {

@@ -2,12 +2,15 @@
 % Please edit documentation in R/n_pages.R
 \name{n_pages}
 \alias{n_pages}
+\alias{n_pages_exiftool}
 \alias{n_pages_qpdf}
 \alias{n_pages_pdftk}
 \alias{n_pages_gs}
-\title{Number of pages in a document}
+\title{Get number of pages in a document}
 \usage{
 n_pages(filename, use_names = TRUE)
+
+n_pages_exiftool(filename, use_names = TRUE)
 
 n_pages_qpdf(filename, use_names = TRUE)
 
@@ -32,6 +35,7 @@ An integer vector of number of pages within each file.
 \item \code{n_pages_qpdf()} which wraps \code{\link[qpdf:qpdf]{qpdf::pdf_length()}}
 \item \code{n_pages_pdftk()} which wraps \code{pdftk} command-line tool
 \item \code{n_pages_gs()} which wraps \code{ghostscript} command-line tool
+\item \code{n_pages_exiftool()} which wraps \code{exiftool} command-line tool
 }
 }
 \examples{
