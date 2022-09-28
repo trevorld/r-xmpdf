@@ -30,10 +30,10 @@
 #'   * Currently only allows setting bookmarks for page numbers within the pdf.
 #'   * Currently only supports setting the title, page number, and level of bookmarks.
 #'
-#' @seealso <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>
+#' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.
 #' @examples
-#' if (piecepackr.metadata:::supports_set_bookmarks() &&
-#'     piecepackr.metadata:::supports_get_bookmarks() &&
+#' if (piecepackr.metadata::supports_set_bookmarks() &&
+#'     piecepackr.metadata::supports_get_bookmarks() &&
 #'     require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
@@ -55,7 +55,7 @@ NULL
 #' @rdname bookmarks
 #' @export
 get_bookmarks <- function(filename) {
-    if (has_cmd("pdftk")) {
+    if (supports_pdftk()) {
         get_bookmarks_pdftk(filename)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
@@ -88,19 +88,12 @@ get_bookmarks_pdftk <- function(filename) {
     }
 }
 
-supports_get_bookmarks <- function() {
-    has_cmd("pdftk")
-}
-supports_set_bookmarks <- function() {
-    has_cmd("pdftk") || has_gs()
-}
-
 #' @rdname bookmarks
 #' @export
 set_bookmarks <- function(bookmarks, input, output = input) {
-    if (has_gs()) {
+    if (supports_gs()) {
         set_bookmarks_gs(bookmarks, input, output)
-    } else if (has_cmd("pdftk")) {
+    } else if (supports_pdftk()) {
         set_bookmarks_pdftk(bookmarks, input, output)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
@@ -115,7 +108,7 @@ set_bookmarks <- function(bookmarks, input, output = input) {
 #' @export
 set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
     bookmarks <- as_bookmarks(bookmarks)
-    cmd <- get_cmd("pdftk")
+    cmd <- pdftk()
     meta <- get_pdftk_metadata(input)
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)

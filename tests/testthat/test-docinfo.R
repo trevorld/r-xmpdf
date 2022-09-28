@@ -18,7 +18,7 @@ test_that("get_docinfo_pdftools", {
     expect_equal(get_docinfo_pdftools(f1)$title, "R Graphics Output")
 })
 test_that("docinfo_pdftk", {
-    skip_if_not(has_cmd("pdftk"))
+    skip_if_not(supports_pdftk())
 
     expect_equal(get_docinfo_pdftk(f1)$title, "R Graphics Output")
 
@@ -39,7 +39,7 @@ test_that("docinfo_pdftk", {
 })
 
 test_that("set_docinfo_gs", {
-    skip_if_not(has_gs())
+    skip_if_not(supports_gs())
 
     f3 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f3))

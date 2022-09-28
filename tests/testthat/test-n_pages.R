@@ -18,10 +18,10 @@ test_that("n_pages_qpdf", {
     expect_equal(n_pages_qpdf(f, use_names = FALSE), 2L)
 })
 test_that("n_pages_pdftk", {
-    skip_if_not(has_cmd("pdftk"))
+    skip_if_not(supports_pdftk())
     expect_equal(n_pages_pdftk(f, use_names = FALSE), 2L)
 })
 test_that("n_pages_ghostscript", {
-    skip_if_not(has_gs())
+    skip_if_not(supports_gs())
     expect_equal(n_pages_gs(f, use_names = FALSE), 2L)
 })

@@ -104,8 +104,8 @@ if it exists instead of using the documentation info dictionary entry.
 }
 
 \examples{
-if (piecepackr.metadata:::supports_set_docinfo() &&
-    piecepackr.metadata:::supports_get_docinfo() &&
+if (piecepackr.metadata::supports_set_docinfo() &&
+    piecepackr.metadata::supports_get_docinfo() &&
     require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
@@ -128,5 +128,6 @@ if (piecepackr.metadata:::supports_set_docinfo() &&
 }
 }
 \seealso{
-\url{https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo}
+\code{\link[=supports_get_docinfo]{supports_get_docinfo()}}, \code{\link[=supports_set_docinfo]{supports_set_docinfo()}}, \code{\link[=supports_gs]{supports_gs()}}, and \code{\link[=supports_pdftk]{supports_pdftk()}} to detect support for these features. For more info about the pdf document info dictionary see
+\url{https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo}.
 }

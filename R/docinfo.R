@@ -45,8 +45,8 @@
 #'     if it exists instead of using the documentation info dictionary entry.
 #'
 #' @examples
-#' if (piecepackr.metadata:::supports_set_docinfo() &&
-#'     piecepackr.metadata:::supports_get_docinfo() &&
+#' if (piecepackr.metadata::supports_set_docinfo() &&
+#'     piecepackr.metadata::supports_get_docinfo() &&
 #'     require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
@@ -67,7 +67,8 @@
 #'   print(di_get2$author)
 #'   unlink(f)
 #' }
-#' @seealso <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo>
+#' @seealso [supports_get_docinfo()], [supports_set_docinfo()], [supports_gs()], and [supports_pdftk()] to detect support for these features. For more info about the pdf document info dictionary see
+#'   <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo>.
 #' @export
 docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, producer = NULL,
                     title = NULL, subject = NULL, keywords = NULL, mod_date = NULL,
@@ -77,13 +78,6 @@ docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, produce
                 creator = creator, producer = producer,
                 title = title, subject = subject, keywords = keywords, mod_date = mod_date,
                 filename = filename)
-}
-
-supports_set_docinfo <- function() {
-    has_cmd("pdftk") || has_gs()
-}
-supports_get_docinfo <- function() {
-    requireNamespace("pdftools", quietly = TRUE) || has_cmd("pdftk")
 }
 
 to_date_pdfmark <- function(date) {
@@ -105,7 +99,7 @@ entry_pdftk <- function(key, value) {
 }
 
 get_pdftk_metadata <- function(filename) {
-    cmd <- get_cmd("pdftk")
+    cmd <- pdftk()
     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
     args <- c(filename, "dump_data_utf8")
     system2(cmd, args, stdout=TRUE)
@@ -114,9 +108,9 @@ get_pdftk_metadata <- function(filename) {
 #' @rdname docinfo
 #' @export
 get_docinfo <- function(filename) {
-    if (requireNamespace("pdftools", quietly = TRUE)) {
+    if (supports_pdftools()) {
         get_docinfo_pdftools(filename)
-    } else if (has_cmd("pdftk")) {
+    } else if (supports_pdftk()) {
         get_docinfo_pdftk(filename)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
@@ -177,9 +171,9 @@ get_docinfo_pdftk <- function(filename) {
 #' @rdname docinfo
 #' @export
 set_docinfo <- function(docinfo, input, output = input) {
-    if (has_gs()) {
+    if (supports_gs()) {
         set_docinfo_gs(docinfo, input, output)
-    } else if (has_cmd("pdftk")) {
+    } else if (supports_pdftk()) {
         set_docinfo_pdftk(docinfo, input, output)
     } else {
         msg <- c("You'll need to install a command to use 'set_docinfo'.",
@@ -217,7 +211,7 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
 #' @rdname docinfo
 #' @export
 set_docinfo_pdftk <- function(docinfo, input, output = input) {
-    cmd <- get_cmd("pdftk")
+    cmd <- pdftk()
     meta <- get_pdftk_metadata(input)
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)

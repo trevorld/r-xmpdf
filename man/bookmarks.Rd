@@ -64,8 +64,8 @@ If missing will be inferred from \code{level} column else will be assumed do be 
 }
 
 \examples{
-if (piecepackr.metadata:::supports_set_bookmarks() &&
-    piecepackr.metadata:::supports_get_bookmarks() &&
+if (piecepackr.metadata::supports_set_bookmarks() &&
+    piecepackr.metadata::supports_get_bookmarks() &&
     require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
@@ -83,5 +83,5 @@ if (piecepackr.metadata:::supports_set_bookmarks() &&
 }
 }
 \seealso{
-\url{https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out}
+\code{\link[=supports_get_bookmarks]{supports_get_bookmarks()}}, \code{\link[=supports_set_bookmarks]{supports_set_bookmarks()}}, \code{\link[=supports_gs]{supports_gs()}}, and \code{\link[=supports_pdftk]{supports_pdftk()}} to detect support for these features.  For more info about the pdf bookmarks feature see \url{https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out}.
 }

@@ -11,7 +11,7 @@
 #' @param filename Character vector of filenames.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @examples
-#' if (piecepackr.metadata:::supports_n_pages() && require("grid", quietly = TRUE)) {
+#' if (piecepackr.metadata::supports_n_pages() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
 #'   grid.text("Page 1")
@@ -22,15 +22,16 @@
 #'   unlink(f)
 #' }
 #' @return An integer vector of number of pages within each file.
+#' @seealso [supports_n_pages()] detects support for this feature.
 #' @export
 n_pages <- function(filename, use_names = TRUE) {
-    if (requireNamespace("qpdf", quietly = TRUE)) {
+    if (supports_qpdf()) {
         n_pages_qpdf(filename, use_names = use_names)
-    } else if (has_cmd("pdftk")) {
+    } else if (supports_pdftk()) {
         n_pages_pdftk(filename, use_names = use_names)
     # } else if (has_cmd("pdfinfo")) {
     #     n_pages_pdfinfo(filename, use_names = use_names)
-    } else if (has_gs()) {
+    } else if (supports_gs()) {
         n_pages_gs(filename, use_names = use_names)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'n_pages'.",
@@ -53,7 +54,7 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 # #' @rdname n_pages
 # #' @export
 # n_pages_pdfinfo <- function(filename, use_names = TRUE) {
-#     cmd <- get_cmd("pdfinfo")
+#     cmd <- Sys.which("pdfinfo")
 #     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
 #     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
 #         pdfinfo <- system2(cmd, f, stdout=TRUE)
@@ -62,14 +63,11 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 #     })
 # }
 
-supports_n_pages <- function() {
-    requireNamespace("qpdf", quietly = TRUE) || has_cmd("pdftk") || has_gs()
-}
 
 #' @rdname n_pages
 #' @export
 n_pages_pdftk <- function(filename, use_names = TRUE) {
-    cmd <- get_cmd("pdftk")
+    cmd <- pdftk()
     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         args <- c(f, "dump_data_utf8")

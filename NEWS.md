@@ -34,3 +34,17 @@ Initial features
   1. `n_pages_qpdf()` which wraps `qpdf::pdf_length()`
   2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
   3. `n_pages_gs()` which wraps `ghostscript` command-line tool
+
+* The following functions detect support for various higher-level features:
+
+  * `supports_get_bookmarks()`
+  * `supports_set_bookmarks()`
+  * `supports_get_docinfo()`
+  * `supports_set_docinfo()`
+  * `supports_n_pages()`
+
+* The following functions detect support for various command-line tools needed for some
+  lower-level helper functions:
+
+  * `supports_gs()` detects support for `ghostscript`
+  * `supports_pdftk()` detects support for `pdftk`

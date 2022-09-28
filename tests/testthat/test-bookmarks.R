@@ -33,7 +33,7 @@ test_that("set_bookmarks", {
 
 test_that("set_bookmarks_gs", {
     skip_if_not(supports_get_bookmarks())
-    skip_if_not(has_gs())
+    skip_if_not(supports_gs())
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
 
@@ -55,7 +55,7 @@ test_that("set_bookmarks_gs", {
 })
 
 test_that("bookmarks_pdftk", {
-    skip_if_not(has_cmd("pdftk"))
+    skip_if_not(supports_pdftk())
 
     expect_equal(nrow(get_bookmarks(f1)), 0L)
 
