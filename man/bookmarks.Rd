@@ -6,6 +6,7 @@
 \alias{get_bookmarks_pdftk}
 \alias{set_bookmarks}
 \alias{set_bookmarks_pdftk}
+\alias{set_bookmarks_gs}
 \title{Set/get pdf bookmarks}
 \usage{
 get_bookmarks(filename)
@@ -15,6 +16,8 @@ get_bookmarks_pdftk(filename)
 set_bookmarks(bookmarks, input, output = input)
 
 set_bookmarks_pdftk(bookmarks, input, output = input)
+
+set_bookmarks_gs(bookmarks, input, output = input)
 }
 \arguments{
 \item{filename}{Filename (pdf) to extract bookmarks from.}
@@ -22,7 +25,10 @@ set_bookmarks_pdftk(bookmarks, input, output = input)
 \item{bookmarks}{A data frame with bookmark information with the following columns:\describe{
 \item{title}{Title for bookmark (mandatory, character)}
 \item{page}{Page number for bookmark (mandatory, integer)}
-\item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer)}
+\item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer).
+If missing will be inferred from \code{count} column else will be assumed to be \code{1L}.}
+\item{count}{Number of bookmarks immediately subordinate (optional, integer).
+If missing will be inferred from \code{level} column else will be assumed do be \code{0L}.}
 }}
 
 \item{input}{Input pdf filename.}
@@ -30,7 +36,7 @@ set_bookmarks_pdftk(bookmarks, input, output = input)
 \item{output}{Output pdf filename.}
 }
 \value{
-\code{get_bookmarks()} returns a data frame with bookmark info.
+\code{get_bookmarks()} returns a data frame with bookmark info (see \code{bookmarks} parameter for details about columns).
 \code{set_bookmarks()} returns the (output) filename invisibly.
 }
 \description{
@@ -45,6 +51,7 @@ set_bookmarks_pdftk(bookmarks, input, output = input)
 
 \code{set_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{
+\item \code{set_bookmarks_gs()} which wraps \code{ghostscript} command-line tool
 \item \code{set_bookmarks_pdftk()} which wraps \code{pdftk} command-line tool
 }
 }

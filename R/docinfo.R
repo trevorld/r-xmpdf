@@ -183,7 +183,8 @@ set_docinfo <- function(docinfo, input, output = input) {
         set_docinfo_pdftk(docinfo, input, output)
     } else {
         msg <- c("You'll need to install a command to use 'set_docinfo'.",
-                 i = "Install `pdftk` command"
+                 i = "Install `ghostscript` command",
+                 i = "Or install `pdftk` command"
         )
         abort(msg, class = "piecepackr_suggested_package")
     }

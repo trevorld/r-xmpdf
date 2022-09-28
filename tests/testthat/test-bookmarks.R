@@ -15,11 +15,12 @@ test_that("get_bookmarks", {
 })
 
 test_that("set_bookmarks", {
+    skip_if_not(supports_get_bookmarks())
     skip_if_not(supports_set_bookmarks())
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
 
-    bookmarks <- data.frame(title = "Page 1", "Page 2",
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks(bookmarks, f1, f2)
     expect_equal(nrow(get_bookmarks(f2)), 2L)
@@ -30,6 +31,29 @@ test_that("set_bookmarks", {
     expect_equal(nrow(get_bookmarks(f2)), 1L)
 })
 
+test_that("set_bookmarks_gs", {
+    skip_if_not(supports_get_bookmarks())
+    skip_if_not(has_gs())
+    f2 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f2))
+
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+                            page = c(1L, 2L))
+    set_bookmarks_gs(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)), 2L)
+
+    bookmarks <- data.frame(title = "Page 2",
+                            page = c(2L))
+    set_bookmarks_gs(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)), 1L)
+
+    bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
+                            level = c(1, 2, 2),
+                            page = c(1L, 1L, 2L))
+    set_bookmarks_gs(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)), 3L)
+})
+
 test_that("bookmarks_pdftk", {
     skip_if_not(has_cmd("pdftk"))
 
@@ -38,7 +62,7 @@ test_that("bookmarks_pdftk", {
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
 
-    bookmarks <- data.frame(title = "Page 1", "Page 2",
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
     expect_equal(nrow(get_bookmarks(f2)), 2L)
@@ -47,4 +71,16 @@ test_that("bookmarks_pdftk", {
                             page = c(2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
     expect_equal(nrow(get_bookmarks(f2)), 1L)
+
+    bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
+                            level = c(1, 2, 2),
+                            page = c(1L, 1L, 2L))
+    set_bookmarks_pdftk(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)), 3L)
+})
+
+test_that("`get_count()` and `get_level()`", {
+    expect_equal(get_count(c(1, 2, 2)), c(2, 0, 0))
+    expect_equal(get_level(c(2, 0, 0)), c(1, 2, 2))
+    expect_equal(get_level(c(-2, 0, 0)), c(1, 2, 2))
 })

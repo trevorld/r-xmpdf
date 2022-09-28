@@ -1,5 +1,7 @@
 ^LICENSE.md$
+^Rakefile$
 ^README.Rmd$
+^README.html$
 ^_pkgdown.yml$
 ^tmp$
 ^\.github$
