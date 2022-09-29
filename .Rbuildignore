@@ -4,4 +4,5 @@
 ^README.html$
 ^_pkgdown.yml$
 ^tmp$
+^raw-data$
 ^\.github$

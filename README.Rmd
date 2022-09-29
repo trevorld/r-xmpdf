@@ -1,4 +1,4 @@
-# xmpdf
+# xmpdf <img src="man/figures/logo.png" align="right" width="200px" alt="xmpdf hex sticker">
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
 
