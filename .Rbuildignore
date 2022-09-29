@@ -5,4 +5,5 @@
 ^_pkgdown.yml$
 ^tmp$
 ^raw-data$
+^favicon$
 ^\.github$

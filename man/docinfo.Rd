@@ -87,7 +87,21 @@ Any such entries will be overridden by any manually set entries in \code{\link[=
 \describe{
 \item{\code{pdfmark()}}{Return a string of pdfmark info for use with \code{ghostscript}.}
 \item{\code{pdftk()}}{Return a string of pdfmark metadata for use with \code{pdftk}.}
-\item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.}
+\item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.
+Can also use the relevant active bindings to set documentation info keys.}
+}
+}
+
+\section{\code{docinfo} R6 Active Bindings}{
+\describe{
+\item{\code{author}}{The document's author.}
+\item{\code{creation_date}}{The date the document was created.}
+\item{\code{creator}}{The name of the application that originally created the document (if converted to pdf).}
+\item{\code{producer}}{The name of the application that converted the document to pdf.}
+\item{\code{title}}{The document's title.}
+\item{\code{subject}}{The document's subject.}
+\item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
+\item{\code{mod_date}}{The date the document was last modified.}
 }
 }
 
@@ -113,15 +127,17 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   invisible(dev.off())
 
   di_get1 <- get_docinfo(f)
-  print(di_get1$title)
-  print(di_get1$author)
+  print(di_get1)
+  \dontshow{cat("\n\n")}
 
-  di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
+  di_set <- docinfo(author = "John Doe",
+                    title = "Two Boring Pages",
+                    keywords = c("R", "xmpdf"),
+                    filename = f)
   set_docinfo(di_set, f)
 
   di_get2 <- get_docinfo(f)
-  print(di_get2$title)
-  print(di_get2$author)
+  print(di_get2)
   unlink(f)
 }
 }

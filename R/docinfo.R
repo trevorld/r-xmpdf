@@ -33,7 +33,18 @@
 #' @section `docinfo` R6 Class Methods:\describe{
 #'     \item{`pdfmark()`}{Return a string of pdfmark info for use with `ghostscript`.}
 #'     \item{`pdftk()`}{Return a string of pdfmark metadata for use with `pdftk`.}
-#'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.}
+#'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.
+#'           Can also use the relevant active bindings to set documentation info keys.}
+#' }
+#' @section `docinfo` R6 Active Bindings:\describe{
+#'    \item{`author`}{The document's author.}
+#'    \item{`creation_date`}{The date the document was created.}
+#'    \item{`creator`}{The name of the application that originally created the document (if converted to pdf).}
+#'    \item{`producer`}{The name of the application that converted the document to pdf.}
+#'    \item{`title`}{The document's title.}
+#'    \item{`subject`}{The document's subject.}
+#'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
+#'    \item{`mod_date`}{The date the document was last modified.}
 #' }
 #' @section Known limitations:
 #'
@@ -54,15 +65,17 @@
 #'   invisible(dev.off())
 #'
 #'   di_get1 <- get_docinfo(f)
-#'   print(di_get1$title)
-#'   print(di_get1$author)
+#'   print(di_get1)
+#'   \dontshow{cat("\n\n")}
 #'
-#'   di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
+#'   di_set <- docinfo(author = "John Doe",
+#'                     title = "Two Boring Pages",
+#'                     keywords = c("R", "xmpdf"),
+#'                     filename = f)
 #'   set_docinfo(di_set, f)
 #'
 #'   di_get2 <- get_docinfo(f)
-#'   print(di_get2$title)
-#'   print(di_get2$author)
+#'   print(di_get2)
 #'   unlink(f)
 #' }
 #' @seealso [supports_get_docinfo()], [supports_set_docinfo()], [supports_gs()], and [supports_pdftk()] to detect support for these features. For more info about the pdf document info dictionary see
@@ -255,6 +268,17 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(mod_date))
                 self$mod_date <- mod_date
             invisible(NULL)
+        },
+        print = function() {
+            text <- c(paste("Author:", self$author),
+                      paste("CreationDate:", self$creation_date),
+                      paste("Creator:", self$creator),
+                      paste("Producer:", self$producer),
+                      paste("Title:", self$title),
+                      paste("Subject:", self$subject),
+                      paste("Keywords:",  paste(self$keywords, collapse = ", ")),
+                      paste("ModDate:", self$mod_date))
+            invisible(cat(text, sep="\n"))
         },
         pdfmark = function() {
             tags <- "["
