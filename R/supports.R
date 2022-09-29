@@ -107,6 +107,9 @@ find_pdftk_cmd <- function() {
     Sys.which("pdftk")
 }
 
+# supports_jsonlite <- function() {
+#     requireNamespace("jsonlite", quietly = TRUE)
+# }
 supports_qpdf <- function() {
     requireNamespace("qpdf", quietly = TRUE)
 }

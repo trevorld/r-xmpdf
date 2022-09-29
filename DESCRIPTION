@@ -1,5 +1,5 @@
 Encoding: UTF-8
-Package: piecepackr.metadata
+Package: xmpdf
 Type: Package
 Title: Add metadata to media files
 Version: 0.1.0-0
@@ -10,7 +10,8 @@ Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"),
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")))
 License: MIT + file LICENSE
-BugReports: https://github.com/piecepackr/piecepackr.metadata/issues
+URL: https://trevorldavis.com/R/xmpdf/dev/
+BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyLoad: yes
 Imports:
     R6,

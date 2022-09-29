@@ -25,3 +25,7 @@ test_that("n_pages_ghostscript", {
     skip_if_not(supports_gs())
     expect_equal(n_pages_gs(f, use_names = FALSE), 2L)
 })
+test_that("n_pages_exiftool", {
+    skip_if_not(supports_exiftool())
+    expect_equal(n_pages_exiftool(f, use_names = FALSE), 2L)
+})

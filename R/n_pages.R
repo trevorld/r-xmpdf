@@ -12,7 +12,7 @@
 #' @param filename Character vector of filenames.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @examples
-#' if (piecepackr.metadata::supports_n_pages() && require("grid", quietly = TRUE)) {
+#' if (supports_n_pages() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
 #'   grid.text("Page 1")
@@ -37,12 +37,13 @@ n_pages <- function(filename, use_names = TRUE) {
     } else if (supports_exiftool()) {
         n_pages_exiftool(filename, use_names = use_names)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'n_pages'.",
+        msg <- c("You'll need to install a suggested R package or system command to use 'n_pages'.",
                  i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
                  i = "Or install `pdftk` command",
-                 i = "Or install `ghostscript` command"
+                 i = "Or install `ghostscript` command",
+                 i = "Or install `exiftools` command"
         )
-        abort(msg, class = "piecepackr_suggested_package")
+        abort(msg, class = "xmpdf_suggested_package")
     }
 }
 
@@ -52,7 +53,7 @@ n_pages_exiftool <- function(filename, use_names = TRUE) {
     filename <- normalizePath(filename, mustWork = TRUE)
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         md <- get_exiftool_metadata(f, "-pdf:pagecount")
-        as.integer(md$PageCount)
+        as.integer(md[["PDF:PageCount"]])
     })
 }
 

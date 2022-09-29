@@ -1,4 +1,4 @@
-destination: "../../websites/R/piecepackr.metadata/"
-url: "https://trevorldavis.com/R/piecepackr.metadata"
+destination: "../../websites/R/xmpdf/"
+url: "https://trevorldavis.com/R/xmpdf"
 development:
     mode: auto

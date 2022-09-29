@@ -1,4 +1,4 @@
 library(testthat)
-library(piecepackr.metadata)
+library(xmpdf)
 
-test_check("piecepackr.metadata")
+test_check("xmpdf")

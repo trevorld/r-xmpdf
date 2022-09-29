@@ -32,9 +32,7 @@
 #'
 #' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.
 #' @examples
-#' if (piecepackr.metadata::supports_set_bookmarks() &&
-#'     piecepackr.metadata::supports_get_bookmarks() &&
-#'     require("grid", quietly = TRUE)) {
+#' if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
 #'   grid.text("Page 1")
@@ -61,7 +59,7 @@ get_bookmarks <- function(filename) {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
                  i = "Install `pdftk` command"
         )
-        abort(msg, class = "piecepackr_suggested_package")
+        abort(msg, class = "xmpdf_suggested_package")
     }
 }
 

@@ -39,7 +39,7 @@ An integer vector of number of pages within each file.
 }
 }
 \examples{
-if (piecepackr.metadata::supports_n_pages() && require("grid", quietly = TRUE)) {
+if (supports_n_pages() && require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
   grid.text("Page 1")

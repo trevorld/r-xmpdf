@@ -1,8 +1,8 @@
-# piecepackr.metadata
+# xmpdf
 
-[![CRAN Status Badge](https://www.r-pkg.org/badges/version/piecepackr.metadata)](https://cran.r-project.org/package=piecepackr.metadata)
+[![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
 
-[![R-CMD-check](https://github.com/piecepackr/piecepackr.metadata/workflows/R-CMD-check/badge.svg)](https://github.com/piecepackr/piecepackr.metadata/actions)
+[![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
@@ -14,7 +14,7 @@
 
 ## <a name="overview">Overview</a>
 
-`{piecepackr.metadata}` provides functions for getting and setting pdf [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out).
+`{xmpdf}` provides functions for getting and setting pdf [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out).
 
 In the future we plan to add support for getting/setting Extensible Metadata Platform (XMP) for a variety of media formats with a particular interest in setting Creative Commons license metadata.
 
@@ -22,7 +22,7 @@ In the future we plan to add support for getting/setting Extensible Metadata Pla
 
 
 ```r
-remotes::install_github("piecepackr/piecepackr.metadata")
+remotes::install_github("trevorld/r-xmpdf")
 ```
 
 Depending on what you'd like to do you'll need to install some additional R packages and/or command-line tools:
@@ -32,7 +32,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
   + `install.packages("qpdf")`
 
 * **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries.
-  Currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
+  Note currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
 
   + `install.packages("pdftools")` will probably install {qpdf} as well
 
@@ -54,12 +54,16 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
 Note most of the R packages below are focused on **getting** metadata rather than **setting** metadata
 and/or only provide low-level wrappers around the relevant command-line tools.
-Please feel free to [open a pull request to add any missing relevant R packages](https://github.com/piecepackr/piecepackr.metadata/edit/main/README.Rmd).
+Please feel free to [open a pull request to add any missing relevant R packages](https://github.com/trevorld/r-xmpdf/edit/main/README.Rmd).
 
 ### exiftool
 
-* [{exifr}](https://github.com/paleolimbot/exifr)
-* [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)
+* [{exifr}](https://github.com/paleolimbot/exifr) bundles (the perl script) `exiftool`.
+  provides a high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
+  Can download `exiftool`.
+* [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr) 
+  provides high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
+  Can download `exiftool`.
 * [exiftool](https://exiftool.org/)
 
 ### other exif tools
@@ -70,7 +74,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 
 ### ghostscript
 
-* [{tools}] has `find_gs_cmd()` to find a GhostScript executable in a cross-platform way.
+* `{tools}` has `find_gs_cmd()` to find a GhostScript executable in a cross-platform way.
 * [ghostscript](https://www.ghostscript.com/)
 
 ### poppler

@@ -1,5 +1,5 @@
-piecepackr.metadata 0.1.0 (development)
-=======================================
+xpmdf 0.1.0 (development)
+=========================
 
 Initial features
 ----------------

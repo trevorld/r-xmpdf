@@ -104,9 +104,7 @@ if it exists instead of using the documentation info dictionary entry.
 }
 
 \examples{
-if (piecepackr.metadata::supports_set_docinfo() &&
-    piecepackr.metadata::supports_get_docinfo() &&
-    require("grid", quietly = TRUE)) {
+if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
   grid.text("Page 1")

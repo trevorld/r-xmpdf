@@ -45,9 +45,7 @@
 #'     if it exists instead of using the documentation info dictionary entry.
 #'
 #' @examples
-#' if (piecepackr.metadata::supports_set_docinfo() &&
-#'     piecepackr.metadata::supports_get_docinfo() &&
-#'     require("grid", quietly = TRUE)) {
+#' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
 #'   grid.text("Page 1")
@@ -110,7 +108,7 @@ get_docinfo <- function(filename) {
                  i = "Use 'install.packages(\"pdftools\")' to install {pdftools}",
                  i = "Or install `pdftk` command"
         )
-        abort(msg, class = "piecepackr_suggested_package")
+        abort(msg, class = "xmpdf_suggested_package")
     }
 }
 

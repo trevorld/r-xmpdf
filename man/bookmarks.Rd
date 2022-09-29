@@ -64,9 +64,7 @@ If missing will be inferred from \code{level} column else will be assumed do be 
 }
 
 \examples{
-if (piecepackr.metadata::supports_set_bookmarks() &&
-    piecepackr.metadata::supports_get_bookmarks() &&
-    require("grid", quietly = TRUE)) {
+if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
   grid.text("Page 1")
