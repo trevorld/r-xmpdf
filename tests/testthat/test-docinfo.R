@@ -57,3 +57,12 @@ test_that("set_docinfo_gs", {
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 })
+
+test_that("from_date_pdfmark()", {
+    expect_equal(format(from_date_pdfmark("D:20081206"), format = "%Y-%m-%d"),
+                 "2008-12-06")
+    expect_equal(format(from_date_pdfmark("20081206"), format = "%Y-%m-%d"),
+                 "2008-12-06")
+    expect_equal(format(from_date_pdfmark("D:2008"), format = "%Y"),
+                 "2008")
+})

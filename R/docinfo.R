@@ -15,13 +15,13 @@
 #' 2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
 #'
 #' @param author The document's author.
-#' @param creation_date The date the document was created. Will be coerced by `as.Date()`.
+#' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt()`.
 #' @param creator The name of the application that originally created the document (if converted to pdf).
 #' @param producer The name of the application that converted the document to pdf.
 #' @param title The document's title.
 #' @param subject The document's subject.
 #' @param keywords Character vector of keywords for this document (for cross-document searching).
-#' @param mod_date The date the document was last modified. Will be coerced by `as.Date()`.
+#' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt()`.
 #'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
 #' @param filename Filename (pdf) to extract info dictionary entries from.
 #'                 Any such entries will be overridden by any manually set entries in [docinfo()].
@@ -91,16 +91,43 @@ docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, produce
                 filename = filename)
 }
 
+tryFormats <- c("%Y-%m-%dT%H:%M:%S%z",
+                "%Y-%m-%d %H:%M:%OS",
+                "%Y/%m/%d %H:%M:%OS",
+                "%Y-%m-%d %H:%M",
+                "%Y/%m/%d %H:%M",
+                "%Y-%m-%d",
+                "%Y/%m/%d")
+
 to_date_pdfmark <- function(date) {
     if (is.null(date))
         NULL
     else
-        as.character(date, "D:%Y%m%d")
+        format(date, format = "D:%Y%m%d%H%M%S%z")
 }
 
 from_date_pdfmark <- function(string) {
-    string <- gsub("^(D:)*([[:digit:]]{8}).*", "\\2", string)
-    as.Date(string, format = "%Y%m%d")
+    destring <- gsub("^(D:)*", "\\2", string)
+    date <- if (nchar(destring) == 4) {
+        as.POSIXlt(destring, format = "%Y")
+    } else if (nchar(destring) == 6) {
+        as.POSIXlt(destring, format = "%Y%m")
+    } else if (nchar(destring) == 8) {
+        as.POSIXlt(destring, format = "%Y%m%d")
+    } else if (nchar(destring) == 10) {
+        as.POSIXlt(destring, format = "%Y%m%d%H")
+    } else if (nchar(destring) == 12) {
+        as.POSIXlt(destring, format = "%Y%m%d%H%M")
+    } else if (nchar(destring) == 14) {
+        as.POSIXlt(destring, format = "%Y%m%d%H%M%S")
+    } else if (nchar(destring) == 19) {
+        as.POSIXlt(destring, format = "%Y%m%d%H%M%S%z")
+    } else {
+        NA
+    }
+    if (is.na(date))
+        abort(paste("Couldn't parse pdfmark date", string))
+    date
 }
 
 entry_pdftk <- function(key, value) {
@@ -346,7 +373,7 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$creation_date
             } else {
-                private$val$creation_date <- as.Date(value)
+                private$val$creation_date <- as.POSIXlt(value, tryFormats = tryFormats)
             }
         },
         creator = function(value) {
@@ -388,7 +415,7 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$mod_date
             } else {
-                private$val$mod_date <- as.Date(value)
+                private$val$mod_date <- as.POSIXlt(value, tryFormats = tryFormats)
             }
         }
     ),

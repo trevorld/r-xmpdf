@@ -37,7 +37,7 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \arguments{
 \item{author}{The document's author.}
 
-\item{creation_date}{The date the document was created. Will be coerced by \code{as.Date()}.}
+\item{creation_date}{The date the document was created. Will be coerced by \code{as.POSIXlt()}.}
 
 \item{creator}{The name of the application that originally created the document (if converted to pdf).}
 
@@ -49,7 +49,7 @@ set_docinfo_pdftk(docinfo, input, output = input)
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).}
 
-\item{mod_date}{The date the document was last modified. Will be coerced by \code{as.Date()}.
+\item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt()}.
 If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.}
 
 \item{filename}{Filename (pdf) to extract info dictionary entries from.

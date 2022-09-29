@@ -2,7 +2,8 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     cmd <- exiftool()
     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
 
-    args <- c(tags, "-G1", "-a", "-d", shQuote("%F %T"), "-csv", filename)
+    # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
+    args <- c(tags, "-G1", "-a", "-d", shQuote("%FT%T%z"), "-csv", filename)
     output <- system2(cmd, args, stdout=TRUE)
     df <- utils::read.csv(textConnection(output),
                           check.names = FALSE, stringsAsFactors = FALSE)
