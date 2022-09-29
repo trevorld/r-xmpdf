@@ -5,12 +5,14 @@ library("piecepackr")
 
 font_file <- system.file("fonts/spleen/spleen-8x16.hex.gz", package = "bittermelon")
 font <- read_hex(font_file)
-l_xmpdf <- as_bm_list("xmpdf", font = font)
+l_xmpdf <- as_bm_list("xmpdf", font = font) |>
+    bm_extend(bottom = 8L)
 l_xmpdf[[1]] <- 2L * l_xmpdf[[1]]
 l_xmpdf[[2]] <- 2L * l_xmpdf[[2]]
+l_xmpdf[[3]][1:12, 1:2] <- 1L
 l_xmpdf[[3]] <- 3L * l_xmpdf[[3]]
 l_xmpdf[[4]] <- 4L * l_xmpdf[[4]]
-l_xmpdf[[5]] <- 4L * l_xmpdf[[5]]
+l_xmpdf[[5]] <- 4L * bm_trim(l_xmpdf[[5]], left = 1L)
 l_xmpdf <- bm_glow(l_xmpdf, corner = TRUE, value = 1L)
 
 xmpdf <- do.call(cbind, l_xmpdf)
@@ -22,13 +24,8 @@ draw_logo <- function() {
     hex <- pp_shape("convex6")
     grid.newpage()
     grid.draw(hex$shape(gp = gpar(col = NA, fill = "skyblue")))
-    vp <- viewport(x=0.52, y=0.60, height=0.3, width=0.8)
-    pushViewport(vp)
-    plot(xmpdf, col = c(NA_character_, "black", "cyan3", "purple", "red"))
-    popViewport()
 
-    # vp <- viewport(x=0.53, y=0.34, height=0.4, width=0.5)
-    # grid.oblicubes(coords_emoji, vp=vp, scale = 0.7)
+    grid.rect(x=0.50, y=0.48, width=0.1, height=0.1, gp=gpar(fill="white", col=NA))
 
     grid.polygon(x = c(min(hex$npc_coords$x), max(hex$npc_coords$x), 0.5),
                  y = c(0.265, 0.265, 0),
@@ -44,11 +41,15 @@ draw_logo <- function() {
                  spacing = spacing, amplitude = 0.2 * spacing,
                  gp = gpar(fill = "black", col = NA))
 
-    grid.rect(x=0.55, y=0.3, width=0.1, height=0.1, gp=gpar(fill="white", col=NA))
-    vp <- viewport(x=0.565, y=0.33, height=0.4, width=0.8)
+    vp <- viewport(x=0.51, y=0.42, height=0.5, width=0.8)
     pushViewport(vp)
-    plot(l_xmpdf[[3]], col = c(NA_character_, "black", "cyan3", "purple", "red"))
+    plot(xmpdf, col = c(NA_character_, "black", "cyan3", "purple", "red"))
     popViewport()
+
+    # vp <- viewport(x=0.565, y=0.33, height=0.4, width=0.8)
+    # pushViewport(vp)
+    # plot(l_xmpdf[[3]], col = c(NA_character_, "black", "cyan3", "purple", "red"))
+    # popViewport()
 
     grid.draw(hex$mat(mat_width = 0.03, gp = gpar(col = NA, fill = "black")))
 }
