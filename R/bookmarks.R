@@ -27,8 +27,9 @@
 #'         `set_bookmarks()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * Currently only allows setting bookmarks for page numbers within the pdf.
-#'   * Currently only supports setting the title, page number, and level of bookmarks.
+#'   * `set_bookmarks_gs()` only supports setting the title, page number, level of bookmarks, and whether open/closed.
+#'   * `set_bookmarks_gs()` also probably doesn't work with Unicode input.
+#'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 #'
 #' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.
 #' @examples
@@ -41,6 +42,7 @@
 #'   invisible(dev.off())
 #'
 #'   print(get_bookmarks(f))
+#'   \dontshow{cat("\n")}
 #'
 #'   bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 #'

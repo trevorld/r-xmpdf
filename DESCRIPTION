@@ -1,11 +1,13 @@
 Encoding: UTF-8
 Package: xmpdf
 Type: Package
-Title: Add metadata to media files
+Title: Edit XMP metadata and PDF bookmarks and documentation info
 Version: 0.1.0-0
-Description: Add bookmarks and docinfo to pdf files.
-             Can detect and use either 'pdftk' or 'ghostscript' commands.
-             Can calculate and add appropriate bookmarks when merging multiple pdf files.
+Description: Edit 'xmp' metadata info in a variety of media files as well as 
+    edit bookmarks (aka table of contents) and documentation info entries in pdf files.
+    Can detect and use a variety of command-line tools to perform these operations such as
+    the 'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>, 
+    and 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
 Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")))
@@ -20,6 +22,7 @@ Imports:
     tools,
     utils
 Suggests:
+    exiftoolr,
     grid,
     qpdf,
     pdftools,

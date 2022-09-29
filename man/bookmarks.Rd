@@ -58,8 +58,9 @@ If missing will be inferred from \code{level} column else will be assumed do be 
 \section{Known limitations}{
 
 \itemize{
-\item Currently only allows setting bookmarks for page numbers within the pdf.
-\item Currently only supports setting the title, page number, and level of bookmarks.
+\item \code{set_bookmarks_gs()} only supports setting the title, page number, level of bookmarks, and whether open/closed.
+\item \code{set_bookmarks_gs()} also probably doesn't work with Unicode input.
+\item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.
 }
 }
 
@@ -73,6 +74,7 @@ if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quie
   invisible(dev.off())
 
   print(get_bookmarks(f))
+  \dontshow{cat("\n")}
 
   bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 

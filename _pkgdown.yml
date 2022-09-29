@@ -2,3 +2,24 @@ destination: "../../websites/R/xmpdf/"
 url: "https://trevorldavis.com/R/xmpdf"
 development:
     mode: auto
+reference:
+  - title: "Get/set XMP metadata"
+    desc: "Functions for getting/setting XMP metadata in a variety of media formats"
+    contents:
+      - set_xmp
+  - title: "Get/set PDF bookmarks"
+    desc: "Functions for getting/setting PDF bookmarks (aka table of contents)"
+    contents:
+      - set_bookmarks
+  - title: "Get/set PDF documentation info"
+    desc: "Functions for getting/setting PDF documentation info"
+    contents:
+      - set_docinfo
+  - title: "Get number of pages"
+    desc: "Functions for getting number of pages in PDF documents"
+    contents:
+      - n_pages
+  - title: "Detect feature support"
+    desc: "Functions for detecting various feature support"
+    contents:
+      - supports_gs

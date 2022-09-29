@@ -2,21 +2,24 @@
 #'
 #' `supports_get_bookmarks()`, `supports_set_bookmarks()`,
 #' `supports_get_docinfo()`, `supports_set_docinfo()`,
+#' `supports_get_xmp()`, `supports_set_xmp()`,
 #' and `supports_n_pages()`
 #' detects support for the functions
 #' [get_bookmarks()], [set_bookmarks()],
 #' [get_docinfo()], [set_docinfo()],
+#' [get_xmp()], [set_xmp()],
 #'  and [n_pages()] respectively.
 #' `supports_exiftool()`, `supports_gs()` and `supports_pdftk()`
 #' detects support for the command-line tools
 #' `exiftool`, `ghostscript` and `pdftk` respectively as used by various lower-level functions.
 #'
 #' * `supports_exiftool()` detects support for the command-line tool `exiftool` which is
-#'   required for [n_pages_exiftool()].
+#'   required for [get_xmp_exiftool()], [set_xmp_exiftool()], and [n_pages_exiftool()].
 #' * `supports_gs()` detects support for the command-line tool `ghostscript` which is
 #'   required for [set_docinfo_gs()], [set_bookmarks_gs()], and [n_pages_gs()].
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
-#'   required for [get_docinfo_pdftk()] and [set_docinfo_pdftk()],
+#'   required for [get_bookmarks_pdftk()], [set_bookmarks_pdftk()],
+#'   [get_docinfo_pdftk()], [set_docinfo_pdftk()], and [n_pages_pdftk()].
 #' * `requireNamespace("qpdf", quietly = TRUE)` detects support for the R packages `qpdf`
 #'   which is required for [n_pages_qpdf()].
 #' * `requireNamespace("pdftools", quietly = TRUE)` detects support for the R package `pdftools`
@@ -27,9 +30,12 @@
 #'   supports_set_docinfo()
 #'   supports_get_bookmarks()
 #'   supports_set_bookmarks()
+#'   supports_get_xmp()
+#'   supports_set_xmp()
 #'   supports_n_pages()
 #'
 #'   # Detect support for lower-level helper features
+#'   supports_exiftool()
 #'   supports_gs()
 #'   supports_pdftk()
 #'   requireNamespace("qpdf", quietly = TRUE)
@@ -61,14 +67,14 @@ supports_set_docinfo <- function() {
     supports_pdftk() || supports_gs()
 }
 
-# #' @rdname supports
-# #' @export
+#' @rdname supports
+#' @export
 supports_get_xmp <- function() {
     supports_exiftool()
 }
 
-# #' @rdname supports
-# #' @export
+#' @rdname supports
+#' @export
 supports_set_xmp <- function() {
     supports_exiftool()
 }
@@ -97,12 +103,17 @@ supports_pdftk <- function() {
     find_pdftk_cmd() != ""
 }
 
-#### {exiftoolr} and {exifr} may have in-built binaries
 find_exiftool_cmd <- function() {
-    Sys.which("exiftool")
+    if (requireNamespace("exiftoolr", quietly = TRUE)) {
+        cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE))
+        if (inherits(cmd, "try-error"))
+            cmd <- ""
+        cmd
+    } else {
+        Sys.which("exiftool")
+    }
 }
 
-#### animation::pdftk() has an option
 find_pdftk_cmd <- function() {
     Sys.which("pdftk")
 }

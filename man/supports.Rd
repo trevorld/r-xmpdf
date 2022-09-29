@@ -6,6 +6,8 @@
 \alias{supports_set_bookmarks}
 \alias{supports_get_docinfo}
 \alias{supports_set_docinfo}
+\alias{supports_get_xmp}
+\alias{supports_set_xmp}
 \alias{supports_n_pages}
 \alias{supports_exiftool}
 \alias{supports_gs}
@@ -20,6 +22,10 @@ supports_get_docinfo()
 
 supports_set_docinfo()
 
+supports_get_xmp()
+
+supports_set_xmp()
+
 supports_n_pages()
 
 supports_exiftool()
@@ -31,10 +37,12 @@ supports_pdftk()
 \description{
 \code{supports_get_bookmarks()}, \code{supports_set_bookmarks()},
 \code{supports_get_docinfo()}, \code{supports_set_docinfo()},
+\code{supports_get_xmp()}, \code{supports_set_xmp()},
 and \code{supports_n_pages()}
 detects support for the functions
 \code{\link[=get_bookmarks]{get_bookmarks()}}, \code{\link[=set_bookmarks]{set_bookmarks()}},
 \code{\link[=get_docinfo]{get_docinfo()}}, \code{\link[=set_docinfo]{set_docinfo()}},
+\code{\link[=get_xmp]{get_xmp()}}, \code{\link[=set_xmp]{set_xmp()}},
 and \code{\link[=n_pages]{n_pages()}} respectively.
 \code{supports_exiftool()}, \code{supports_gs()} and \code{supports_pdftk()}
 detects support for the command-line tools
@@ -43,11 +51,12 @@ detects support for the command-line tools
 \details{
 \itemize{
 \item \code{supports_exiftool()} detects support for the command-line tool \code{exiftool} which is
-required for \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
+required for \code{\link[=get_xmp_exiftool]{get_xmp_exiftool()}}, \code{\link[=set_xmp_exiftool]{set_xmp_exiftool()}}, and \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
 \item \code{supports_gs()} detects support for the command-line tool \code{ghostscript} which is
 required for \code{\link[=set_docinfo_gs]{set_docinfo_gs()}}, \code{\link[=set_bookmarks_gs]{set_bookmarks_gs()}}, and \code{\link[=n_pages_gs]{n_pages_gs()}}.
 \item \code{supports_pdftk()} detects support for the command-line tool \code{pdftk} which is
-required for \code{\link[=get_docinfo_pdftk]{get_docinfo_pdftk()}} and \code{\link[=set_docinfo_pdftk]{set_docinfo_pdftk()}},
+required for \code{\link[=get_bookmarks_pdftk]{get_bookmarks_pdftk()}}, \code{\link[=set_bookmarks_pdftk]{set_bookmarks_pdftk()}},
+\code{\link[=get_docinfo_pdftk]{get_docinfo_pdftk()}}, \code{\link[=set_docinfo_pdftk]{set_docinfo_pdftk()}}, and \code{\link[=n_pages_pdftk]{n_pages_pdftk()}}.
 \item \code{requireNamespace("qpdf", quietly = TRUE)} detects support for the R packages \code{qpdf}
 which is required for \code{\link[=n_pages_qpdf]{n_pages_qpdf()}}.
 \item \code{requireNamespace("pdftools", quietly = TRUE)} detects support for the R package \code{pdftools}
@@ -60,9 +69,12 @@ which is required for \code{\link[=get_docinfo_pdftools]{get_docinfo_pdftools()}
   supports_set_docinfo()
   supports_get_bookmarks()
   supports_set_bookmarks()
+  supports_get_xmp()
+  supports_set_xmp()
   supports_n_pages()
 
   # Detect support for lower-level helper features
+  supports_exiftool()
   supports_gs()
   supports_pdftk()
   requireNamespace("qpdf", quietly = TRUE)

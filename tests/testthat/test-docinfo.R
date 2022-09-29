@@ -11,29 +11,29 @@ invisible(dev.off())
 
 test_that("get_docinfo", {
     skip_if_not(supports_get_docinfo())
-    expect_equal(get_docinfo(f1)$title, "R Graphics Output")
+    expect_equal(get_docinfo(f1)[[1]]$title, "R Graphics Output")
 })
 test_that("get_docinfo_pdftools", {
     skip_if_not_installed("pdftools")
-    expect_equal(get_docinfo_pdftools(f1)$title, "R Graphics Output")
+    expect_equal(get_docinfo_pdftools(f1)[[1]]$title, "R Graphics Output")
 })
 test_that("docinfo_pdftk", {
     skip_if_not(supports_pdftk())
 
-    expect_equal(get_docinfo_pdftk(f1)$title, "R Graphics Output")
+    expect_equal(get_docinfo_pdftk(f1)[[1]]$title, "R Graphics Output")
 
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
 
     di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
     set_docinfo_pdftk(di_set, f1, f2)
-    di_get <- get_docinfo_pdftk(f2)
+    di_get <- get_docinfo_pdftk(f2)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 
     di_set <- docinfo(filename = f2)
     set_docinfo_pdftk(di_set, f1, f2)
-    di_get <- get_docinfo_pdftk(f2)
+    di_get <- get_docinfo_pdftk(f2)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 })
@@ -48,12 +48,12 @@ test_that("set_docinfo_gs", {
     set_docinfo_gs(di_set, f1, f3)
 
     skip_if_not(supports_get_docinfo())
-    di_get <- get_docinfo(f3)
+    di_get <- get_docinfo(f3)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 
     set_docinfo(di_set, f1, f3)
-    di_get <- get_docinfo(f3)
+    di_get <- get_docinfo(f3)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 })

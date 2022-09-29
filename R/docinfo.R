@@ -25,10 +25,12 @@
 #'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
 #' @param filename Filename (pdf) to extract info dictionary entries from.
 #'                 Any such entries will be overridden by any manually set entries in [docinfo()].
+#' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @param docinfo A "docinfo" object (as returned by [docinfo()] or [get_docinfo()]).
 #' @param input Input pdf filename.
 #' @param output Output pdf filename.
-#' @return `docinfo()` and `get_docinfo()` returns a "docinfo" R6 class.
+#' @return `docinfo()` returns a "docinfo" R6 class.
+#'         `get_docinfo()` returns a list of "docinfo" R6 classes.
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section `docinfo` R6 Class Methods:\describe{
 #'     \item{`pdfmark()`}{Return a string of pdfmark info for use with `ghostscript`.}
@@ -49,11 +51,10 @@
 #' @section Known limitations:
 #'
 #'   * Currently does not support arbitrary info dictionary entries.
-#'   * Currently only supports date year, month, and day for `CreationDate` and `ModDate` entries
-#'     (does not support hours, minutes, seconds and relation to GMT).
-#'   * `set_docinfo_pdftk()` won't update any previously set XPN metadata.
+#'   * `set_docinfo_gs()` probably doesn't work with Unicode input.
+#'   * `set_docinfo_pdftk()` doesn't seem to update any previously set matching XPN metadata.
 #'     Some pdf viewers will preferentially use the previously set document title from XPN metadata
-#'     if it exists instead of using the documentation info dictionary entry.
+#'     if it exists instead of using the title set in documentation info dictionary entry.
 #'
 #' @examples
 #' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
@@ -64,9 +65,9 @@
 #'   grid.text("Page 2")
 #'   invisible(dev.off())
 #'
-#'   di_get1 <- get_docinfo(f)
+#'   di_get1 <- get_docinfo(f)[[1]]
 #'   print(di_get1)
-#'   \dontshow{cat("\n\n")}
+#'   \dontshow{cat("\n")}
 #'
 #'   di_set <- docinfo(author = "John Doe",
 #'                     title = "Two Boring Pages",
@@ -74,7 +75,7 @@
 #'                     filename = f)
 #'   set_docinfo(di_set, f)
 #'
-#'   di_get2 <- get_docinfo(f)
+#'   di_get2 <- get_docinfo(f)[[1]]
 #'   print(di_get2)
 #'   unlink(f)
 #' }
@@ -138,11 +139,11 @@ entry_pdftk <- function(key, value) {
 
 #' @rdname docinfo
 #' @export
-get_docinfo <- function(filename) {
+get_docinfo <- function(filename, use_names = TRUE) {
     if (supports_pdftools()) {
-        get_docinfo_pdftools(filename)
+        get_docinfo_pdftools(filename, use_names = use_names)
     } else if (supports_pdftk()) {
-        get_docinfo_pdftk(filename)
+        get_docinfo_pdftk(filename, use_names = use_names)
     } else {
         msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
                  i = "Use 'install.packages(\"pdftools\")' to install {pdftools}",
@@ -154,7 +155,17 @@ get_docinfo <- function(filename) {
 
 #' @rdname docinfo
 #' @export
-get_docinfo_pdftools <- function(filename) {
+get_docinfo_pdftools <- function(filename, use_names = TRUE) {
+    assert_suggested("pdftools")
+    l <- lapply(filename, get_docinfo_pdftools_helper)
+    if (use_names)
+        names(l) <- filename
+    else
+        names(l) <- NULL
+    l
+}
+
+get_docinfo_pdftools_helper <- function(filename) {
     info <- pdftools::pdf_info(filename)
     dinfo <- docinfo()
     for (i in seq_along(info$keys)) {
@@ -175,7 +186,16 @@ get_docinfo_pdftools <- function(filename) {
 
 #' @rdname docinfo
 #' @export
-get_docinfo_pdftk <- function(filename) {
+get_docinfo_pdftk <- function(filename, use_names = TRUE) {
+    l <- lapply(filename, get_docinfo_pdftk_helper)
+    if (use_names)
+        names(l) <- filename
+    else
+        names(l) <- NULL
+    l
+}
+
+get_docinfo_pdftk_helper <- function(filename) {
     info <- get_pdftk_metadata(filename)
     dinfo <- docinfo()
     if (length(id <- grep("^InfoKey: Author", info)))
@@ -422,7 +442,7 @@ DocInfo <- R6Class("docinfo",
     private = list(
         val = list(),
         get_docinfo = function(filename) {
-            dinfo <- get_docinfo(filename)
+            dinfo <- get_docinfo(filename)[[1]]
             self$author <- dinfo$author
             self$creation_date <- dinfo$creation_date
             self$creator <- dinfo$creator

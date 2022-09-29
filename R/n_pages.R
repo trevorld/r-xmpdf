@@ -41,7 +41,7 @@ n_pages <- function(filename, use_names = TRUE) {
                  i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
                  i = "Or install `pdftk` command",
                  i = "Or install `ghostscript` command",
-                 i = "Or install `exiftools` command"
+                 i = "Or install `exiftools` command possibly via `exiftoolr::install_exiftool()`"
         )
         abort(msg, class = "xmpdf_suggested_package")
     }

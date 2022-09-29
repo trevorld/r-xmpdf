@@ -22,11 +22,11 @@ docinfo(
   filename = NULL
 )
 
-get_docinfo(filename)
+get_docinfo(filename, use_names = TRUE)
 
-get_docinfo_pdftools(filename)
+get_docinfo_pdftools(filename, use_names = TRUE)
 
-get_docinfo_pdftk(filename)
+get_docinfo_pdftk(filename, use_names = TRUE)
 
 set_docinfo(docinfo, input, output = input)
 
@@ -55,6 +55,8 @@ If left \code{NULL} will default to \code{Sys.Date()} when used to set documenta
 \item{filename}{Filename (pdf) to extract info dictionary entries from.
 Any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}}.}
 
+\item{use_names}{If \code{TRUE} (default) use \code{filename} as the names of the result.}
+
 \item{docinfo}{A "docinfo" object (as returned by \code{\link[=docinfo]{docinfo()}} or \code{\link[=get_docinfo]{get_docinfo()}}).}
 
 \item{input}{Input pdf filename.}
@@ -62,7 +64,8 @@ Any such entries will be overridden by any manually set entries in \code{\link[=
 \item{output}{Output pdf filename.}
 }
 \value{
-\code{docinfo()} and \code{get_docinfo()} returns a "docinfo" R6 class.
+\code{docinfo()} returns a "docinfo" R6 class.
+\code{get_docinfo()} returns a list of "docinfo" R6 classes.
 \code{set_docinfo()} returns the (output) filename invisibly.
 }
 \description{
@@ -109,11 +112,10 @@ Can also use the relevant active bindings to set documentation info keys.}
 
 \itemize{
 \item Currently does not support arbitrary info dictionary entries.
-\item Currently only supports date year, month, and day for \code{CreationDate} and \code{ModDate} entries
-(does not support hours, minutes, seconds and relation to GMT).
-\item \code{set_docinfo_pdftk()} won't update any previously set XPN metadata.
+\item \code{set_docinfo_gs()} probably doesn't work with Unicode input.
+\item \code{set_docinfo_pdftk()} doesn't seem to update any previously set matching XPN metadata.
 Some pdf viewers will preferentially use the previously set document title from XPN metadata
-if it exists instead of using the documentation info dictionary entry.
+if it exists instead of using the title set in documentation info dictionary entry.
 }
 }
 
@@ -126,9 +128,9 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   grid.text("Page 2")
   invisible(dev.off())
 
-  di_get1 <- get_docinfo(f)
+  di_get1 <- get_docinfo(f)[[1]]
   print(di_get1)
-  \dontshow{cat("\n\n")}
+  \dontshow{cat("\n")}
 
   di_set <- docinfo(author = "John Doe",
                     title = "Two Boring Pages",
@@ -136,7 +138,7 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
                     filename = f)
   set_docinfo(di_set, f)
 
-  di_get2 <- get_docinfo(f)
+  di_get2 <- get_docinfo(f)[[1]]
   print(di_get2)
   unlink(f)
 }

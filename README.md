@@ -14,9 +14,7 @@
 
 ## <a name="overview">Overview</a>
 
-`{xmpdf}` provides functions for getting and setting pdf [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out).
-
-In the future we plan to add support for getting/setting Extensible Metadata Platform (XMP) for a variety of media formats with a particular interest in setting Creative Commons license metadata.
+`{xmpdf}` provides functions for getting and setting [Extensibe Metadata Platform (XMP)](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform) metadata in a variety of media formats as well as getting and setting PDF [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out).
 
 ## <a name="installation">Installation</a>
 
@@ -36,8 +34,9 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("pdftools")` will probably install {qpdf} as well
 
-* **[exiftool](https://exiftool.org/)** can be used to get number of pages in a pdf.
+* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files.  Can alse be used to get the number of pages in a pdf.
 
+  + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
 
 * **[ghostscript](https://www.ghostscript.com/)** can be used to set pdf bookmarks and documentation info entries. Can also be used to get the number of pages in a pdf.
@@ -50,6 +49,109 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
 ## <a name="examples">Examples</a>
 
+A simple example where we create a two page pdf using `pdf()` and then add XMP metadata, PDF documentation info metadata, and PDF bookmarks to it:
+
+
+```r
+library("grid")
+library("xmpdf")
+
+# Create a two page pdf
+f <- tempfile(fileext = ".pdf")
+pdf(f, onefile = TRUE)
+grid.text("Page 1")
+grid.newpage()
+grid.text("Page 2")
+invisible(dev.off())
+
+# Edit XMP metadata
+print(get_xmp(f)[[1]])
+```
+
+```
+## named list()
+```
+
+```r
+xmp <- list(title = "Two Boring Pages", author = "John Doe")
+set_xmp(xmp, f)
+print(get_xmp(f)[[1]])
+```
+
+```
+## $`x:XMPToolkit`
+## [1] "Image::ExifTool 12.40"
+## 
+## $`dc:Title`
+## [1] "Two Boring Pages"
+## 
+## $`pdf:Author`
+## [1] "John Doe"
+```
+
+```r
+# Edit PDF documentation info
+print(get_docinfo(f)[[1]])
+```
+
+```
+## Author: 
+## CreationDate: 2022-09-29 09:19:41
+## Creator: R
+## Producer: R 4.2.1
+## Title: R Graphics Output
+## Subject: 
+## Keywords: 
+## ModDate: 2022-09-29 09:19:41
+```
+
+```r
+di <- docinfo(author = "John Doe",
+              title = "Two Boring Pages",
+              keywords = c("R", "xmpdf"),
+              filename = f)
+set_docinfo(di, f)
+print(get_docinfo(f)[[1]])
+```
+
+```
+## Author: John Doe
+## CreationDate: 2022-09-29 09:19:41
+## Creator: R
+## Producer: GPL Ghostscript 9.55.0
+## Title: Two Boring Pages
+## Subject: 
+## Keywords: R, xmpdf
+## ModDate: 2022-09-29 09:19:41
+```
+
+```r
+# Edit PDF bookmarks
+print(get_bookmarks(f))
+```
+
+```
+## [1] title level page  count
+## <0 rows> (or 0-length row.names)
+```
+
+```r
+bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
+set_bookmarks(bookmarks, f)
+print(get_bookmarks(f))
+```
+
+```
+##    title level page count
+## 1 Page 1     1    1     0
+## 2 Page 2     1    2     0
+```
+
+```r
+unlink(f)
+```
+
+
 ## <a name="similar">Related Software</a>
 
 Note most of the R packages below are focused on **getting** metadata rather than **setting** metadata
@@ -58,7 +160,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 
 ### exiftool
 
-* [{exifr}](https://github.com/paleolimbot/exifr) bundles (the perl script) `exiftool`.
+* [{exifr}](https://github.com/paleolimbot/exifr) 
   provides a high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
   Can download `exiftool`.
 * [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr) 
