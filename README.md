@@ -98,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-30 06:18:04
+## CreationDate: 2022-09-30 06:32:34
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-30 06:18:04
+## ModDate: 2022-09-30 06:32:34
 ```
 
 ```r
@@ -118,18 +118,18 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-30 06:18:04
+## CreationDate: 2022-09-30 06:32:34
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-30 06:18:04
+## ModDate: 2022-09-30 06:32:34
 ```
 
 ```r
 # Edit PDF bookmarks
-print(get_bookmarks(f))
+print(get_bookmarks(f)[[1]])
 ```
 
 ```
@@ -140,7 +140,7 @@ print(get_bookmarks(f))
 ```r
 bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 set_bookmarks(bookmarks, f)
-print(get_bookmarks(f))
+print(get_bookmarks(f)[[1]])
 ```
 
 ```

@@ -25,8 +25,9 @@
 #' @param keywords Character vector of keywords for this document (for cross-document searching).
 #' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt()`.
 #'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
-#' @param filename Filename (pdf) to extract info dictionary entries from.
-#'                 Any such entries will be overridden by any manually set entries in [docinfo()].
+#' @param filename Filename(s) (pdf) to extract info dictionary entries from.
+#'                 For `docinfo()` just a single pdf filename to extract info dictionary entries from:
+#'                 any such entries will be overridden by any manually set entries in [docinfo()] call.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @param docinfo A "docinfo" object (as returned by [docinfo()] or [get_docinfo()]).
 #' @param input Input pdf filename.

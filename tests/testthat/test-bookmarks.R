@@ -11,7 +11,7 @@ invisible(dev.off())
 
 test_that("get_bookmarks", {
     skip_if_not(supports_get_bookmarks())
-    expect_equal(nrow(get_bookmarks(f1)), 0L)
+    expect_equal(nrow(get_bookmarks(f1)[[1]]), 0L)
 })
 
 test_that("set_bookmarks", {
@@ -23,12 +23,12 @@ test_that("set_bookmarks", {
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 2L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 2L)
 
     bookmarks <- data.frame(title = "Page 2",
                             page = c(2L))
     set_bookmarks(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 1L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 1L)
 })
 
 test_that("set_bookmarks_gs", {
@@ -40,18 +40,18 @@ test_that("set_bookmarks_gs", {
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks_gs(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 2L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 2L)
 
     bookmarks <- data.frame(title = "Page 2",
                             page = c(2L))
     set_bookmarks_gs(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 1L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 1L)
 
     bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
     set_bookmarks_gs(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 3L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 3L)
 
     # Negative count (closed)
     bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
@@ -60,13 +60,13 @@ test_that("set_bookmarks_gs", {
                             style = c(1L, 2L, 3L),
                             color = c("black", "red", "blue"))
     set_bookmarks_gs(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 3L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 3L)
 })
 
 test_that("bookmarks_pdftk", {
     skip_if_not(supports_pdftk())
 
-    expect_equal(nrow(get_bookmarks(f1)), 0L)
+    expect_equal(nrow(get_bookmarks(f1)[[1]]), 0L)
 
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
@@ -74,18 +74,18 @@ test_that("bookmarks_pdftk", {
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 2L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 2L)
 
     bookmarks <- data.frame(title = "Page 2",
                             page = c(2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 1L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 1L)
 
     bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
-    expect_equal(nrow(get_bookmarks(f2)), 3L)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 3L)
 })
 
 test_that("`get_count()` and `get_level()`", {

@@ -12,7 +12,8 @@
 #' 1. `set_bookmarks_gs()` which wraps `ghostscript` command-line tool
 #' 2. `set_bookmarks_pdftk()` which wraps `pdftk` command-line tool
 #'
-#' @param filename Filename (pdf) to extract bookmarks from.
+#' @param filename Filename(s) (pdf) to extract bookmarks from.
+#' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @param bookmarks A data frame with bookmark information with the following columns:\describe{
 #'   \item{title}{Title for bookmark (mandatory, character)}
 #'   \item{page}{Page number for bookmark (mandatory, integer)}
@@ -33,8 +34,8 @@
 #' }
 #' @param input Input pdf filename.
 #' @param output Output pdf filename.
-#' @return `get_bookmarks()` returns a data frame with bookmark info (see `bookmarks` parameter for details about columns).
-#'         An `NA` indicates that the backend doesn't report information about this pdf feature.
+#' @return `get_bookmarks()` returns a list of data frames with bookmark info (see `bookmarks` parameter for details about columns).
+#'         `NA` values in the data frame indicates that the backend doesn't report information about this pdf feature.
 #'         `set_bookmarks()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
@@ -54,13 +55,13 @@
 #'   grid.text("Page 2")
 #'   invisible(dev.off())
 #'
-#'   print(get_bookmarks(f))
+#'   print(get_bookmarks(f)[[1]])
 #'   \dontshow{cat("\n")}
 #'
 #'   bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 #'
 #'   set_bookmarks(bookmarks, f)
-#'   print(get_bookmarks(f))
+#'   print(get_bookmarks(f)[[1]])
 #'   unlink(f)
 #' }
 #' @name bookmarks
@@ -68,9 +69,9 @@ NULL
 
 #' @rdname bookmarks
 #' @export
-get_bookmarks <- function(filename) {
+get_bookmarks <- function(filename, use_names = TRUE) {
     if (supports_pdftk()) {
-        get_bookmarks_pdftk(filename)
+        get_bookmarks_pdftk(filename, use_names = use_names)
     } else {
         msg <- c(need_to_install_str("get_bookmarks()"),
                  install_pdftk_str()
@@ -81,7 +82,16 @@ get_bookmarks <- function(filename) {
 
 #' @rdname bookmarks
 #' @export
-get_bookmarks_pdftk <- function(filename) {
+get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
+    l <- lapply(filename, get_bookmarks_pdftk_helper)
+    if (use_names)
+        names(l) <- filename
+    else
+        names(l) <- NULL
+    l
+}
+
+get_bookmarks_pdftk_helper <- function(filename) {
     meta <- get_pdftk_metadata(filename)
     id_bookmark <- grep("^BookmarkBegin", meta)
     df <- if (length(id_bookmark)) {

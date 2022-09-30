@@ -9,9 +9,9 @@
 \alias{set_bookmarks_gs}
 \title{Set/get pdf bookmarks}
 \usage{
-get_bookmarks(filename)
+get_bookmarks(filename, use_names = TRUE)
 
-get_bookmarks_pdftk(filename)
+get_bookmarks_pdftk(filename, use_names = TRUE)
 
 set_bookmarks(bookmarks, input, output = input)
 
@@ -20,7 +20,9 @@ set_bookmarks_pdftk(bookmarks, input, output = input)
 set_bookmarks_gs(bookmarks, input, output = input)
 }
 \arguments{
-\item{filename}{Filename (pdf) to extract bookmarks from.}
+\item{filename}{Filename(s) (pdf) to extract bookmarks from.}
+
+\item{use_names}{If \code{TRUE} (default) use \code{filename} as the names of the result.}
 
 \item{bookmarks}{A data frame with bookmark information with the following columns:\describe{
 \item{title}{Title for bookmark (mandatory, character)}
@@ -46,8 +48,8 @@ Note many pdf viewers quietly ignore this feature.}
 \item{output}{Output pdf filename.}
 }
 \value{
-\code{get_bookmarks()} returns a data frame with bookmark info (see \code{bookmarks} parameter for details about columns).
-An \code{NA} indicates that the backend doesn't report information about this pdf feature.
+\code{get_bookmarks()} returns a list of data frames with bookmark info (see \code{bookmarks} parameter for details about columns).
+\code{NA} values in the data frame indicates that the backend doesn't report information about this pdf feature.
 \code{set_bookmarks()} returns the (output) filename invisibly.
 }
 \description{
@@ -86,13 +88,13 @@ if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quie
   grid.text("Page 2")
   invisible(dev.off())
 
-  print(get_bookmarks(f))
+  print(get_bookmarks(f)[[1]])
   \dontshow{cat("\n")}
 
   bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 
   set_bookmarks(bookmarks, f)
-  print(get_bookmarks(f))
+  print(get_bookmarks(f)[[1]])
   unlink(f)
 }
 }

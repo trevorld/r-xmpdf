@@ -58,8 +58,9 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt()}.
 If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.}
 
-\item{filename}{Filename (pdf) to extract info dictionary entries from.
-Any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}}.}
+\item{filename}{Filename(s) (pdf) to extract info dictionary entries from.
+For \code{docinfo()} just a single pdf filename to extract info dictionary entries from:
+any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}} call.}
 
 \item{use_names}{If \code{TRUE} (default) use \code{filename} as the names of the result.}
 
