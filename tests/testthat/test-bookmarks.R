@@ -52,6 +52,15 @@ test_that("set_bookmarks_gs", {
                             page = c(1L, 1L, 2L))
     set_bookmarks_gs(bookmarks, f1, f2)
     expect_equal(nrow(get_bookmarks(f2)), 3L)
+
+    # Negative count (closed)
+    bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
+                            page = c(1L, 1L, 2L),
+                            count = c(2L, -1L, 0),
+                            style = c(1L, 2L, 3L),
+                            color = c("black", "red", "blue"))
+    set_bookmarks_gs(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)), 3L)
 })
 
 test_that("bookmarks_pdftk", {

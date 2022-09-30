@@ -28,7 +28,17 @@ set_bookmarks_gs(bookmarks, input, output = input)
 \item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer).
 If missing will be inferred from \code{count} column else will be assumed to be \code{1L}.}
 \item{count}{Number of bookmarks immediately subordinate (optional, integer).
-If missing will be inferred from \code{level} column else will be assumed do be \code{0L}.}
+Positive count indicates bookmark should start open while
+negative count indicates that this bookmark should start closed.
+If missing will be inferred from \code{level} column else will be assumed to be \code{0L}.
+Note some pdf viewers quietly ignore the initially open/closed feature.}
+\item{style}{Style of the bookmark (optional, integer).
+If \code{NA_integer_} will be unset (defaults to "plain").
+0 is Plain, 1 is Italic, 2 is Bold, and 3 is Bold and italic.
+Note many pdf viewers quietly ignore this feature.}
+\item{color}{Color of the bookmark (optional, character).
+If \code{NA_character_} will be unset (presumably defaults to "black").
+Note many pdf viewers quietly ignore this feature.}
 }}
 
 \item{input}{Input pdf filename.}
@@ -37,6 +47,7 @@ If missing will be inferred from \code{level} column else will be assumed do be 
 }
 \value{
 \code{get_bookmarks()} returns a data frame with bookmark info (see \code{bookmarks} parameter for details about columns).
+An \code{NA} indicates that the backend doesn't report information about this pdf feature.
 \code{set_bookmarks()} returns the (output) filename invisibly.
 }
 \description{
@@ -65,6 +76,7 @@ If missing will be inferred from \code{level} column else will be assumed do be 
 }
 
 \examples{
+# Create 2-page pdf using `pdf)` and add some bookmarks to it
 if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
   pdf(f, onefile = TRUE)
@@ -80,6 +92,7 @@ if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quie
 
   set_bookmarks(bookmarks, f)
   print(get_bookmarks(f))
+  unlink(f)
 }
 }
 \seealso{

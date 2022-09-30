@@ -19,11 +19,22 @@
 #'   \item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer).
 #'                If missing will be inferred from `count` column else will be assumed to be `1L`.}
 #'   \item{count}{Number of bookmarks immediately subordinate (optional, integer).
-#'                If missing will be inferred from `level` column else will be assumed do be `0L`.}
+#'                Positive count indicates bookmark should start open while
+#'                negative count indicates that this bookmark should start closed.
+#'                If missing will be inferred from `level` column else will be assumed to be `0L`.
+#'                Note some pdf viewers quietly ignore the initially open/closed feature.}
+#'   \item{style}{Style of the bookmark (optional, integer).
+#'                If `NA_integer_` will be unset (defaults to "plain").
+#'                0 is Plain, 1 is Italic, 2 is Bold, and 3 is Bold and italic.
+#'                Note many pdf viewers quietly ignore this feature.}
+#'   \item{color}{Color of the bookmark (optional, character).
+#'                If `NA_character_` will be unset (presumably defaults to "black").
+#'                Note many pdf viewers quietly ignore this feature.}
 #' }
 #' @param input Input pdf filename.
 #' @param output Output pdf filename.
 #' @return `get_bookmarks()` returns a data frame with bookmark info (see `bookmarks` parameter for details about columns).
+#'         An `NA` indicates that the backend doesn't report information about this pdf feature.
 #'         `set_bookmarks()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
@@ -33,6 +44,7 @@
 #'
 #' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.
 #' @examples
+#' # Create 2-page pdf using `pdf)` and add some bookmarks to it
 #' if (supports_set_bookmarks() && supports_get_bookmarks() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
 #'   pdf(f, onefile = TRUE)
@@ -48,6 +60,7 @@
 #'
 #'   set_bookmarks(bookmarks, f)
 #'   print(get_bookmarks(f))
+#'   unlink(f)
 #' }
 #' @name bookmarks
 NULL
@@ -70,22 +83,27 @@ get_bookmarks <- function(filename) {
 get_bookmarks_pdftk <- function(filename) {
     meta <- get_pdftk_metadata(filename)
     id_bookmark <- grep("^BookmarkBegin", meta)
-    if (length(id_bookmark)) {
+    df <- if (length(id_bookmark)) {
         title <- gsub("^BookmarkTitle: ", "", meta[id_bookmark + 1L])
         level <- gsub("^BookmarkLevel: ", "", meta[id_bookmark + 2L])
         page <- gsub("^BookmarkPageNumber: ", "", meta[id_bookmark + 3L])
         data.frame(title = title,
-                   level = as.integer(level),
                    page = as.integer(page),
-                   count = get_count(as.integer(level)),
+                   level = as.integer(level),
+                   count = NA_integer_,
+                   color = NA_character_,
+                   style = NA_integer_,
                    stringsAsFactors = FALSE)
     } else {
         data.frame(title = character(0),
-                   level = integer(0),
                    page = integer(0),
+                   level = integer(0),
                    count = integer(0),
+                   color = character(),
+                   style = integer(0),
                    stringsAsFactors = FALSE)
     }
+    df
 }
 
 #' @rdname bookmarks
@@ -104,10 +122,33 @@ set_bookmarks <- function(bookmarks, input, output = input) {
     }
 }
 
+should_pdftk_message <- function(bookmarks) {
+    any(bookmarks$count < 0) || any(!is.na(bookmarks$color)) || any(!is.na(bookmarks$style))
+}
+
 #' @rdname bookmarks
 #' @export
 set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
     bookmarks <- as_bookmarks(bookmarks)
+    if (should_pdftk_message(bookmarks)) {
+        msg <- c("!" = paste(sQuote("set_bookmarks_pdftk()"),
+                            "will ignore certain requested bookmarks features:"))
+        if (any(bookmarks$count < 0))
+            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"), "treats negative",
+                                      sQuote("count"), "values as positive ones."))
+        if (any(!is.na(bookmarks$color)))
+            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
+                                      "ignores non-missing", sQuote("color"), "values."))
+        if (any(!is.na(bookmarks$style)))
+            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
+                                      "ignores non-missing", sQuote("style"), "values."))
+        msg <- c(msg, "i" = paste(sQuote("set_bookmarks_gs()"),
+                                  "can handle these features (but not Unicode)"),
+                 "i" = paste("You can suppress these messages with",
+                             sQuote('suppressMessages(expr, classes = "xmpdf_inform")')))
+        inform(msg, class = "xmpdf_inform")
+    }
+
     cmd <- pdftk()
     meta <- get_pdftk_metadata(input)
     input <- normalizePath(input, mustWork = TRUE)
@@ -168,6 +209,13 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
 #### count
 as_bookmarks <- function(bookmarks) {
     bookmarks <- as.data.frame(bookmarks)
+    if (nrow(bookmarks) == 0)
+        return (data.frame(title = character(),
+                           page = integer(),
+                           level = integer(),
+                           count = integer(),
+                           color = character(),
+                           style = integer()))
     stopifnot(hasName(bookmarks, "title"),
               hasName(bookmarks, "page"))
     bookmarks[["title"]] <- as.character(bookmarks[["title"]])
@@ -175,6 +223,8 @@ as_bookmarks <- function(bookmarks) {
     if (hasName(bookmarks, "level") && hasName(bookmarks, "count")) {
         bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
         bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
+        if (any(is.na(bookmarks[["count"]])))
+            bookmarks[["count"]] <- get_count(bookmarks[["level"]])
     } else if (hasName(bookmarks, "level")) {
         bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
         bookmarks[["count"]] <- get_count(bookmarks[["level"]])
@@ -185,10 +235,14 @@ as_bookmarks <- function(bookmarks) {
         bookmarks[["level"]] <- 1L
         bookmarks[["count"]] <- 0L
     }
+    if (hasName(bookmarks, "color"))
+        bookmarks[["color"]] <- as.character(bookmarks[["color"]])
+    else
+        bookmarks[["color"]] <- NA_character_
     if (hasName(bookmarks, "style"))
         bookmarks[["style"]] <- as.integer(bookmarks[["style"]])
     else
-        bookmarks[["style"]] <- 0L
+        bookmarks[["style"]] <- NA_integer_
     bookmarks
 }
 
@@ -232,11 +286,24 @@ bookmark_pdftk <- function(title, level, page, ...) {
       paste("BookmarkPageNumber:", page))
 }
 
-bookmark_gs <- function(title, page, count, ...) {
+bookmark_gs <- function(title, page, count, style, color, ...) {
     if (count == 0)
         count_str <- ""
     else
-        count_str <- sprintf(" /Count %d", count)
-    sprintf("[%s /Page %d /View [/XYZ null null null] /Title (%s) /OUT pdfmark",
-            count_str, page, title)
+        count_str <- paste(" /Count", count)
+    if (is.na(style))
+        style_str <- ""
+    else
+        style_str <- paste0(" /F ", style, "\n")
+    if (is.na(color)) {
+        color_str <- ""
+    } else {
+        rgb <- grDevices::col2rgb(color)
+        color_str <- sprintf("/C [%f %f %f]\n",
+                             rgb[1] / 255,
+                             rgb[2] / 255,
+                             rgb[3] / 255)
+    }
+    sprintf("[%s /Page %d /View [/XYZ null null null]\n /Title (%s)\n%s%s /OUT pdfmark",
+            count_str, page, title, color_str, style_str)
 }

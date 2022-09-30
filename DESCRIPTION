@@ -17,6 +17,7 @@ URL: https://trevorldavis.com/R/xmpdf/dev/
 BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyLoad: yes
 Imports:
+    grDevices,
     R6,
     purrr,
     rlang,
