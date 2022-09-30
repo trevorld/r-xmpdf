@@ -38,8 +38,8 @@
 #'   supports_exiftool()
 #'   supports_gs()
 #'   supports_pdftk()
-#'   requireNamespace("qpdf", quietly = TRUE)
-#'   requireNamespace("pdftools", quietly = TRUE)
+#'   print(requireNamespace("qpdf", quietly = TRUE))
+#'   print(requireNamespace("pdftools", quietly = TRUE))
 #' @name supports
 NULL
 
@@ -88,19 +88,19 @@ supports_n_pages <- function() {
 #' @rdname supports
 #' @export
 supports_exiftool <- function() {
-    find_exiftool_cmd() != ""
+    as.logical(find_exiftool_cmd() != "")
 }
 
 #' @rdname supports
 #' @export
 supports_gs <- function() {
-    tools::find_gs_cmd() != ""
+    as.logical(tools::find_gs_cmd() != "")
 }
 
 #' @rdname supports
 #' @export
 supports_pdftk <- function() {
-    find_pdftk_cmd() != ""
+    as.logical(find_pdftk_cmd() != "")
 }
 
 find_exiftool_cmd <- function() {

@@ -77,6 +77,6 @@ which is required for \code{\link[=get_docinfo_pdftools]{get_docinfo_pdftools()}
   supports_exiftool()
   supports_gs()
   supports_pdftk()
-  requireNamespace("qpdf", quietly = TRUE)
-  requireNamespace("pdftools", quietly = TRUE)
+  print(requireNamespace("qpdf", quietly = TRUE))
+  print(requireNamespace("pdftools", quietly = TRUE))
 }
