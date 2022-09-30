@@ -52,7 +52,7 @@
 #' @section Known limitations:
 #'
 #'   * Currently does not support arbitrary info dictionary entries.
-#'   * `set_docinfo_gs()` probably doesn't work with Unicode input.
+#'   * `set_docinfo_gs()` doesn't work with Unicode input.
 #'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
 #'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
 #'     any previously set matching XPN metadata.

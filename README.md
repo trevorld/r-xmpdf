@@ -98,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-30 06:06:42
+## CreationDate: 2022-09-30 06:18:04
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-30 06:06:42
+## ModDate: 2022-09-30 06:18:04
 ```
 
 ```r
@@ -118,13 +118,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-30 06:06:42
+## CreationDate: 2022-09-30 06:18:04
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-30 06:06:42
+## ModDate: 2022-09-30 06:18:04
 ```
 
 ```r
@@ -167,10 +167,12 @@ Unicode support | Yes | Yes | No
 
 Known limitations:
 
-* `set_bookmarks_gs()` supports most bookmarks features including color and sytle but only action supported is to view a particular page and doesn't work with Unicode titles.
+* `get_bookmarks_pdftk()` doesn't report information about bookmarks color, style, and whether the bookmarks
+  should start open or closed.
+* `set_bookmarks_gs()` supports most bookmarks features including color and style but only action supported is to view a particular page and doesn't work with Unicode titles.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
-* `set_docinfo_gs()` probably doesn't work with Unicode info dictionary values.
+* `set_docinfo_gs()` doesn't work with Unicode info dictionary values.
 * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.

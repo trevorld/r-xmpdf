@@ -119,7 +119,7 @@ Can also use the relevant active bindings to set documentation info keys.}
 
 \itemize{
 \item Currently does not support arbitrary info dictionary entries.
-\item \code{set_docinfo_gs()} probably doesn't work with Unicode input.
+\item \code{set_docinfo_gs()} doesn't work with Unicode input.
 \item As a side effect \code{set_docinfo_gs()} seems to also update in previously set matching XPN metadata
 while \code{set_docinfo_exiftool()} and \code{set_docinfo_pdftk()} don't update
 any previously set matching XPN metadata.

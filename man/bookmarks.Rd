@@ -69,8 +69,9 @@ An \code{NA} indicates that the backend doesn't report information about this pd
 \section{Known limitations}{
 
 \itemize{
-\item \code{set_bookmarks_gs()} only supports setting the title, page number, level of bookmarks, and whether open/closed.
-\item \code{set_bookmarks_gs()} also probably doesn't work with Unicode input.
+\item \code{get_bookmarks_pdftk()} doesn't report information about bookmarks color, style, and whether the bookmarks
+should start open or closed.
+\item \code{set_bookmarks_gs()} supports most bookmarks features including color and style but only action supported is to view a particular page and doesn’t work with Unicode titles.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.
 }
 }
