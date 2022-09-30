@@ -3,11 +3,12 @@ Package: xmpdf
 Type: Package
 Title: Edit XMP metadata and PDF bookmarks and documentation info
 Version: 0.1.0-0
-Description: Edit 'xmp' metadata info in a variety of media files as well as 
-    edit bookmarks (aka table of contents) and documentation info entries in pdf files.
+Description: Edit 'xmp' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
+    in a variety of media file formats as well as 
+    edit bookmarks (aka outline aka table of contents) and documentation info entries in pdf files.
     Can detect and use a variety of command-line tools to perform these operations such as
-    the 'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>, 
-    and 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
+    'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>, 
+    and/or 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
 Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")))
@@ -27,7 +28,7 @@ Suggests:
     qpdf,
     pdftools,
     testthat (>= 3.0.0)
-SystemRequirements: 'ghostscript' or 'pdftk'
+SystemRequirements: 'ghostscript' or 'pdftk' for editing pdf bookmarks
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Config/testthat/edition: 3

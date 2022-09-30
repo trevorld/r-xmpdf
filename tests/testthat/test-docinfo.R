@@ -46,6 +46,10 @@ test_that("docinfo_pdftk", {
     set_docinfo_pdftk(docinfo(author = "John Doe"), f4)
     expect_equal(get_docinfo_pdftk(f4)[[1]]$title, "R Graphics Output")
     expect_equal(get_docinfo_pdftk(f4)[[1]]$author, "John Doe")
+
+    # Unicode works?
+    set_docinfo_pdftk(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
+    expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
 
 test_that("set_docinfo_gs", {
@@ -76,9 +80,13 @@ test_that("set_docinfo_gs", {
     set_docinfo_gs(docinfo(author = "John Doe"), f4)
     expect_equal(get_docinfo(f4)[[1]]$title, "R Graphics Output")
     expect_equal(get_docinfo(f4)[[1]]$author, "John Doe")
+
+    # # Unicode works?
+    # set_docinfo_gs(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
+    # expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
 
-test_that("get_docinfo_exiftool", {
+test_that("docinfo_exiftool", {
     skip_if_not(supports_exiftool())
 
     expect_equal(get_docinfo_exiftool(f1)[[1]]$title, "R Graphics Output")
@@ -102,6 +110,10 @@ test_that("get_docinfo_exiftool", {
     set_docinfo_exiftool(docinfo(author = "John Doe"), f4)
     expect_equal(get_docinfo_exiftool(f4)[[1]]$title, "R Graphics Output")
     expect_equal(get_docinfo_exiftool(f4)[[1]]$author, "John Doe")
+
+    # # Unicode works?
+    set_docinfo_exiftool(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
+    expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
 
 test_that("from_date_pdfmark()", {

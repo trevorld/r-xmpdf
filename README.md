@@ -16,7 +16,7 @@
 
 ## <a name="overview">Overview</a>
 
-`{xmpdf}` provides functions for getting and setting [Extensibe Metadata Platform (XMP)](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform) metadata in a variety of media formats as well as getting and setting PDF [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out) (aka table of contents).
+`{xmpdf}` provides functions for getting and setting [Extensibe Metadata Platform (XMP)](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform) metadata in a variety of media file formats as well as getting and setting PDF [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out) (aka outline aka table of contents).
 
 ## <a name="installation">Installation</a>
 
@@ -98,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-30 03:01:39
+## CreationDate: 2022-09-30 03:27:40
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-30 03:01:39
+## ModDate: 2022-09-30 03:27:40
 ```
 
 ```r
@@ -118,13 +118,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-30 03:01:39
+## CreationDate: 2022-09-30 03:27:40
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-30 03:01:39
+## ModDate: 2022-09-30 03:27:40
 ```
 
 ```r
@@ -163,7 +163,7 @@ Get PDF bookmarks | No | Okay: only can get Title, Page number, and Level | No
 Set PDF bookmarks | No | Okay: only can set Title, Page number, and Level | Yes
 Get PDF documentation info | Yes | Yes | No
 Set PDF documentation info | Yes | Yes | Yes: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
-Unicode support | Yes? | Yes? | No?
+Unicode support | Yes | Yes | No
 
 Known limitations:
 
