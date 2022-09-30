@@ -36,6 +36,16 @@ test_that("docinfo_pdftk", {
     di_get <- get_docinfo_pdftk(f2)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
+
+    # Only partial update
+    f4 <- tempfile(fileext = ".pdf")
+    pdf(f4)
+    plot(0, 0)
+    dev.off()
+    expect_equal(get_docinfo_pdftk(f4)[[1]]$title, "R Graphics Output")
+    set_docinfo_pdftk(docinfo(author = "John Doe"), f4)
+    expect_equal(get_docinfo_pdftk(f4)[[1]]$title, "R Graphics Output")
+    expect_equal(get_docinfo_pdftk(f4)[[1]]$author, "John Doe")
 })
 
 test_that("set_docinfo_gs", {
@@ -52,10 +62,46 @@ test_that("set_docinfo_gs", {
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 
-    set_docinfo(di_set, f1, f3)
+    set_docinfo_gs(di_set, f1, f3)
     di_get <- get_docinfo(f3)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
+
+    # Only partial update
+    f4 <- tempfile(fileext = ".pdf")
+    pdf(f4)
+    plot(0, 0)
+    dev.off()
+    expect_equal(get_docinfo(f4)[[1]]$title, "R Graphics Output")
+    set_docinfo_gs(docinfo(author = "John Doe"), f4)
+    expect_equal(get_docinfo(f4)[[1]]$title, "R Graphics Output")
+    expect_equal(get_docinfo(f4)[[1]]$author, "John Doe")
+})
+
+test_that("get_docinfo_exiftool", {
+    skip_if_not(supports_exiftool())
+
+    expect_equal(get_docinfo_exiftool(f1)[[1]]$title, "R Graphics Output")
+
+    f3 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f3))
+
+    di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
+    set_docinfo_exiftool(di_set, f1, f3)
+
+    di_get <- get_docinfo(f3)[[1]]
+    expect_equal(di_get$title, "Two Boring Pages")
+    expect_equal(di_get$author, "John Doe")
+
+    # Only partial update
+    f4 <- tempfile(fileext = ".pdf")
+    pdf(f4)
+    plot(0, 0)
+    dev.off()
+    expect_equal(get_docinfo_exiftool(f4)[[1]]$title, "R Graphics Output")
+    set_docinfo_exiftool(docinfo(author = "John Doe"), f4)
+    expect_equal(get_docinfo_exiftool(f4)[[1]]$title, "R Graphics Output")
+    expect_equal(get_docinfo_exiftool(f4)[[1]]$author, "John Doe")
 })
 
 test_that("from_date_pdfmark()", {

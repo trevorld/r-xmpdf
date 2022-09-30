@@ -44,8 +44,8 @@ get_xmp <- function(filename, use_names = TRUE) {
     if (supports_exiftool()) {
         get_xmp_exiftool(filename, use_names = use_names)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'get_xmp'.",
-                 i = "Install `exiftools` command possibly via `exiftoolr::install_exiftool()`"
+        msg <- c(need_to_install_str("get_xmp()"),
+                 install_exiftool_str()
         )
         abort(msg, class = "xmpdf_suggested_package")
     }
@@ -74,8 +74,8 @@ set_xmp <- function(xmp, input, output = input) {
     if (supports_exiftool()) {
         set_xmp_exiftool(xmp, input, output)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'set_xmp'.",
-                 i = "Install `exiftools` command possibly via `exiftoolr::install_exiftool()`"
+        msg <- c(need_to_install_str("set_xmp()"),
+                 install_exiftool_str()
         )
         abort(msg, class = "xmpdf_suggested_package")
     }

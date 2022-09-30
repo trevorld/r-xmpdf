@@ -4,6 +4,8 @@
 \alias{docinfo}
 \alias{get_docinfo}
 \alias{get_docinfo_pdftools}
+\alias{get_docinfo_exiftool}
+\alias{set_docinfo_exiftool}
 \alias{get_docinfo_pdftk}
 \alias{set_docinfo}
 \alias{set_docinfo_gs}
@@ -25,6 +27,10 @@ docinfo(
 get_docinfo(filename, use_names = TRUE)
 
 get_docinfo_pdftools(filename, use_names = TRUE)
+
+get_docinfo_exiftool(filename, use_names = TRUE)
+
+set_docinfo_exiftool(docinfo, input, output = input)
 
 get_docinfo_pdftk(filename, use_names = TRUE)
 
@@ -77,19 +83,20 @@ Any such entries will be overridden by any manually set entries in \code{\link[=
 \code{get_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{get_docinfo_pdftools()} which wraps \code{\link[pdftools:pdftools]{pdftools::pdf_info()}}
+\item \code{get_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{get_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
 }
 
 \code{set_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{set_docinfo_gs()} which wraps \code{ghostscript} command-line tool
+\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{set_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
 }
 }
 \section{\code{docinfo} R6 Class Methods}{
 \describe{
-\item{\code{pdfmark()}}{Return a string of pdfmark info for use with \code{ghostscript}.}
-\item{\code{pdftk()}}{Return a string of pdfmark metadata for use with \code{pdftk}.}
+\item{\code{print()}}{Print out the documentation info entries.}
 \item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.
 Can also use the relevant active bindings to set documentation info keys.}
 }
@@ -113,9 +120,15 @@ Can also use the relevant active bindings to set documentation info keys.}
 \itemize{
 \item Currently does not support arbitrary info dictionary entries.
 \item \code{set_docinfo_gs()} probably doesn't work with Unicode input.
-\item \code{set_docinfo_pdftk()} doesn't seem to update any previously set matching XPN metadata.
+\item As a side effect \code{set_docinfo_gs()} seems to also update in previously set matching XPN metadata
+while \code{set_docinfo_exiftool()} and \code{set_docinfo_pdftk()} don't update
+any previously set matching XPN metadata.
 Some pdf viewers will preferentially use the previously set document title from XPN metadata
 if it exists instead of using the title set in documentation info dictionary entry.
+Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set_xmp()}}.
+\item Old metadata information is usually not deleted from the pdf file by these operations.
+If deleting the old metadata is important one may want to try
+\code{qpdf::pdf_compress(input, linearize = TRUE)}.
 }
 }
 

@@ -58,8 +58,8 @@ get_bookmarks <- function(filename) {
     if (supports_pdftk()) {
         get_bookmarks_pdftk(filename)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
-                 i = "Install `pdftk` command"
+        msg <- c(need_to_install_str("get_bookmarks()"),
+                 install_pdftk_str()
         )
         abort(msg, class = "xmpdf_suggested_package")
     }
@@ -96,11 +96,11 @@ set_bookmarks <- function(bookmarks, input, output = input) {
     } else if (supports_pdftk()) {
         set_bookmarks_pdftk(bookmarks, input, output)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
-                 i = "Install `ghostscript` command",
-                 i = "Or install `pdftk` command"
+        msg <- c(need_to_install_str("set_bookmarks()"),
+                 install_gs_str(),
+                 install_pdftk_str()
         )
-        abort(msg, class = "piecepackr_suggested_package")
+        abort(msg, class = "xmpdf_suggested_package")
     }
 }
 

@@ -7,12 +7,14 @@
 #' `get_docinfo()` will try to use the following helper functions in the following order:
 #'
 #' 1. `get_docinfo_pdftools()` which wraps [pdftools::pdf_info()]
-#' 2. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
+#' 3. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
 #'
 #' `set_docinfo()` will try to use the following helper functions in the following order:
 #'
 #' 1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
-#' 2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 2. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
+#' 3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
 #'
 #' @param author The document's author.
 #' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt()`.
@@ -33,8 +35,7 @@
 #'         `get_docinfo()` returns a list of "docinfo" R6 classes.
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section `docinfo` R6 Class Methods:\describe{
-#'     \item{`pdfmark()`}{Return a string of pdfmark info for use with `ghostscript`.}
-#'     \item{`pdftk()`}{Return a string of pdfmark metadata for use with `pdftk`.}
+#'     \item{`print()`}{Print out the documentation info entries.}
 #'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.
 #'           Can also use the relevant active bindings to set documentation info keys.}
 #' }
@@ -52,9 +53,15 @@
 #'
 #'   * Currently does not support arbitrary info dictionary entries.
 #'   * `set_docinfo_gs()` probably doesn't work with Unicode input.
-#'   * `set_docinfo_pdftk()` doesn't seem to update any previously set matching XPN metadata.
+#'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
+#'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
+#'     any previously set matching XPN metadata.
 #'     Some pdf viewers will preferentially use the previously set document title from XPN metadata
 #'     if it exists instead of using the title set in documentation info dictionary entry.
+#'     Consider also manually setting this XPN metadata using [set_xmp()].
+#'   * Old metadata information is usually not deleted from the pdf file by these operations.
+#'     If deleting the old metadata is important one may want to try
+#'     `qpdf::pdf_compress(input, linearize = TRUE)`.
 #'
 #' @examples
 #' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
@@ -101,18 +108,25 @@ tryFormats <- c("%Y-%m-%dT%H:%M:%S%z",
                 "%Y/%m/%d")
 
 to_date_pdfmark <- function(date) {
-    if (is.null(date))
+    if (is.null(date)) {
         NULL
-    else
-        format(date, format = "D:%Y%m%d%H%M%S%z")
+    } else if (is.character(date)) {
+        ""
+    } else {
+        val <- format(date, format = "D:%Y%m%d%H%M%S%z")
+        paste0(substr(val, 1, 19), "'", substr(val, 20, 21), "'")
+    }
 }
 
 from_date_pdfmark <- function(string) {
     destring <- gsub("^(D:)*", "\\2", string)
+    destring <- gsub("'", "", destring) # GMT offset
     date <- if (nchar(destring) == 4) {
-        as.POSIXlt(destring, format = "%Y")
+        destring <- paste0(destring, "0101")
+        as.POSIXlt(destring, format = "%Y%m%d")
     } else if (nchar(destring) == 6) {
-        as.POSIXlt(destring, format = "%Y%m")
+        destring <- paste0(destring, "01")
+        as.POSIXlt(destring, format = "%Y%m%d")
     } else if (nchar(destring) == 8) {
         as.POSIXlt(destring, format = "%Y%m%d")
     } else if (nchar(destring) == 10) {
@@ -121,13 +135,17 @@ from_date_pdfmark <- function(string) {
         as.POSIXlt(destring, format = "%Y%m%d%H%M")
     } else if (nchar(destring) == 14) {
         as.POSIXlt(destring, format = "%Y%m%d%H%M%S")
+    } else if (nchar(destring) == 17) {
+        destring <- paste0(destring, "00")
+        as.POSIXlt(destring, format = "%Y%m%d%H%M%S%z")
     } else if (nchar(destring) == 19) {
         as.POSIXlt(destring, format = "%Y%m%d%H%M%S%z")
     } else {
         NA
     }
-    if (is.na(date))
+    if (is.na(date)) {
         abort(paste("Couldn't parse pdfmark date", string))
+    }
     date
 }
 
@@ -142,12 +160,15 @@ entry_pdftk <- function(key, value) {
 get_docinfo <- function(filename, use_names = TRUE) {
     if (supports_pdftools()) {
         get_docinfo_pdftools(filename, use_names = use_names)
+    } else if (supports_exiftool()) {
+        get_docinfo_exiftool(filename, use_names = use_names)
     } else if (supports_pdftk()) {
         get_docinfo_pdftk(filename, use_names = use_names)
     } else {
-        msg <- c("You'll need to install a suggested package or command to use 'get_docinfo'.",
-                 i = "Use 'install.packages(\"pdftools\")' to install {pdftools}",
-                 i = "Or install `pdftk` command"
+        msg <- c(need_to_install_str("get_docinfo()"),
+                 install_package_str("pdftools"),
+                 install_exiftool_str(),
+                 install_pdftk_str()
         )
         abort(msg, class = "xmpdf_suggested_package")
     }
@@ -182,6 +203,48 @@ get_docinfo_pdftools_helper <- function(filename) {
     if (!is.null(info$modified))
         dinfo$mod_date <- info$modified
     dinfo
+}
+
+#' @rdname docinfo
+#' @export
+get_docinfo_exiftool <- function(filename, use_names = TRUE) {
+    l <- lapply(filename, get_docinfo_exiftool_helper)
+    if (use_names)
+        names(l) <- filename
+    else
+        names(l) <- NULL
+    l
+}
+get_docinfo_exiftool_helper <- function(filename) {
+    md <- get_exiftool_metadata(filename, tags="-PDF:all")
+    md <- md[grep("^PDF:", names(md))]
+    names(md) <- gsub("^PDF:", "", names(md))
+    dinfo <- docinfo()
+
+    for (i in seq_along(md)) {
+        key <- names(md)[i]
+        if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
+            dinfo$set_item(names(md)[i], md[[i]])
+        } else if (key %in% c("PDFVersion", "Linearized", "PageCount", "CreateDate", "ModifyDate")) {
+            next
+        } else {
+            msg <- sprintf("We don't support key '%s' yet.", key)
+            warn(msg)
+        }
+    }
+    if (!is.null(md$CreateDate))
+        dinfo$creation_date <- md$CreateDate
+    if (!is.null(md$ModifyDate))
+        dinfo$mod_date <- md$ModifyDate
+    dinfo
+}
+
+#' @rdname docinfo
+#' @export
+set_docinfo_exiftool <- function(docinfo, input, output = input) {
+    stopifnot(inherits(docinfo, "docinfo"))
+    tags <- docinfo$exiftool_tags()
+    set_exiftool_metadata(tags, input, output)
 }
 
 #' @rdname docinfo
@@ -224,20 +287,24 @@ get_docinfo_pdftk_helper <- function(filename) {
 set_docinfo <- function(docinfo, input, output = input) {
     if (supports_gs()) {
         set_docinfo_gs(docinfo, input, output)
+    } else if (supports_exiftool()) {
+        set_docinfo_exiftool(docinfo, input, output)
     } else if (supports_pdftk()) {
         set_docinfo_pdftk(docinfo, input, output)
     } else {
-        msg <- c("You'll need to install a command to use 'set_docinfo'.",
-                 i = "Install `ghostscript` command",
-                 i = "Or install `pdftk` command"
+        msg <- c(need_to_install_str("set_docinfo()"),
+                 install_gs_str(),
+                 install_exiftool_str(),
+                 install_pdftk_str()
         )
-        abort(msg, class = "piecepackr_suggested_package")
+        abort(msg, class = "xmpdf_suggested_package")
     }
 }
 
 #' @rdname docinfo
 #' @export
 set_docinfo_gs <- function(docinfo, input, output = input) {
+    stopifnot(inherits(docinfo, "docinfo"))
     cmd <- gs()
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)
@@ -262,6 +329,7 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
 #' @rdname docinfo
 #' @export
 set_docinfo_pdftk <- function(docinfo, input, output = input) {
+    stopifnot(inherits(docinfo, "docinfo"))
     cmd <- pdftk()
     meta <- get_pdftk_metadata(input)
     input <- normalizePath(input, mustWork = TRUE)
@@ -327,35 +395,74 @@ DocInfo <- R6Class("docinfo",
                       paste("ModDate:", self$mod_date))
             invisible(cat(text, sep="\n"))
         },
+        exiftool_tags = function() {
+            # We're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
+            tags <- list()
+            if (!is.null(self$author))
+                tags[["PDF:Author"]] <- self$author
+            if (!is.null(self$creation_date))
+                tags[["PDF:CreateDate"]] <- format(self$creation_date,
+                                                     format = "%Y-%m-%dT%H:%M:%S%z")
+            if (!is.null(self$creator))
+                tags[["PDF:Creator"]] <- self$creator
+            if (!is.null(self$producer))
+                tags[["PDF:Producer"]] <- self$producer
+            if (!is.null(self$title))
+                tags[["PDF:Title"]] <- self$title
+            if (!is.null(self$subject))
+                tags[["PDF:Subject"]] <- self$subject
+            if (!is.null(self$keywords))
+                tags[["PDF:Keywords"]] <- self$keywords
+            if (!is.null(self$mod_date))
+                tags[["PDF:ModifyDate"]] <-  format(self$mod_date,
+                                                    format = "%Y-%m-%dT%H:%M:%S%z")
+            tags
+        },
         pdfmark = function() {
             tags <- "["
-            tags <- append(tags, sprintf(" /Author (%s)\n", self$author %||% ""))
-            tags <- append(tags, sprintf(" /CreationDate (%s)\n",
-                                         to_date_pdfmark(self$creation_date %||% "")))
-            tags <- append(tags, sprintf(" /Creator (%s)\n", self$creator %||% ""))
-            tags <- append(tags, sprintf(" /Producer (%s)\n", self$producer %||% ""))
-            tags <- append(tags, sprintf(" /Title (%s)\n", self$title %||% ""))
-            tags <- append(tags, sprintf(" /Subject (%s)\n", self$subject %||% ""))
-            tags <- append(tags, sprintf(" /Keywords (%s)\n",
-                                         paste(self$keywords, collapse = ", ") %||% ""))
-            tags <- append(tags, sprintf(" /ModDate (%s)\n",
-                                         to_date_pdfmark(self$mod_date %||% Sys.Date())))
+            if (!is.null(self$author))
+                tags <- append(tags, sprintf(" /Author (%s)\n", self$author))
+            if (!is.null(self$creation_date))
+                tags <- append(tags, sprintf(" /CreationDate (%s)\n",
+                                             to_date_pdfmark(self$creation_date)))
+            if (!is.null(self$creator))
+                tags <- append(tags, sprintf(" /Creator (%s)\n", self$creator))
+            if (!is.null(self$producer))
+                tags <- append(tags, sprintf(" /Producer (%s)\n", self$producer))
+            if (!is.null(self$title))
+                tags <- append(tags, sprintf(" /Title (%s)\n", self$title))
+            if (!is.null(self$subject))
+                tags <- append(tags, sprintf(" /Subject (%s)\n", self$subject))
+            if (!is.null(self$keywords))
+                tags <- append(tags, sprintf(" /Keywords (%s)\n",
+                                             paste(self$keywords, collapse = ", ")))
+            if (!is.null(self$mod_date))
+                tags <- append(tags, sprintf(" /ModDate (%s)\n",
+                                             to_date_pdfmark(self$mod_date)))
             tags <- append(tags, " /DOCINFO pdfmark\n")
             paste(tags, collapse="")
         },
         pdftk = function() {
             tags <- character()
-            tags <- append(tags, entry_pdftk("Author", self$author %||% ""))
-            tags <- append(tags, entry_pdftk("CreationDate",
-                                             to_date_pdfmark(self$creation_date %||% "")))
-            tags <- append(tags, entry_pdftk("Creator", self$creator %||% ""))
-            tags <- append(tags, entry_pdftk("Producer", self$producer %||% ""))
-            tags <- append(tags, entry_pdftk("Title", self$title %||% ""))
-            tags <- append(tags, entry_pdftk("Subject", self$subject %||% ""))
-            tags <- append(tags, entry_pdftk("Keywords",
-                                             paste(self$keywords, collapse = ", ") %||% ""))
-            tags <- append(tags, entry_pdftk("ModDate",
-                                             to_date_pdfmark(self$mod_date %||% Sys.Date())))
+            if (!is.null(self$author))
+                tags <- append(tags, entry_pdftk("Author", self$author))
+            if (!is.null(self$creation_date))
+                tags <- append(tags, entry_pdftk("CreationDate",
+                                                 to_date_pdfmark(self$creation_date)))
+            if (!is.null(self$creator))
+                tags <- append(tags, entry_pdftk("Creator", self$creator))
+            if (!is.null(self$producer))
+                tags <- append(tags, entry_pdftk("Producer", self$producer))
+            if (!is.null(self$title))
+                tags <- append(tags, entry_pdftk("Title", self$title))
+            if (!is.null(self$subject))
+                tags <- append(tags, entry_pdftk("Subject", self$subject))
+            if (!is.null(self$keywords))
+                tags <- append(tags, entry_pdftk("Keywords",
+                                                 paste(self$keywords, collapse = ", ")))
+            if (!is.null(self$mod_date))
+                tags <- append(tags, entry_pdftk("ModDate",
+                                                 to_date_pdfmark(self$mod_date)))
             tags
         },
         set_item = function(key, value) {
@@ -393,7 +500,10 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$creation_date
             } else {
-                private$val$creation_date <- as.POSIXlt(value, tryFormats = tryFormats)
+                if (is.null(value))
+                    private$val$creation_date <- NULL
+                else
+                    private$val$creation_date <- as.POSIXlt(value, tryFormats = tryFormats)
             }
         },
         creator = function(value) {
@@ -435,7 +545,10 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$mod_date
             } else {
-                private$val$mod_date <- as.POSIXlt(value, tryFormats = tryFormats)
+                if (is.null(value))
+                    private$val$mod_date <- NULL
+                else
+                    private$val$mod_date <- as.POSIXlt(value, tryFormats = tryFormats)
             }
         }
     ),

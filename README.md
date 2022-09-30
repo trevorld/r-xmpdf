@@ -10,11 +10,13 @@
 
 * [Overview](#overview)
 * [Installation](#installation)
+* [Examples](#examples)
+* [Limitations by backend](#comparison)
 * [Related Software](#similar)
 
 ## <a name="overview">Overview</a>
 
-`{xmpdf}` provides functions for getting and setting [Extensibe Metadata Platform (XMP)](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform) metadata in a variety of media formats as well as getting and setting PDF [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out).
+`{xmpdf}` provides functions for getting and setting [Extensibe Metadata Platform (XMP)](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform) metadata in a variety of media formats as well as getting and setting PDF [documentation info](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo) entries and [bookmarks](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out) (aka table of contents).
 
 ## <a name="installation">Installation</a>
 
@@ -32,9 +34,9 @@ Depending on what you'd like to do you'll need to install some additional R pack
 * **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries.
   Note currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
 
-  + `install.packages("pdftools")` will probably install {qpdf} as well
+  + `install.packages("pdftools")` will probably install `{qpdf}` as well
 
-* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files.  Can alse be used to get the number of pages in a pdf.
+* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
 
   + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
@@ -43,7 +45,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
 
-* **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** or **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** can be used to get/set pdf bookmarks and documentation info entries.  Can also be used to get the number of pages in a pdf.
+* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set pdf bookmarks and documentation info entries.  Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
 
@@ -96,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-29 09:19:41
+## CreationDate: 2022-09-30 03:01:39
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-29 09:19:41
+## ModDate: 2022-09-30 03:01:39
 ```
 
 ```r
@@ -116,13 +118,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-29 09:19:41
+## CreationDate: 2022-09-30 03:01:39
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-29 09:19:41
+## ModDate: 2022-09-30 03:01:39
 ```
 
 ```r
@@ -151,6 +153,35 @@ print(get_bookmarks(f))
 unlink(f)
 ```
 
+## <a name="comparison">Limitations by backend</a>
+
+`{xmpdf}` Feature | `exiftool` | `pdftk` | `ghostscript`
+---|---|---|---|
+Get XMP metadata | Yes | No | No
+Set XMP metadata | Yes | No | Poor: when documentation info metadata is set then as a side effect it seems will also be set as XMP metadata
+Get PDF bookmarks | No | Okay: only can get Title, Page number, and Level | No
+Set PDF bookmarks | No | Okay: only can set Title, Page number, and Level | Yes
+Get PDF documentation info | Yes | Yes | No
+Set PDF documentation info | Yes | Yes | Yes: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Unicode support | Yes? | Yes? | No?
+
+Known limitations:
+
+* `set_bookmarks_gs()` only supports setting the title, page number, level of bookmarks, and whether open/closed.
+  `set_bookmarks_gs()` probably doesn't work with Unicode input.
+* `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
+* All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
+* `set_docinfo_gs()` probably doesn't work with Unicode input.
+* As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
+  while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
+  any previously set matching XPN metadata.
+  Some pdf viewers will preferentially use the previously set document title from XPN metadata
+  if it exists instead of using the title set in documentation info dictionary entry.
+  Consider also manually setting this XPN metadata using `set_xmp()`.
+* Old metadata information is usually not deleted from the pdf file by these 
+  operations (i.e. these operations are often theoretically reversible).
+  If deleting the old metadata is important one may want to consider calling
+  `qpdf::pdf_compress(input, linearize = TRUE)` at the end.
 
 ## <a name="similar">Related Software</a>
 

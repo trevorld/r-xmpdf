@@ -20,13 +20,15 @@ Initial features
   `get_docinfo()` will try to use the following helper functions in the following order:
 
   1. `get_docinfo_pdftools()` which wraps `pdftools::pdf_info()`
-  2. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
+  3. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
 
-* `set_docinfo()` sets (replaces) pdf documentation info entries to a pdf file (#3).
+* `set_docinfo()` sets pdf documentation info entries to a pdf file (#3).
   `set_docinfo()` will try to use the following helper functions in the following order:
 
   1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
-  2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  2. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
+  3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
 
 * `get_xmp()` reads in xmp metadata from media file(s).
   `get_xmp()` will try to use the following helper functions in the following order:

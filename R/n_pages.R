@@ -37,11 +37,11 @@ n_pages <- function(filename, use_names = TRUE) {
     } else if (supports_exiftool()) {
         n_pages_exiftool(filename, use_names = use_names)
     } else {
-        msg <- c("You'll need to install a suggested R package or system command to use 'n_pages'.",
-                 i = "Use 'install.packages(\"qpdf\")' to install {qpdf}",
-                 i = "Or install `pdftk` command",
-                 i = "Or install `ghostscript` command",
-                 i = "Or install `exiftools` command possibly via `exiftoolr::install_exiftool()`"
+        msg <- c(need_to_install_str("n_pages()"),
+                 install_package_str("pdftools"),
+                 install_exiftool_str(),
+                 install_pdftk_str(),
+                 install_gs_str()
         )
         abort(msg, class = "xmpdf_suggested_package")
     }
