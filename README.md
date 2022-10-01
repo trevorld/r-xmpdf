@@ -71,24 +71,19 @@ print(get_xmp(f)[[1]])
 ```
 
 ```
-## named list()
+## no XMP metadata found
 ```
 
 ```r
-xmp <- list(title = "Two Boring Pages", author = "John Doe")
-set_xmp(xmp, f)
+x <- xmp(title = "Two Boring Pages", creator = "John Doe")
+set_xmp(x, f)
 print(get_xmp(f)[[1]])
 ```
 
 ```
-## $`x:XMPToolkit`
-## [1] "Image::ExifTool 12.40"
-## 
-## $`dc:Title`
-## [1] "Two Boring Pages"
-## 
-## $`pdf:Author`
-## [1] "John Doe"
+## x:XMPToolkit : Image::ExifTool 12.40 
+## dc:Creator : John Doe 
+## dc:Title : Two Boring Pages
 ```
 
 ```r
@@ -98,33 +93,33 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-30 06:32:34
+## CreationDate: 2022-09-30 16:06:05
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-30 06:32:34
+## ModDate: 2022-09-30 16:06:05
 ```
 
 ```r
-di <- docinfo(author = "John Doe",
-              title = "Two Boring Pages",
-              keywords = c("R", "xmpdf"),
-              filename = f)
-set_docinfo(di, f)
+d <- docinfo(author = "John Doe",
+             title = "Two Boring Pages",
+             keywords = c("R", "xmpdf"),
+             filename = f)
+set_docinfo(d, f)
 print(get_docinfo(f)[[1]])
 ```
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-30 06:32:34
+## CreationDate: 2022-09-30 16:06:05
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-30 06:32:34
+## ModDate: 2022-09-30 16:06:05
 ```
 
 ```r

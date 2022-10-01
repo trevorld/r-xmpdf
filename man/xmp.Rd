@@ -2,49 +2,20 @@
 % Please edit documentation in R/xmp.R
 \name{xmp}
 \alias{xmp}
-\alias{get_xmp}
-\alias{get_xmp_exiftool}
-\alias{set_xmp}
-\alias{set_xmp_exiftool}
-\title{Set/get xmp metadata}
+\title{xmp metadata object}
 \usage{
-get_xmp(filename, use_names = TRUE)
-
-get_xmp_exiftool(filename, use_names = TRUE)
-
-set_xmp(xmp, input, output = input)
-
-set_xmp_exiftool(xmp, input, output = input)
+xmp(...)
 }
 \arguments{
-\item{filename}{Filename(s) to extract xmp metadata from.}
-
-\item{use_names}{If \code{TRUE} (default) use \code{filename} as the names of the result.}
-
-\item{xmp}{A named list of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
-
-\item{input}{Input filename.}
-
-\item{output}{Output filename.}
+\item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
 }
 \value{
-\code{get_xmp()} returns a list of named lists: the names are the xmp namespace and tag names separated by ":" and the values are the xmp values.  Note any datetimes will be a string in \code{"\%Y-\%m-\%dT\%H:\%M:\%S\%z"} format.
-\code{set_xmp()} returns the (output) filename invisibly.
+An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as \code{\link[=POSIXlt]{POSIXlt()}} or else a character vector in the \code{"\%Y-\%m-\%dT\%H:\%M:\%S\%z"} format.
 }
 \description{
-\code{get_xmp()} gets xmp metadata from a file.
-\code{set_xmp()} sets xmp metadata for a file.
-}
-\details{
-\code{get_xmp()} will try to use the following helper functions in the following order:
-\enumerate{
-\item \code{get_xmp_exiftool()} which wraps \code{exiftool} command-line tool
-}
-
-\code{set_xmp()} will try to use the following helper functions in the following order:
-\enumerate{
-\item \code{set_xmp_exiftool()} which wraps \code{exiftool} command-line tool
-}
+\code{xmp()} creates
+Such objects can be used with \code{\link[=set_xmp]{set_xmp()}} to edit XMP medata for a variety of media formats
+and such objects are returned by \code{\link[=get_xmp]{get_xmp()}}.
 }
 \examples{
 if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE)) {
@@ -55,14 +26,12 @@ if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE))
   grid.text("Page 2")
   invisible(dev.off())
 
-  print(get_xmp(f)[[1]])
-  \dontshow{cat("\n")}
-
-  xmp <- list(Title = "An XMP title")
-  set_xmp(xmp, f)
+  x <- xmp(title = "An XMP title", creator = "John Doe")
+  set_xmp(x, f)
   print(get_xmp(f)[[1]])
 }
 }
 \seealso{
-\code{\link[=supports_get_xmp]{supports_get_xmp()}}, \code{\link[=supports_set_xmp]{supports_set_xmp()}}, and \code{\link[=supports_exiftool]{supports_exiftool()}} to detect support for these features.  For more info about xmp metadata see \url{https://www.exiftool.org/TagNames/XMP.html}.
+\code{\link[=get_xmp]{get_xmp()}} and \code{\link[=set_xmp]{set_xmp()}} for getting/setting such information from/to a variety of media file formats.
+\code{\link[=as_xmp]{as_xmp()}} for coercing to this object.
 }

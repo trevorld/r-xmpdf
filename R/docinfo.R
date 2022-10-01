@@ -16,18 +16,7 @@
 #' 2. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
 #' 3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
 #'
-#' @param author The document's author.
-#' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt()`.
-#' @param creator The name of the application that originally created the document (if converted to pdf).
-#' @param producer The name of the application that converted the document to pdf.
-#' @param title The document's title.
-#' @param subject The document's subject.
-#' @param keywords Character vector of keywords for this document (for cross-document searching).
-#' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt()`.
-#'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
 #' @param filename Filename(s) (pdf) to extract info dictionary entries from.
-#'                 For `docinfo()` just a single pdf filename to extract info dictionary entries from:
-#'                 any such entries will be overridden by any manually set entries in [docinfo()] call.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
 #' @param docinfo A "docinfo" object (as returned by [docinfo()] or [get_docinfo()]).
 #' @param input Input pdf filename.
@@ -35,21 +24,6 @@
 #' @return `docinfo()` returns a "docinfo" R6 class.
 #'         `get_docinfo()` returns a list of "docinfo" R6 classes.
 #'         `set_docinfo()` returns the (output) filename invisibly.
-#' @section `docinfo` R6 Class Methods:\describe{
-#'     \item{`print()`}{Print out the documentation info entries.}
-#'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.
-#'           Can also use the relevant active bindings to set documentation info keys.}
-#' }
-#' @section `docinfo` R6 Active Bindings:\describe{
-#'    \item{`author`}{The document's author.}
-#'    \item{`creation_date`}{The date the document was created.}
-#'    \item{`creator`}{The name of the application that originally created the document (if converted to pdf).}
-#'    \item{`producer`}{The name of the application that converted the document to pdf.}
-#'    \item{`title`}{The document's title.}
-#'    \item{`subject`}{The document's subject.}
-#'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
-#'    \item{`mod_date`}{The date the document was last modified.}
-#' }
 #' @section Known limitations:
 #'
 #'   * Currently does not support arbitrary info dictionary entries.
@@ -73,22 +47,83 @@
 #'   grid.text("Page 2")
 #'   invisible(dev.off())
 #'
-#'   di_get1 <- get_docinfo(f)[[1]]
-#'   print(di_get1)
+#'   print(get_docinfo(f)[[1]])
 #'   \dontshow{cat("\n")}
 #'
-#'   di_set <- docinfo(author = "John Doe",
-#'                     title = "Two Boring Pages",
-#'                     keywords = c("R", "xmpdf"),
-#'                     filename = f)
-#'   set_docinfo(di_set, f)
+#'   d <- docinfo(author = "John Doe",
+#'                title = "Two Boring Pages",
+#'                keywords = c("R", "xmpdf"),
+#'                filename = f)
+#'   set_docinfo(d, f)
 #'
-#'   di_get2 <- get_docinfo(f)[[1]]
-#'   print(di_get2)
+#'   print(get_docinfo(f)[[1]])
+#'
 #'   unlink(f)
 #' }
-#' @seealso [supports_get_docinfo()], [supports_set_docinfo()], [supports_gs()], and [supports_pdftk()] to detect support for these features. For more info about the pdf document info dictionary see
+#' @seealso [docinfo()] for more information about the documentation info objects.  [supports_get_docinfo()], [supports_set_docinfo()], [supports_gs()], and [supports_pdftk()] to detect support for these features. For more info about the pdf document info dictionary see
 #'   <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo>.
+#' @name edit_docinfo
+NULL
+
+#' PDF documentation info dictionary object
+#'
+#' `docinfo()` creates a PDF documentation info dictionary object
+#' Such objects can be used with [set_docinfo()] to edit PDF documentation info dictionary entries
+#' and such objects are returned by [get_docinfo()].
+#' @param author The document's author.
+#' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt()`.
+#' @param creator The name of the application that originally created the document (if converted to pdf).
+#' @param producer The name of the application that converted the document to pdf.
+#' @param title The document's title.
+#' @param subject The document's subject.
+#' @param keywords Character vector of keywords for this document (for cross-document searching).
+#' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt()`.
+#'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
+#' @param filename A pdf filename to extract info dictionary entries from:
+#'                 any such entries will be overridden by any manually set entries in [docinfo()] call.
+#' @seealso [get_docinfo()] and [set_docinfo()] for getting/setting such information from/to PDF files.
+#'    [as_xmp()] can be used to coerce `docinfo()` objects into [xmp()] objects.
+#' @section Known limitations:
+#'
+#'   * Currently does not support arbitrary info dictionary entries.
+#'
+#' @section `docinfo` R6 Class Methods:\describe{
+#'     \item{`print()`}{Print out the documentation info entries.}
+#'     \item{`set_item(key, value)`}{Set documentation info key `key` with value `value`.
+#'           Can also use the relevant active bindings to set documentation info keys.}
+#' }
+#' @section `docinfo` R6 Active Bindings:\describe{
+#'    \item{`author`}{The document's author.}
+#'    \item{`creation_date`}{The date the document was created.}
+#'    \item{`creator`}{The name of the application that originally created the document (if converted to pdf).}
+#'    \item{`producer`}{The name of the application that converted the document to pdf.}
+#'    \item{`title`}{The document's title.}
+#'    \item{`subject`}{The document's subject.}
+#'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
+#'    \item{`mod_date`}{The date the document was last modified.}
+#' }
+#' @examples
+#' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
+#'   f <- tempfile(fileext = ".pdf")
+#'   pdf(f, onefile = TRUE)
+#'   grid.text("Page 1")
+#'   grid.newpage()
+#'   grid.text("Page 2")
+#'   invisible(dev.off())
+#'
+#'   print(get_docinfo(f)[[1]])
+#'   \dontshow{cat("\n")}
+#'
+#'   d <- docinfo(author = "John Doe",
+#'                title = "Two Boring Pages",
+#'                keywords = c("R", "xmpdf"),
+#'                filename = f)
+#'   set_docinfo(d, f)
+#'
+#'   print(get_docinfo(f)[[1]])
+#'
+#'   unlink(f)
+#' }
 #' @export
 docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, producer = NULL,
                     title = NULL, subject = NULL, keywords = NULL, mod_date = NULL,
@@ -156,7 +191,7 @@ entry_pdftk <- function(key, value) {
       paste("InfoValue:", value))
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 get_docinfo <- function(filename, use_names = TRUE) {
     if (supports_pdftools()) {
@@ -175,7 +210,7 @@ get_docinfo <- function(filename, use_names = TRUE) {
     }
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 get_docinfo_pdftools <- function(filename, use_names = TRUE) {
     assert_suggested("pdftools")
@@ -206,7 +241,7 @@ get_docinfo_pdftools_helper <- function(filename) {
     dinfo
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 get_docinfo_exiftool <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_docinfo_exiftool_helper)
@@ -240,7 +275,7 @@ get_docinfo_exiftool_helper <- function(filename) {
     dinfo
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
     stopifnot(inherits(docinfo, "docinfo"))
@@ -248,7 +283,7 @@ set_docinfo_exiftool <- function(docinfo, input, output = input) {
     set_exiftool_metadata(tags, input, output)
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 get_docinfo_pdftk <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_docinfo_pdftk_helper)
@@ -283,7 +318,7 @@ get_docinfo_pdftk_helper <- function(filename) {
     dinfo
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 set_docinfo <- function(docinfo, input, output = input) {
     if (supports_gs()) {
@@ -302,7 +337,7 @@ set_docinfo <- function(docinfo, input, output = input) {
     }
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 set_docinfo_gs <- function(docinfo, input, output = input) {
     stopifnot(inherits(docinfo, "docinfo"))
@@ -327,7 +362,7 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
     invisible(output)
 }
 
-#' @rdname docinfo
+#' @rdname edit_docinfo
 #' @export
 set_docinfo_pdftk <- function(docinfo, input, output = input) {
     stopifnot(inherits(docinfo, "docinfo"))
@@ -413,11 +448,37 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$subject))
                 tags[["PDF:Subject"]] <- self$subject
             if (!is.null(self$keywords))
-                tags[["PDF:Keywords"]] <- self$keywords
+                tags[["PDF:Keywords"]] <- paste(self$keywords, collapse = ", ")
             if (!is.null(self$mod_date))
                 tags[["PDF:ModifyDate"]] <-  format(self$mod_date,
                                                     format = "%Y-%m-%dT%H:%M:%S%z")
             tags
+        },
+        xmp = function() {
+            # these are the XMP tags that `ghostscript` chooses as equivalent
+            # to the eight documentation info dictionary entries
+            # With `exiftool` we're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
+            tags <- list()
+            if (!is.null(self$title))
+                tags[["dc:Title"]] <- self$title
+            if (!is.null(self$author))
+                tags[["dc:Creator"]] <- self$author
+            if (!is.null(self$subject))
+                tags[["dc:Description"]] <- self$subject
+
+            if (!is.null(self$producer))
+                tags[["pdf:Producer"]] <- self$producer
+            if (!is.null(self$keywords))
+                tags[["pdf:Keywords"]] <- paste(self$keywords, collapse = ", ")
+
+            if (!is.null(self$creation_date))
+                tags[["xmp:CreateDate"]] <- self$creation_date
+            if (!is.null(self$creator))
+                tags[["xmp:CreatorTool"]] <- self$creator
+            if (!is.null(self$mod_date))
+                tags[["xmp:ModifyDate"]] <-  self$mod_date
+
+            as_xmp(tags)
         },
         pdfmark = function() {
             tags <- "["

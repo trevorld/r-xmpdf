@@ -66,17 +66,17 @@ invisible(dev.off())
 
 # Edit XMP metadata
 print(get_xmp(f)[[1]])
-xmp <- list(title = "Two Boring Pages", author = "John Doe")
-set_xmp(xmp, f)
+x <- xmp(title = "Two Boring Pages", creator = "John Doe")
+set_xmp(x, f)
 print(get_xmp(f)[[1]])
 
 # Edit PDF documentation info
 print(get_docinfo(f)[[1]])
-di <- docinfo(author = "John Doe",
-              title = "Two Boring Pages",
-              keywords = c("R", "xmpdf"),
-              filename = f)
-set_docinfo(di, f)
+d <- docinfo(author = "John Doe",
+             title = "Two Boring Pages",
+             keywords = c("R", "xmpdf"),
+             filename = f)
+set_docinfo(d, f)
 print(get_docinfo(f)[[1]])
 
 # Edit PDF bookmarks

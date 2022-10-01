@@ -2,15 +2,7 @@
 % Please edit documentation in R/docinfo.R
 \name{docinfo}
 \alias{docinfo}
-\alias{get_docinfo}
-\alias{get_docinfo_pdftools}
-\alias{get_docinfo_exiftool}
-\alias{set_docinfo_exiftool}
-\alias{get_docinfo_pdftk}
-\alias{set_docinfo}
-\alias{set_docinfo_gs}
-\alias{set_docinfo_pdftk}
-\title{Set/get pdf document info dictionary}
+\title{PDF documentation info dictionary object}
 \usage{
 docinfo(
   author = NULL,
@@ -23,22 +15,6 @@ docinfo(
   mod_date = NULL,
   filename = NULL
 )
-
-get_docinfo(filename, use_names = TRUE)
-
-get_docinfo_pdftools(filename, use_names = TRUE)
-
-get_docinfo_exiftool(filename, use_names = TRUE)
-
-set_docinfo_exiftool(docinfo, input, output = input)
-
-get_docinfo_pdftk(filename, use_names = TRUE)
-
-set_docinfo(docinfo, input, output = input)
-
-set_docinfo_gs(docinfo, input, output = input)
-
-set_docinfo_pdftk(docinfo, input, output = input)
 }
 \arguments{
 \item{author}{The document's author.}
@@ -58,43 +34,21 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt()}.
 If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.}
 
-\item{filename}{Filename(s) (pdf) to extract info dictionary entries from.
-For \code{docinfo()} just a single pdf filename to extract info dictionary entries from:
+\item{filename}{A pdf filename to extract info dictionary entries from:
 any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}} call.}
-
-\item{use_names}{If \code{TRUE} (default) use \code{filename} as the names of the result.}
-
-\item{docinfo}{A "docinfo" object (as returned by \code{\link[=docinfo]{docinfo()}} or \code{\link[=get_docinfo]{get_docinfo()}}).}
-
-\item{input}{Input pdf filename.}
-
-\item{output}{Output pdf filename.}
-}
-\value{
-\code{docinfo()} returns a "docinfo" R6 class.
-\code{get_docinfo()} returns a list of "docinfo" R6 classes.
-\code{set_docinfo()} returns the (output) filename invisibly.
 }
 \description{
-\code{docinfo()} creates an object of pdf document info dictionary information from scratch.
-\code{get_docinfo()} gets pdf document info from a file.
-\code{set_docinfo()} sets pdf document info for a file.
+\code{docinfo()} creates a PDF documentation info dictionary object
+Such objects can be used with \code{\link[=set_docinfo]{set_docinfo()}} to edit PDF documentation info dictionary entries
+and such objects are returned by \code{\link[=get_docinfo]{get_docinfo()}}.
 }
-\details{
-\code{get_docinfo()} will try to use the following helper functions in the following order:
-\enumerate{
-\item \code{get_docinfo_pdftools()} which wraps \code{\link[pdftools:pdftools]{pdftools::pdf_info()}}
-\item \code{get_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
-\item \code{get_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
+\section{Known limitations}{
+
+\itemize{
+\item Currently does not support arbitrary info dictionary entries.
+}
 }
 
-\code{set_docinfo()} will try to use the following helper functions in the following order:
-\enumerate{
-\item \code{set_docinfo_gs()} which wraps \code{ghostscript} command-line tool
-\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
-\item \code{set_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
-}
-}
 \section{\code{docinfo} R6 Class Methods}{
 \describe{
 \item{\code{print()}}{Print out the documentation info entries.}
@@ -116,23 +70,6 @@ Can also use the relevant active bindings to set documentation info keys.}
 }
 }
 
-\section{Known limitations}{
-
-\itemize{
-\item Currently does not support arbitrary info dictionary entries.
-\item \code{set_docinfo_gs()} doesn't work with Unicode input.
-\item As a side effect \code{set_docinfo_gs()} seems to also update in previously set matching XPN metadata
-while \code{set_docinfo_exiftool()} and \code{set_docinfo_pdftk()} don't update
-any previously set matching XPN metadata.
-Some pdf viewers will preferentially use the previously set document title from XPN metadata
-if it exists instead of using the title set in documentation info dictionary entry.
-Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set_xmp()}}.
-\item Old metadata information is usually not deleted from the pdf file by these operations.
-If deleting the old metadata is important one may want to try
-\code{qpdf::pdf_compress(input, linearize = TRUE)}.
-}
-}
-
 \examples{
 if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
   f <- tempfile(fileext = ".pdf")
@@ -142,22 +79,21 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   grid.text("Page 2")
   invisible(dev.off())
 
-  di_get1 <- get_docinfo(f)[[1]]
-  print(di_get1)
+  print(get_docinfo(f)[[1]])
   \dontshow{cat("\n")}
 
-  di_set <- docinfo(author = "John Doe",
-                    title = "Two Boring Pages",
-                    keywords = c("R", "xmpdf"),
-                    filename = f)
-  set_docinfo(di_set, f)
+  d <- docinfo(author = "John Doe",
+               title = "Two Boring Pages",
+               keywords = c("R", "xmpdf"),
+               filename = f)
+  set_docinfo(d, f)
 
-  di_get2 <- get_docinfo(f)[[1]]
-  print(di_get2)
+  print(get_docinfo(f)[[1]])
+
   unlink(f)
 }
 }
 \seealso{
-\code{\link[=supports_get_docinfo]{supports_get_docinfo()}}, \code{\link[=supports_set_docinfo]{supports_set_docinfo()}}, \code{\link[=supports_gs]{supports_gs()}}, and \code{\link[=supports_pdftk]{supports_pdftk()}} to detect support for these features. For more info about the pdf document info dictionary see
-\url{https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#document-info-dictionary-docinfo}.
+\code{\link[=get_docinfo]{get_docinfo()}} and \code{\link[=set_docinfo]{set_docinfo()}} for getting/setting such information from/to PDF files.
+\code{\link[=as_xmp]{as_xmp()}} can be used to coerce \code{docinfo()} objects into \code{\link[=xmp]{xmp()}} objects.
 }
