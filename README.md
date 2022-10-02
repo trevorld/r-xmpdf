@@ -31,21 +31,21 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("qpdf")`
 
-* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries.
+* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries in pdf files.
   Note currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
 
   + `install.packages("pdftools")` will probably install `{qpdf}` as well
 
-* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
+* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files as well as documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
 
   + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
 
-* **[ghostscript](https://www.ghostscript.com/)** can be used to set pdf bookmarks and documentation info entries. Can also be used to get the number of pages in a pdf.
+* **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
 
-* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set pdf bookmarks and documentation info entries.  Can also be used to get the number of pages in a pdf.
+* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
 
@@ -93,13 +93,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: 
-## CreationDate: 2022-09-30 16:06:05
+## CreationDate: 2022-10-01 11:36:33
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: 
 ## Keywords: 
-## ModDate: 2022-09-30 16:06:05
+## ModDate: 2022-10-01 11:36:33
 ```
 
 ```r
@@ -113,13 +113,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-09-30 16:06:05
+## CreationDate: 2022-10-01 11:36:33
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: 
 ## Keywords: R, xmpdf
-## ModDate: 2022-09-30 16:06:05
+## ModDate: 2022-10-01 11:36:33
 ```
 
 ```r
@@ -181,9 +181,13 @@ Known limitations:
 
 ## <a name="similar">Related Software</a>
 
-Note most of the R packages below are focused on **getting** metadata rather than **setting** metadata
+Note most of the R packages listed below are focused on **getting** metadata rather than **setting** metadata
 and/or only provide low-level wrappers around the relevant command-line tools.
 Please feel free to [open a pull request to add any missing relevant R packages](https://github.com/trevorld/r-xmpdf/edit/main/README.Rmd).
+
+### exempi
+
+* [exempi](https://libopenraw.freedesktop.org/exempi/)
 
 ### exiftool
 
@@ -195,10 +199,14 @@ Please feel free to [open a pull request to add any missing relevant R packages]
   Can download `exiftool`.
 * [exiftool](https://exiftool.org/)
 
+### exiv2
+
+* [{exiv}](https://github.com/hrbrmstr/exiv) read and write ‘Exif’, ‘ID3v1’ and ‘ID3v2’ image/media tags
+* [exiv2](https://exiv2.org/)
+
 ### other exif tools
 
 * [{exif}](https://github.com/Ironholds/exif) reads EXIF from jpeg images
-* [{exiv}](https://github.com/hrbrmstr/exiv) read and write ‘Exif’, ‘ID3v1’ and ‘ID3v2’ image/media tags
 * [{magick}](https://github.com/ropensci/magick) has `image_attributes()` which reads EXIF image tags.
 
 ### ghostscript
