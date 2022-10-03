@@ -254,7 +254,7 @@ to_date_pdfmark <- function(date) {
     } else if (is.character(date)) {
         ""
     } else {
-        val <- as.character(date, format = "D:%Y%m%d%H%M%S%z")
+        val <- format(date, format = "D:%Y%m%d%H%M%S%z")
         paste0(substr(val, 1, 19), "'", substr(val, 20, 21), "'")
     }
 }
