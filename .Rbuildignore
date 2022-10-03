@@ -2,6 +2,7 @@
 ^Rakefile$
 ^README.Rmd$
 ^README.html$
+^codecov.yml$
 ^pkgdown$
 ^_pkgdown.yml$
 ^tmp$

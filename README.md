@@ -1,9 +1,8 @@
 # xmpdf <img src="man/figures/logo.png" align="right" width="200px" alt="xmpdf hex sticker">
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
-
 [![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
-
+[![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg?token=K12GJIBIL7)](https://codecov.io/github/trevorld/r-xmpdf)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 ### Table of Contents
@@ -99,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-02 22:49:07+0000
+## CreationDate: 2022-10-03 00:04:45+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-02 22:49:07+0000
+## ModDate: 2022-10-03 00:04:45+0000
 ```
 
 ```r
@@ -119,14 +118,14 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-02 22:49:07+0000
+## CreationDate: 2022-10-03 00:04:45+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R
 ## Keywords: xmpdf
-## ModDate: 2022-10-02 22:49:07+0000
+## ModDate: 2022-10-03 00:04:45+0000
 ```
 
 ```r
