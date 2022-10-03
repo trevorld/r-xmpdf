@@ -37,6 +37,7 @@
 #'   * Old metadata information is usually not deleted from the pdf file by these operations.
 #'     If deleting the old metadata is important one may want to try
 #'     `qpdf::pdf_compress(input, linearize = TRUE)`.
+#'   * Datetimes are often converted to UTC time.
 #'
 #' @examples
 #' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {
@@ -70,18 +71,24 @@ NULL
 #' `docinfo()` creates a PDF documentation info dictionary object
 #' Such objects can be used with [set_docinfo()] to edit PDF documentation info dictionary entries
 #' and such objects are returned by [get_docinfo()].
-#' @param author The document's author.
-#' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt()`.
+#' @param author The document's author.  Matching xmp metadata tag is `dc:Creator`.
+#' @param creation_date The date the document was created. Will be coerced by `as.POSIXlt(tz = "GMT")`.
+#'                Matching xmp metadata tag is `xmp:CreateDate`.
 #' @param creator The name of the application that originally created the document (if converted to pdf).
+#'                Matching xmp metadata tag is `xmp:CreatorTool`.
 #' @param producer The name of the application that converted the document to pdf.
-#' @param title The document's title.
-#' @param subject The document's subject.
+#'                Matching xmp metadata tag is `pdf:Producer`.
+#' @param title The document's title.  Matching xmp metadata tag is `dc:Title`.
+#' @param subject The document's subject.  Matching xmp metadata tag is `dc:Description`.
 #' @param keywords Character vector of keywords for this document (for cross-document searching).
-#' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt()`.
+#'                 Matching xmp metadata tag is `pdf:Keywords`.
+#' @param mod_date The date the document was last modified. Will be coerced by `as.POSIXlt(tz = "GMT")`.
 #'                 If left `NULL` will default to `Sys.Date()` when used to set documentation info entry.
+#'                 Matching xmp metadata tag is `xmp:ModifyDate`.
 #' @param filename A pdf filename to extract info dictionary entries from:
 #'                 any such entries will be overridden by any manually set entries in [docinfo()] call.
 #' @seealso [get_docinfo()] and [set_docinfo()] for getting/setting such information from/to PDF files.
+#'          [as_docinfo()] for coercing to this object.
 #'    [as_xmp()] can be used to coerce `docinfo()` objects into [xmp()] objects.
 #' @section Known limitations:
 #'
@@ -135,7 +142,105 @@ docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, produce
                 filename = filename)
 }
 
-tryFormats <- c("%Y-%m-%dT%H:%M:%S%z",
+#' Coerce to docinfo objects
+#'
+#' `as_docinfo()` coerces objects into a [docinfo()] object.
+#'
+#' @param x An object that can reasonably be coerced to a [docinfo()] object.
+#' @param ... Further arguments passed to or from other methods.
+#' @return A [docinfo()] object.
+#' @examples
+#'  x <- xmp(`dc:Creator` = "John Doe", `dc:Title` = "A Title")
+#'  as_docinfo(x)
+#'
+#' @export
+as_docinfo <- function(x, ...) {
+    UseMethod("as_docinfo")
+}
+
+#' @export
+as_docinfo.docinfo <- function(x, ...) {
+    x
+}
+
+#' @export
+as_docinfo.default <- function(x, ...) {
+    l <- as.list(x)
+    do.call(docinfo, l)
+}
+
+#' @rdname as_docinfo
+#' @export
+as_docinfo.xmp <- function(x, ...) {
+    l <- as.list(x)
+    names(l) <- tolower(names(l))
+    di <- docinfo()
+    if (hasName(l, "dc:title"))
+        di$title <- l[["dc:title"]]
+    else if (hasName(l, "title"))
+        di$title <- l[["title"]]
+
+    if (hasName(l, "dc:creator"))
+        di$author <- l[["dc:creator"]]
+    else if (hasName(l, "creator"))
+        di$creator <- l[["creator"]]
+
+    if (hasName(l, "dc:description"))
+        di$subject <- l[["dc:description"]]
+    else if (hasName(l, "description"))
+        di$subject <- l[["description"]]
+
+    if (hasName(l, "pdf:producer"))
+       di$producer <- l[["pdf:producer"]]
+    else if (hasName(l, "producer"))
+       di$producer <- l[["producer"]]
+
+    if (hasName(l, "pdf:keywords"))
+       di$keywords <- l[["pdf:keywords"]]
+    else if (hasName(l, "keywords"))
+       di$keywords <- l[["keywords"]]
+
+    if (hasName(l, "xmp:createdate"))
+        di$creation_date <- l[["xmp:createdate"]]
+    else if (hasName(l, "createdate"))
+        di$creation_date <- l[["createdate"]]
+
+    if (hasName(l, "xmp:creatortool"))
+        di$creator <- l[["xmp:creatortool"]]
+    else if (hasName(l, "creatortool"))
+        di$creator <- l[["creatortool"]]
+
+    if (hasName(l, "xmp:modifydate"))
+        di$creation_date <- l[["xmp:modifydate"]]
+    else if (hasName(l, "modifydate"))
+        di$creation_date <- l[["modifydate"]]
+
+    di
+}
+
+#' @export
+as.list.docinfo <- function(x, ...) {
+    l <- list()
+    if (!is.null(x$author))
+        l$author <- x$author
+    if (!is.null(x$creation_date))
+        l$creation_date <- x$creation_date
+    if (!is.null(x$creator))
+        l$creator <- x$creator
+    if (!is.null(x$producer))
+        l$producer <- x$producer
+    if (!is.null(x$title))
+        l$title <- x$title
+    if (!is.null(x$subject))
+        l$subject <- x$subject
+    if (!is.null(x$keywords))
+        l$keywords <- x$keywords
+    if (!is.null(x$mod_date))
+        l$mod_date <-  x$mod_date
+    l
+}
+
+tryFormats <- c("%FT%T%z",
                 "%Y-%m-%d %H:%M:%OS",
                 "%Y/%m/%d %H:%M:%OS",
                 "%Y-%m-%d %H:%M",
@@ -149,8 +254,20 @@ to_date_pdfmark <- function(date) {
     } else if (is.character(date)) {
         ""
     } else {
-        val <- format(date, format = "D:%Y%m%d%H%M%S%z")
+        val <- as.character(date, format = "D:%Y%m%d%H%M%S%z")
         paste0(substr(val, 1, 19), "'", substr(val, 20, 21), "'")
+    }
+}
+
+d_format <- function(value) {
+    if (is.null(value)) {
+        "NULL"
+    } else if (is.character(value)) {
+        value
+    } else if (length(value) > 1) {
+        paste(value, collapse = ", ")
+    } else {
+        strftime(value, format = "%F %T%z")
     }
 }
 
@@ -158,29 +275,28 @@ from_date_pdfmark <- function(string) {
     destring <- gsub("^(D:)*", "\\2", string)
     destring <- gsub("'", "", destring) # GMT offset
     date <- if (nchar(destring) == 4) {
-        destring <- paste0(destring, "0101")
-        as.POSIXlt(destring, format = "%Y%m%d")
+        destring <- paste0(destring, "0101000000+0000")
     } else if (nchar(destring) == 6) {
-        destring <- paste0(destring, "01")
-        as.POSIXlt(destring, format = "%Y%m%d")
+        destring <- paste0(destring, "01000000+0000")
     } else if (nchar(destring) == 8) {
-        as.POSIXlt(destring, format = "%Y%m%d")
+        destring <- paste0(destring, "000000+0000")
     } else if (nchar(destring) == 10) {
-        as.POSIXlt(destring, format = "%Y%m%d%H")
+        destring <- paste0(destring, "0000+0000")
     } else if (nchar(destring) == 12) {
-        as.POSIXlt(destring, format = "%Y%m%d%H%M")
+        destring <- paste0(destring, "00+0000")
     } else if (nchar(destring) == 14) {
-        as.POSIXlt(destring, format = "%Y%m%d%H%M%S")
+        destring <- paste0(destring, "+0000")
     } else if (nchar(destring) == 17) {
         destring <- paste0(destring, "00")
-        as.POSIXlt(destring, format = "%Y%m%d%H%M%S%z")
-    } else if (nchar(destring) == 19) {
-        as.POSIXlt(destring, format = "%Y%m%d%H%M%S%z")
+    }
+    if (nchar(destring) == "19") {
+        tz <- substr(destring, 15, 19)
+        date <- strptime(destring, tz = "GMT", format = "%Y%m%d%H%M%S%z")
     } else {
-        NA
+        date <- NA
     }
     if (is.na(date)) {
-        abort(paste("Couldn't parse pdfmark date", string))
+        abort(paste("Couldn't parse pdfmark date", sQuote(string)))
     }
     date
 }
@@ -278,7 +394,7 @@ get_docinfo_exiftool_helper <- function(filename) {
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
-    stopifnot(inherits(docinfo, "docinfo"))
+    docinfo <- as_docinfo(docinfo)
     tags <- docinfo$exiftool_tags()
     set_exiftool_metadata(tags, input, output)
 }
@@ -340,7 +456,7 @@ set_docinfo <- function(docinfo, input, output = input) {
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_gs <- function(docinfo, input, output = input) {
-    stopifnot(inherits(docinfo, "docinfo"))
+    docinfo <- as_docinfo(docinfo)
     cmd <- gs()
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)
@@ -365,7 +481,7 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_pdftk <- function(docinfo, input, output = input) {
-    stopifnot(inherits(docinfo, "docinfo"))
+    docinfo <- as_docinfo(docinfo)
     cmd <- pdftk()
     meta <- get_pdftk_metadata(input)
     input <- normalizePath(input, mustWork = TRUE)
@@ -421,14 +537,14 @@ DocInfo <- R6Class("docinfo",
             invisible(NULL)
         },
         print = function() {
-            text <- c(paste("Author:", self$author),
-                      paste("CreationDate:", self$creation_date),
-                      paste("Creator:", self$creator),
-                      paste("Producer:", self$producer),
-                      paste("Title:", self$title),
-                      paste("Subject:", self$subject),
-                      paste("Keywords:",  paste(self$keywords, collapse = ", ")),
-                      paste("ModDate:", self$mod_date))
+            text <- c(paste("Author:", d_format(self$author)),
+                      paste("CreationDate:", d_format(self$creation_date)),
+                      paste("Creator:", d_format(self$creator)),
+                      paste("Producer:", d_format(self$producer)),
+                      paste("Title:", d_format(self$title)),
+                      paste("Subject:", d_format(self$subject)),
+                      paste("Keywords:",  d_format(self$keywords)),
+                      paste("ModDate:", d_format(self$mod_date)))
             invisible(cat(text, sep="\n"))
         },
         exiftool_tags = function() {
@@ -565,7 +681,7 @@ DocInfo <- R6Class("docinfo",
                 if (is.null(value))
                     private$val$creation_date <- NULL
                 else
-                    private$val$creation_date <- as.POSIXlt(value, tryFormats = tryFormats)
+                    private$val$creation_date <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
             }
         },
         creator = function(value) {
@@ -610,7 +726,7 @@ DocInfo <- R6Class("docinfo",
                 if (is.null(value))
                     private$val$mod_date <- NULL
                 else
-                    private$val$mod_date <- as.POSIXlt(value, tryFormats = tryFormats)
+                    private$val$mod_date <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
             }
         }
     ),

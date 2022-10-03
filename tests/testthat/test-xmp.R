@@ -1,7 +1,6 @@
 skip_if_not_installed("grid")
 library("grid")
 
-
 test_that("get_xmp() / set_xmp()", {
     skip_if_not(supports_get_xmp() && supports_set_xmp())
     f <- tempfile(fileext = ".pdf")
@@ -14,9 +13,12 @@ test_that("get_xmp() / set_xmp()", {
 
     expect_equal(length(get_xmp(f)[[1]]), 0L)
 
+    expect_snapshot(print(xmp()))
     xmp <- list(Title = "An XMP title")
     set_xmp(xmp, f)
-    expect_equal(get_xmp(f)[[1]][["dc:Title"]], "An XMP title")
+    x <- get_xmp(f)[[1]]
+    expect_equal(x[["dc:Title"]], "An XMP title")
+    expect_snapshot(print(x))
 })
 
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
@@ -31,7 +33,7 @@ test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
 
     expect_equal(length(get_xmp_exiftool(f)[[1]]), 0L)
 
-    xmp <- list(Title = "An XMP title")
+    xmp <- xmp(title = "An XMP title", `dc:Creator` = "An XMP creator")
     set_xmp_exiftool(xmp, f)
-    expect_equal(get_xmp_exiftool(f)[[1]][["dc:Title"]], "An XMP title")
+    expect_equal(get_xmp_exiftool(f, use_names = FALSE)[[1]][["dc:Title"]], "An XMP title")
 })

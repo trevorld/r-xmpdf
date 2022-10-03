@@ -9,34 +9,51 @@ assert_suggested <- function(package) {
 }
 
 need_to_install_str <- function(fn_call) {
-    sprintf("You must install (only) one suggested R package or system command to use %s.",
-            sQuote(fn_call))
+    c("!" = sprintf("You must install (only) one suggested R package or system command to use %s",
+                    sQuote(fn_call)))
 }
 
 install_package_str <- function(package) {
-     c(x = sprintf("The suggested package %s is not installed.", sQuote(package)),
+     c(x = sprintf("The suggested package %s is not installed", sQuote(package)),
        i = sQuote(sprintf('install.packages("%s")', package))
        )
 }
 
 install_cmd_str <- function(cmd) {
-    c(x = sprintf("The system command %s is not installed (or detected).", sQuote(cmd)))
+    c(x = sprintf("The system command %s is not installed (or detected)", sQuote(cmd)))
 }
 
-install_pdftk_str <- function(cmd) {
+install_pdftk_str <- function() {
     c(install_cmd_str("pdftk"),
-      i = paste(sQuote("sudo apt-get install pdftk-java"), "(Debian/Ubuntu)"))
+      i = "<https://gitlab.com/pdftk-java/pdftk> (Official)",
+      i = paste(sQuote("sudo apt-get install pdftk-java"), "(Debian/Ubuntu)"),
+      i = paste(sQuote("brew install pdftk-java"), "(Homebrew)"),
+      i = paste(sQuote("choco install pdftk-java"), "(Chocolately)"),
+      i = paste(sQuote('Sys.setenv(PDFTK_PATH = "/path/to/pdftk")'),
+                "if installed but not detected on PATH")
+    )
 }
 
-install_gs_str <- function(cmd) {
+install_gs_str <- function() {
     c(install_cmd_str("ghostscript"),
-      i = paste(sQuote("sudo apt-get install ghostscript"), "(Debian/Ubuntu)"))
+      i = "<https://www.ghostscript.com/releases/gsdnld.html> (Official)",
+      i = paste(sQuote("sudo apt-get install ghostscript"), "(Debian/Ubuntu)"),
+      i = paste(sQuote("brew install ghostscript"), "(Homebrew)"),
+      i = paste(sQuote("choco install ghostscript"), "(Chocolately)"),
+      i = paste(sQuote('Sys.setenv(R_GSCMD = "/path/to/gs")'),
+                "if installed but not detected on PATH")
+    )
 }
 
-install_exiftool_str <- function(cmd) {
+install_exiftool_str <- function() {
     c(install_cmd_str("exiftool"),
-      i = paste(sQuote("sudo apt-get install libimage-exiftool-perl"), "(Debian/Ubuntu)"),
+      i = "<https://exiftool.org/index.html> (Official)",
       i = paste(sQuote('install.packages("exiftoolr"); exiftoolr::install_exiftool()'),
-                "(Cross-Platform)")
+                "(Cross-Platform)"),
+      i = paste(sQuote("sudo apt-get install libimage-exiftool-perl"), "(Debian/Ubuntu)"),
+      i = paste(sQuote("brew install exiftool"), "(Homebrew)"),
+      i = paste(sQuote("choco install exiftool"), "(Chocolately)"),
+      i = paste(sQuote('Sys.setenv(ET_EXIFTOOL_PATH = "/path/to/exiftool")'),
+                "if installed but not detected on PATH")
     )
 }

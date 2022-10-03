@@ -40,14 +40,20 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
+  + `brew install exiftool` (Homebrew)
+  + `choco install exiftool` (Chocolately)
 
 * **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
+  + `brew install ghostscript` (Homebrew)
+  + `choco install ghostscript` (Chocolately)
 
 * **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
+  + `brew install pdftk-java` (Homebrew)
+  + `choco install pdftk-java` (Chocolately)
 
 ## <a name="examples">Examples</a>
 
@@ -81,8 +87,8 @@ print(get_xmp(f)[[1]])
 ```
 
 ```
-## x:XMPToolkit : Image::ExifTool 12.40 
-## dc:Creator : John Doe 
+## x:XMPToolkit : Image::ExifTool 12.40
+## dc:Creator : John Doe
 ## dc:Title : Two Boring Pages
 ```
 
@@ -92,14 +98,14 @@ print(get_docinfo(f)[[1]])
 ```
 
 ```
-## Author: 
-## CreationDate: 2022-10-01 11:36:33
+## Author: NULL
+## CreationDate: 2022-10-02 22:49:07+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
-## Subject: 
-## Keywords: 
-## ModDate: 2022-10-01 11:36:33
+## Subject: NULL
+## Keywords: NULL
+## ModDate: 2022-10-02 22:49:07+0000
 ```
 
 ```r
@@ -113,13 +119,14 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-01 11:36:33
+## CreationDate: 2022-10-02 22:49:07+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
-## Subject: 
-## Keywords: R, xmpdf
-## ModDate: 2022-10-01 11:36:33
+## Subject: NULL
+## Keywords: R
+## Keywords: xmpdf
+## ModDate: 2022-10-02 22:49:07+0000
 ```
 
 ```r
@@ -168,6 +175,7 @@ Known limitations:
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * `set_docinfo_gs()` doesn't work with Unicode info dictionary values.
+* Datetimes are often converted to UTC time.
 * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.

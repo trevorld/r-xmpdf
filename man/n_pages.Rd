@@ -33,9 +33,9 @@ An integer vector of number of pages within each file.
 \code{n_pages()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{n_pages_qpdf()} which wraps \code{\link[qpdf:qpdf]{qpdf::pdf_length()}}
+\item \code{n_pages_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{n_pages_pdftk()} which wraps \code{pdftk} command-line tool
 \item \code{n_pages_gs()} which wraps \code{ghostscript} command-line tool
-\item \code{n_pages_exiftool()} which wraps \code{exiftool} command-line tool
 }
 }
 \examples{

@@ -53,7 +53,7 @@ test_that("docinfo_pdftk", {
 })
 
 test_that("set_docinfo_gs", {
-    skip_if_not(supports_gs())
+    skip_if_not(supports_gs() && supports_set_docinfo())
 
     f3 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f3))
@@ -116,11 +116,54 @@ test_that("docinfo_exiftool", {
     expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
 
+test_that("conversion to/from docinfo()", {
+    d <- docinfo(author = "John Doe",
+                 creation_date = "2022-11-11 11:11:11",
+                 creator = "Generic Creator",
+                 producer = "Generic Producer",
+                 title = "Generic Title",
+                 subject = "Generic Subject",
+                 keywords = c("Key", "Word"),
+                 mod_date = "2022-11-11 11:11:11")
+    expect_snapshot(print(d))
+    dl <- as.list(d)
+    expect_equal(dl$author, "John Doe")
+    expect_true(is.list(dl))
+
+    x <- as_xmp(d)
+    expect_snapshot(print(x))
+    expect_equal(x[["dc:Creator"]], "John Doe")
+
+    d2 <- as_docinfo(x)
+    expect_equal(d2$title, "Generic Title")
+
+    x2 <- as.list(x)
+    names(x2) <- gsub("^[[:alpha:]]+:", "", names(x2))
+    d3 <- as_docinfo(as_xmp(x2))
+    expect_equal(d3$subject, "Generic Subject")
+})
+
 test_that("from_date_pdfmark()", {
+    expect_null(to_date_pdfmark(NULL))
+    expect_error(from_date_pdfmark("D:20081"), "Couldn't parse pdfmark date")
     expect_equal(format(from_date_pdfmark("D:20081206"), format = "%Y-%m-%d"),
                  "2008-12-06")
     expect_equal(format(from_date_pdfmark("20081206"), format = "%Y-%m-%d"),
                  "2008-12-06")
-    expect_equal(format(from_date_pdfmark("D:2008"), format = "%Y"),
-                 "2008")
+    expect_equal(format(from_date_pdfmark("D:2008"), format = "%Y-%m-%d"),
+                 "2008-01-01")
+    expect_equal(format(from_date_pdfmark("D:200802"), format = "%Y-%m-%d"),
+                 "2008-02-01")
+    expect_equal(format(from_date_pdfmark("D:20080210"), format = "%Y-%m-%d"),
+                 "2008-02-10")
+    expect_equal(format(from_date_pdfmark("D:2008021020"), format = "%Y-%m-%d %H:%M:%S"),
+                 "2008-02-10 20:00:00")
+    expect_equal(format(from_date_pdfmark("D:200802102010"), format = "%Y-%m-%d %H:%M:%S"),
+                 "2008-02-10 20:10:00")
+    expect_equal(format(from_date_pdfmark("D:20080210201005"), format = "%Y-%m-%d %H:%M:%S"),
+                 "2008-02-10 20:10:05")
+    expect_equal(format(from_date_pdfmark("D:20080210201005+05"), format = "%Y-%m-%d %H:%M:%S%z"),
+                 "2008-02-10 15:10:05+0000")
+    expect_equal(format(from_date_pdfmark("D:20080210201005+0500"), format = "%Y-%m-%d %H:%M:%S%z"),
+                 "2008-02-10 15:10:05+0000")
 })

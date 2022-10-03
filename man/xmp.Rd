@@ -34,4 +34,5 @@ if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE))
 \seealso{
 \code{\link[=get_xmp]{get_xmp()}} and \code{\link[=set_xmp]{set_xmp()}} for getting/setting such information from/to a variety of media file formats.
 \code{\link[=as_xmp]{as_xmp()}} for coercing to this object.
+\code{\link[=as_docinfo]{as_docinfo()}} can be used to coerce \code{xmp()} objects into \code{\link[=docinfo]{docinfo()}} objects.
 }

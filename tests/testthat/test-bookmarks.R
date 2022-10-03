@@ -86,6 +86,13 @@ test_that("bookmarks_pdftk", {
                             page = c(1L, 1L, 2L))
     set_bookmarks_pdftk(bookmarks, f1, f2)
     expect_equal(nrow(get_bookmarks(f2)[[1]]), 3L)
+
+    bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
+                            count = c(-2L, 1L, 0L),
+                            page = c(1L, 1L, 2L),
+                            style = c(2, 1, 0),
+                            color = c("black", "blue", "red"))
+    expect_snapshot(set_bookmarks_pdftk(bookmarks, f1, f2))
 })
 
 test_that("`get_count()` and `get_level()`", {

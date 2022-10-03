@@ -17,22 +17,27 @@ docinfo(
 )
 }
 \arguments{
-\item{author}{The document's author.}
+\item{author}{The document's author.  Matching xmp metadata tag is \code{dc:Creator}.}
 
-\item{creation_date}{The date the document was created. Will be coerced by \code{as.POSIXlt()}.}
+\item{creation_date}{The date the document was created. Will be coerced by \code{as.POSIXlt(tz = "GMT")}.
+Matching xmp metadata tag is \code{xmp:CreateDate}.}
 
-\item{creator}{The name of the application that originally created the document (if converted to pdf).}
+\item{creator}{The name of the application that originally created the document (if converted to pdf).
+Matching xmp metadata tag is \code{xmp:CreatorTool}.}
 
-\item{producer}{The name of the application that converted the document to pdf.}
+\item{producer}{The name of the application that converted the document to pdf.
+Matching xmp metadata tag is \code{pdf:Producer}.}
 
-\item{title}{The document's title.}
+\item{title}{The document's title.  Matching xmp metadata tag is \code{dc:Title}.}
 
-\item{subject}{The document's subject.}
+\item{subject}{The document's subject.  Matching xmp metadata tag is \code{dc:Description}.}
 
-\item{keywords}{Character vector of keywords for this document (for cross-document searching).}
+\item{keywords}{Character vector of keywords for this document (for cross-document searching).
+Matching xmp metadata tag is \code{pdf:Keywords}.}
 
-\item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt()}.
-If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.}
+\item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt(tz = "GMT")}.
+If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.
+Matching xmp metadata tag is \code{xmp:ModifyDate}.}
 
 \item{filename}{A pdf filename to extract info dictionary entries from:
 any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}} call.}
@@ -95,5 +100,6 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
 }
 \seealso{
 \code{\link[=get_docinfo]{get_docinfo()}} and \code{\link[=set_docinfo]{set_docinfo()}} for getting/setting such information from/to PDF files.
+\code{\link[=as_docinfo]{as_docinfo()}} for coercing to this object.
 \code{\link[=as_xmp]{as_xmp()}} can be used to coerce \code{docinfo()} objects into \code{\link[=xmp]{xmp()}} objects.
 }

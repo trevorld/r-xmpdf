@@ -16,6 +16,8 @@ Initial features
   2. `set_bookmarks_pdftk()` which wraps `pdftk` command-line tool
 
 * `docinfo()` provides an `{R6}` object to represent pdf documentation info entries.
+* `as_docinfo()` can coerce objects into `docinfo()` objects.
+  In particular there is an `as_docinfo.xmp()` method to coerce `xmp()` objects.
 * `get_docinfo()` reads in pdf documentation info entries from pdf file(s).
   `get_docinfo()` will try to use the following helper functions in the following order:
 
@@ -47,9 +49,9 @@ Initial features
   `n_pages()` will try to use the following helper functions in the following order:
  
   1. `n_pages_qpdf()` which wraps `qpdf::pdf_length()`
-  2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
-  3. `n_pages_gs()` which wraps `ghostscript` command-line tool
-  4. `n_pages_exiftool()` which wraps `exiftool` command-line tool
+  2. `n_pages_exiftool()` which wraps `exiftool` command-line tool
+  3. `n_pages_pdftk()` which wraps `pdftk` command-line tool
+  4. `n_pages_gs()` which wraps `ghostscript` command-line tool
 
 * The following functions detect support for various higher-level features:
 

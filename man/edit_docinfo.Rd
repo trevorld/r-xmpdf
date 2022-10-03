@@ -78,6 +78,7 @@ Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set
 \item Old metadata information is usually not deleted from the pdf file by these operations.
 If deleting the old metadata is important one may want to try
 \code{qpdf::pdf_compress(input, linearize = TRUE)}.
+\item Datetimes are often converted to UTC time.
 }
 }
 

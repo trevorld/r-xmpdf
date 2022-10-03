@@ -39,14 +39,20 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
+  + `brew install exiftool` (Homebrew)
+  + `choco install exiftool` (Chocolately)
 
 * **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
+  + `brew install ghostscript` (Homebrew)
+  + `choco install ghostscript` (Chocolately)
 
 * **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
+  + `brew install pdftk-java` (Homebrew)
+  + `choco install pdftk-java` (Chocolately)
 
 ## <a name="examples">Examples</a>
 
@@ -108,6 +114,7 @@ Known limitations:
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * `set_docinfo_gs()` doesn't work with Unicode info dictionary values.
+* Datetimes are often converted to UTC time.
 * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.

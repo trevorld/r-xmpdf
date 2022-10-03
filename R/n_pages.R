@@ -5,9 +5,9 @@
 #' `n_pages()` will try to use the following helper functions in the following order:
 #'
 #' 1. `n_pages_qpdf()` which wraps [qpdf::pdf_length()]
-#' 2. `n_pages_pdftk()` which wraps `pdftk` command-line tool
-#' 3. `n_pages_gs()` which wraps `ghostscript` command-line tool
-#' 4. `n_pages_exiftool()` which wraps `exiftool` command-line tool
+#' 2. `n_pages_exiftool()` which wraps `exiftool` command-line tool
+#' 3. `n_pages_pdftk()` which wraps `pdftk` command-line tool
+#' 4. `n_pages_gs()` which wraps `ghostscript` command-line tool
 #'
 #' @param filename Character vector of filenames.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
@@ -28,17 +28,17 @@
 n_pages <- function(filename, use_names = TRUE) {
     if (supports_qpdf()) {
         n_pages_qpdf(filename, use_names = use_names)
+    } else if (supports_exiftool()) {
+        n_pages_exiftool(filename, use_names = use_names)
     } else if (supports_pdftk()) {
         n_pages_pdftk(filename, use_names = use_names)
     # } else if (has_cmd("pdfinfo")) {
     #     n_pages_pdfinfo(filename, use_names = use_names)
     } else if (supports_gs()) {
         n_pages_gs(filename, use_names = use_names)
-    } else if (supports_exiftool()) {
-        n_pages_exiftool(filename, use_names = use_names)
     } else {
         msg <- c(need_to_install_str("n_pages()"),
-                 install_package_str("pdftools"),
+                 install_package_str("qpdf"),
                  install_exiftool_str(),
                  install_pdftk_str(),
                  install_gs_str()

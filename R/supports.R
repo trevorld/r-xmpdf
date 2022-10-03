@@ -94,7 +94,7 @@ supports_exiftool <- function() {
 #' @rdname supports
 #' @export
 supports_gs <- function() {
-    as.logical(tools::find_gs_cmd() != "")
+    as.logical(find_gs_cmd() != "")
 }
 
 #' @rdname supports
@@ -104,45 +104,64 @@ supports_pdftk <- function() {
 }
 
 find_exiftool_cmd <- function() {
-    if (requireNamespace("exiftoolr", quietly = TRUE)) {
+    if (getOption("xmpdf_disable_exiftool", FALSE)) {
+        ""
+    } else if (requireNamespace("exiftoolr", quietly = TRUE)) {
         cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE))
         if (inherits(cmd, "try-error"))
-            cmd <- ""
-        cmd
+            ""
+        else
+            cmd
     } else {
-        Sys.which("exiftool")
+        Sys.which(Sys.getenv("ET_EXIFTOOL_PATH", "exiftool"))
     }
 }
 
+find_gs_cmd <- function() {
+    if (getOption("xmpdf_disable_gs", FALSE))
+        ""
+    else
+        tools::find_gs_cmd()
+}
+
 find_pdftk_cmd <- function() {
-    Sys.which("pdftk")
+    if (getOption("xmpdf_disable_pdftk", FALSE))
+        ""
+    else
+        Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
 }
 
 # supports_jsonlite <- function() {
 #     requireNamespace("jsonlite", quietly = TRUE)
 # }
 supports_qpdf <- function() {
-    requireNamespace("qpdf", quietly = TRUE)
+    requireNamespace("qpdf", quietly = TRUE) &&
+        !getOption("xmpdf_disable_qpdf", FALSE)
 }
 supports_pdftools <- function() {
-    requireNamespace("pdftools", quietly = TRUE)
+    requireNamespace("pdftools", quietly = TRUE) &&
+        !getOption("xmpdf_disable_pdftools", FALSE)
 }
 
 gs <- function() {
-    get_cmd("ghostscript", tools::find_gs_cmd)
+    get_cmd("ghostscript", find_gs_cmd, install_gs_str)
 }
 
 pdftk <- function() {
-    get_cmd("pdftk", find_pdftk_cmd)
+    get_cmd("pdftk", find_pdftk_cmd, install_pdftk_str)
 }
 
 exiftool <- function() {
-    get_cmd("exiftool", find_exiftool_cmd)
+    get_cmd("exiftool", find_exiftool_cmd, install_exiftool_str)
 }
 
-get_cmd <- function(name, cmd_fn = function() Sys.which(name)) {
+#### Use more enhance error message with
+# 'install_exiftool_str()', 'install_gs_str()', 'install_pdftk_str()'
+get_cmd <- function(name,
+                    cmd_fn = function() Sys.which(name),
+                    msg_fn = function() install_cmd_str(name)) {
     cmd <- cmd_fn()
     if (cmd == "")
-        abort(sprintf("Can't find system dependency `%s` on PATH", name))
+        abort(msg_fn(), class = "xmpdf_suggested_package")
     cmd
 }

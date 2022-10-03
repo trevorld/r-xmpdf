@@ -37,13 +37,13 @@ set_exiftool_metadata <- function(tags, input, output = input) {
         target <- output
     }
     for (name in names(tags)) {
-        # We're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
-        tags[[name]] <- as.character(tags[[name]], format = "%Y-%m-%dT%H:%M:%S%z")
+        # We're using a date format equivalent to R's "%FTT%z"
+        tags[[name]] <- as.character(tags[[name]], format = "%FT%T%z")
     }
     nms <- names(tags)
     values <- unlist(tags)
     tags <- paste0("-", nms, "=", values)
-    # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
+    # Date format equivalent to R's "%FT%T%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
         args <- c(tags, "-d", "%FT%T%z", "-o", target, input)
         results <- exiftoolr::exif_call(args, quiet = TRUE)

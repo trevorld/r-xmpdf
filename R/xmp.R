@@ -46,6 +46,7 @@ NULL
 #' @return An xmp object as can be used with [set_xmp()].  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as [POSIXlt()] or else a character vector in the `"%Y-%m-%dT%H:%M:%S%z"` format.
 #' @seealso [get_xmp()] and [set_xmp()] for getting/setting such information from/to a variety of media file formats.
 #'          [as_xmp()] for coercing to this object.
+#'    [as_docinfo()] can be used to coerce `xmp()` objects into [docinfo()] objects.
 #' @examples
 #' if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
@@ -84,7 +85,6 @@ as_xmp <- function(x, ...) {
     UseMethod("as_xmp")
 }
 
-#' @rdname as_xmp
 #' @export
 as_xmp.default <- function(x, ...) {
     as_xmp(as.list(x))
@@ -104,12 +104,17 @@ as_xmp.list <- function(x, ...) {
 }
 
 #' @export
+as_xmp.xmp <- function(x, ...) {
+    x
+}
+
+#' @export
 print.xmp <- function(x, ...) {
     if (length(x) == 0L) {
         cat("no XMP metadata found")
     } else {
         for (name in names(x))
-            cat(paste0(name, " : ", x[[name]]), "\n")
+            cat(paste0(name, " : ", d_format(x[[name]]), "\n"))
     }
     invisible(NULL)
 }

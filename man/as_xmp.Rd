@@ -2,14 +2,11 @@
 % Please edit documentation in R/xmp.R
 \name{as_xmp}
 \alias{as_xmp}
-\alias{as_xmp.default}
 \alias{as_xmp.docinfo}
 \alias{as_xmp.list}
 \title{Coerce to xmp objects}
 \usage{
 as_xmp(x, ...)
-
-\method{as_xmp}{default}(x, ...)
 
 \method{as_xmp}{docinfo}(x, ...)
 
