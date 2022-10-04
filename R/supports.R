@@ -107,7 +107,8 @@ find_exiftool_cmd <- function() {
     if (getOption("xmpdf_disable_exiftool", FALSE)) {
         ""
     } else if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE))
+        cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE),
+                   silent = TRUE)
         if (inherits(cmd, "try-error"))
             ""
         else
