@@ -98,13 +98,13 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-03 00:04:45+0000
+## CreationDate: 2022-10-04 13:27:45+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-03 00:04:45+0000
+## ModDate: 2022-10-04 13:27:45+0000
 ```
 
 ```r
@@ -118,14 +118,14 @@ print(get_docinfo(f)[[1]])
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-03 00:04:45+0000
+## CreationDate: 2022-10-04 13:27:45+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R
 ## Keywords: xmpdf
-## ModDate: 2022-10-03 00:04:45+0000
+## ModDate: 2022-10-04 13:27:45+0000
 ```
 
 ```r
@@ -156,31 +156,29 @@ unlink(f)
 
 ## <a name="comparison">Limitations by backend</a>
 
-`{xmpdf}` Feature | `exiftool` | `pdftk` | `ghostscript`
+`{xmpdf}` feature | `exiftool` | `pdftk` | `ghostscript`
 ---|---|---|---|
-Get XMP metadata | Yes | No | No
-Set XMP metadata | Yes | No | Poor: when documentation info metadata is set then as a side effect it seems will also be set as XMP metadata
-Get PDF bookmarks | No | Okay: can only get Title, Page number, and Level | No
-Set PDF bookmarks | No | Okay: can only set Title, Page number, and Level | Good: supports most bookmarks features including color and style but only action supported is to view a particular page.
-Get PDF documentation info | Yes | Yes | No
-Set PDF documentation info | Yes | Yes | Yes: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
-Unicode support | Yes | Yes | No
+Get XMP metadata | **Yes** | **No** | **No**
+Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata is set then as a side effect it seems the documentation info metadata will also be set as XMP metadata
+Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
+Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and style but only action supported is to view a particular page
+Get PDF documentation info | **Yes** | **Yes** | **No**
+Set PDF documentation info | **Yes** | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
 
 Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, style, and whether the bookmarks
   should start open or closed.
-* `set_bookmarks_gs()` supports most bookmarks features including color and style but only action supported is to view a particular page and doesn't work with Unicode titles.
+* `set_bookmarks_gs()` supports most bookmarks features including color and style but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
-* `set_docinfo_gs()` doesn't work with Unicode info dictionary values.
-* Datetimes are often converted to UTC time.
-* As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
+* Datetimes are often converted to UTC time (any original "UTF offsets" may not be preserved).
+* As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.
   Some pdf viewers will preferentially use the previously set document title from XPN metadata
   if it exists instead of using the title set in documentation info dictionary entry.
-  Consider also manually setting this XPN metadata using `set_xmp()`.
+  Consider also manually setting this XPN metadata using `set_xmp()` 
 * Old metadata information is usually not deleted from the files by these 
   operations (i.e. these operations are often theoretically reversible).
   If deleting the old metadata is important one may want to consider calling

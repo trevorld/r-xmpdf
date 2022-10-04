@@ -81,9 +81,11 @@ test_that("set_docinfo_gs", {
     expect_equal(get_docinfo(f4)[[1]]$title, "R Graphics Output")
     expect_equal(get_docinfo(f4)[[1]]$author, "John Doe")
 
-    # # Unicode works?
-    # set_docinfo_gs(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
-    # expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
+    # Unicode works?
+    set_docinfo_gs(docinfo(title = "Test title", subject = "R\u5f88\u68d2\uff01"), f4)
+    d <- get_docinfo(f4)[[1]]
+    expect_equal(d$subject, "R\u5f88\u68d2\uff01")
+    expect_equal(d$title, "Test title")
 })
 
 test_that("docinfo_exiftool", {
@@ -111,7 +113,7 @@ test_that("docinfo_exiftool", {
     expect_equal(get_docinfo_exiftool(f4)[[1]]$title, "R Graphics Output")
     expect_equal(get_docinfo_exiftool(f4)[[1]]$author, "John Doe")
 
-    # # Unicode works?
+    # Unicode works?
     set_docinfo_exiftool(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })

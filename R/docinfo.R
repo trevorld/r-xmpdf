@@ -27,7 +27,6 @@
 #' @section Known limitations:
 #'
 #'   * Currently does not support arbitrary info dictionary entries.
-#'   * `set_docinfo_gs()` doesn't work with Unicode input.
 #'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
 #'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
 #'     any previously set matching XPN metadata.
@@ -259,6 +258,21 @@ to_date_pdfmark <- function(date) {
     }
 }
 
+pdfmark_string <- function(value) {
+    paste0("(", value, ")")
+}
+
+raw_pdfmark_entry <- function(open, value, close) {
+    r <- iconv(open, to = "latin1", toRaw = TRUE)[[1]]
+    l1 <- iconv(value, to = "latin1")
+    if (is.na(l1)) { # Unicode needs to be "UTF-16BE" while rest needs to be "latin1"
+        r <- append(r, iconv(paste0("\ufeff", value), to = "UTF-16BE", toRaw = TRUE)[[1]])
+    } else {
+        r <- append(r, iconv(value, to = "latin1", toRaw = TRUE)[[1]])
+    }
+    append(r, iconv(close, to = "latin1", toRaw = TRUE)[[1]])
+}
+
 d_format <- function(value) {
     if (is.null(value)) {
         "NULL"
@@ -466,9 +480,20 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
     } else {
         target <- output
     }
-    metafile <- tempfile(fileext = ".txt")
+    metafile <- tempfile(fileext = ".bin")
     on.exit(unlink(metafile))
-    writeLines(docinfo$pdfmark(), metafile)
+    pmc <- docinfo$pdfmark_character()
+    pmc_l1 <- iconv(pmc, to = "latin1")
+    if (is.na(pmc_l1)) { # Has non-Latin-1 characters
+        writeBin(docinfo$pdfmark_raw(),
+                 metafile,
+                 endian = "big")
+    } else { # Just Latin-1 characters
+        f <- file(metafile, encoding = "latin1")
+        open(f, "w")
+        writeLines(pmc_l1, f)
+        close(f)
+    }
     metafile <- normalizePath(metafile, mustWork = TRUE)
     args <- c("-q", "-o", shQuote(target), "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
               shQuote(input), shQuote(metafile))
@@ -596,7 +621,7 @@ DocInfo <- R6Class("docinfo",
 
             as_xmp(tags)
         },
-        pdfmark = function() {
+        pdfmark_character = function() {
             tags <- "["
             if (!is.null(self$author))
                 tags <- append(tags, sprintf(" /Author (%s)\n", self$author))
@@ -619,6 +644,34 @@ DocInfo <- R6Class("docinfo",
                                              to_date_pdfmark(self$mod_date)))
             tags <- append(tags, " /DOCINFO pdfmark\n")
             paste(tags, collapse="")
+        },
+        pdfmark_raw = function() {
+            tags <- iconv("[", to = "latin1", toRaw = TRUE)[[1]]
+            if (!is.null(self$author))
+                tags <- append(tags, raw_pdfmark_entry(" /Author (", self$author, ")\n"))
+            if (!is.null(self$creation_date)) {
+                creation_date <- sprintf(" /CreationDate (%s)\n", to_date_pdfmark(self$creation_date))
+                tags <- append(tags, iconv(creation_date, to = "latin1", toRaw = TRUE)[[1]])
+            }
+            if (!is.null(self$creator))
+                tags <- append(tags, raw_pdfmark_entry(" /Creator (", self$creator, ")\n"))
+            if (!is.null(self$producer))
+                tags <- append(tags, raw_pdfmark_entry(" /Producer (", self$producer, ")\n"))
+            if (!is.null(self$title))
+                tags <- append(tags, raw_pdfmark_entry(" /Title (", self$title, ")\n"))
+            if (!is.null(self$subject))
+                tags <- append(tags, raw_pdfmark_entry(" /Subject (", self$subject, ")\n"))
+            if (!is.null(self$keywords)) {
+                keywords <- paste(self$keywords, collapse = ", ")
+                tags <- append(tags, raw_pdfmark_entry(" /Keywords (", keywords, ")\n"))
+            }
+            if (!is.null(self$mod_date)) {
+                mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
+                tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
+            }
+            tags <- append(tags,
+                           iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
+            tags
         },
         pdftk = function() {
             tags <- character()

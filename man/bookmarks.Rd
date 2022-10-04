@@ -73,7 +73,7 @@ Note many pdf viewers quietly ignore this feature.}
 \itemize{
 \item \code{get_bookmarks_pdftk()} doesn't report information about bookmarks color, style, and whether the bookmarks
 should start open or closed.
-\item \code{set_bookmarks_gs()} supports most bookmarks features including color and style but only action supported is to view a particular page and doesn’t work with Unicode titles.
+\item \code{set_bookmarks_gs()} supports most bookmarks features including color and style but only action supported is to view a particular page.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.
 }
 }
