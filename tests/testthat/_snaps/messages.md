@@ -90,6 +90,24 @@
 
 ---
 
+    ! You must install (only) one suggested R package or system command to use 'cat_pages()'
+    x The suggested package 'qpdf' is not installed
+    i 'install.packages("qpdf")'
+    x The system command 'pdftk' is not installed (or detected)
+    i <https://gitlab.com/pdftk-java/pdftk> (Official)
+    i 'sudo apt-get install pdftk-java' (Debian/Ubuntu)
+    i 'brew install pdftk-java' (Homebrew)
+    i 'choco install pdftk-java' (Chocolately)
+    i 'Sys.setenv(PDFTK_PATH = "/path/to/pdftk")' if installed but not detected on PATH
+    x The system command 'ghostscript' is not installed (or detected)
+    i <https://www.ghostscript.com/releases/gsdnld.html> (Official)
+    i 'sudo apt-get install ghostscript' (Debian/Ubuntu)
+    i 'brew install ghostscript' (Homebrew)
+    i 'choco install ghostscript' (Chocolately)
+    i 'Sys.setenv(R_GSCMD = "/path/to/gs")' if installed but not detected on PATH
+
+---
+
     ! You must install (only) one suggested R package or system command to use 'n_pages()'
     x The suggested package 'qpdf' is not installed
     i 'install.packages("qpdf")'

@@ -49,6 +49,13 @@ Initial features
 
   1. `set_xmp_exiftool()` which wraps `exiftool` command-line tool
 
+* `cat_pages()` concatenates (pdf) file(s) into a single output pdf.
+  `cat_pages()` will try to use the following helper functions in the following order:
+ 
+  1. `cat_pages_qpdf()` which wraps `qpdf::pdf_combine()`
+  2. `cat_pages_pdftk()` which wraps `pdftk` command-line tool
+  3. `cat_pages_gs()` which wraps `ghostscript` command-line tool
+
 * `n_pages()` returns the number of pages in the (pdf) file(s).
   `n_pages()` will try to use the following helper functions in the following order:
  

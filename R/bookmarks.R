@@ -110,9 +110,9 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #'  # Create two different two-page pdf files
 #'  make_pdf <- function(f, title) {
 #'    pdf(f, onefile = TRUE, title = title)
-#'    grid.text("Page 1")
+#'    grid.text(paste(title, "Page 1"))
 #'    grid.newpage()
-#'    grid.text("Page 2")
+#'    grid.text(paste(title, "Page 2"))
 #'    invisible(dev.off())
 #'  }
 #'  f1 <- tempfile(fileext = "_doc1.pdf")
@@ -143,10 +143,21 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #'  cat('\nmethod = "title":\n')
 #'  print(bm)
 #'
+#'  # `cat_bookmarks()` is useful for setting concatenated pdf files
+#'  # created with `cat_pages()`
+#'  if (supports_cat_pages()) {
+#'     fc <- tempfile(fileext = "_cat.pdf")
+#'     on.exit(unlink(fc))
+#'     cat_pages(c(f1, f2), fc)
+#'     set_bookmarks(bm, fc)
+#'     unlink(fc)
+#'  }
+#'
 #'  unlink(f1)
 #'  unlink(f2)
 #' }
-#' @seealso [get_bookmarks()] and [set_bookmarks()].
+#' @seealso [get_bookmarks()] and [set_bookmarks()] for setting bookmarks.
+#'          [cat_pages()] for concatenating pdf files together.
 #' @export
 cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
     #### Add styling options for new high level bookmarks open, color, style
@@ -355,13 +366,15 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
 #### open/closed
 as_bookmarks <- function(bookmarks) {
     bookmarks <- as.data.frame(bookmarks)
-    if (nrow(bookmarks) == 0)
-        return (data.frame(title = character(),
-                           page = integer(),
-                           level = integer(),
-                           count = integer(),
-                           color = character(),
-                           style = integer()))
+    if (nrow(bookmarks) == 0) {
+        bookmarks$title <- character()
+        bookmarks$page <- integer()
+        bookmarks$level <- integer()
+        bookmarks$count <- integer()
+        bookmarks$color <- character()
+        bookmarks$style <- integer()
+        return(bookmarks)
+    }
     stopifnot(hasName(bookmarks, "title"), hasName(bookmarks, "page"))
     bookmarks[["title"]] <- as.character(bookmarks[["title"]])
     bookmarks[["page"]] <- as.integer(bookmarks[["page"]])

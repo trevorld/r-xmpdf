@@ -26,7 +26,8 @@ remotes::install_github("trevorld/r-xmpdf")
 
 Depending on what you'd like to do you'll need to install some additional R packages and/or command-line tools:
 
-* **[{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)** can be used to get the number of pages in a pdf.  Note currently a dependency of [{pdftools}](https://docs.ropensci.org/pdftools/).
+* **[{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)** can be used to concatenate pdf files together as well as get the number of pages in a pdf.
+  Note currently a dependency of [{pdftools}](https://docs.ropensci.org/pdftools/).
 
   + `install.packages("qpdf")`
 
@@ -42,13 +43,15 @@ Depending on what you'd like to do you'll need to install some additional R pack
   + `brew install exiftool` (Homebrew)
   + `choco install exiftool` (Chocolately)
 
-* **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. Can also be used to get the number of pages in a pdf.
+* **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. 
+  Can also be used to concatenate pdf files together as well as get the number of pages in a pdf.
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
   + `brew install ghostscript` (Homebrew)
   + `choco install ghostscript` (Chocolately)
 
-* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.
+* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  
+  Can also be used to concatenate pdf files together as well as get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
   + `brew install pdftk-java` (Homebrew)
@@ -77,13 +80,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-04 21:44:59+0000
+## CreationDate: 2022-10-04 23:24:16+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-04 21:44:59+0000
+## ModDate: 2022-10-04 23:24:16+0000
 ```
 
 ```r
@@ -115,13 +118,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-04 21:44:59+0000
+## CreationDate: 2022-10-04 23:24:16+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R, xmpdf
-## ModDate: 2022-10-04 21:44:59+0000
+## ModDate: 2022-10-04 23:24:16+0000
 ```
 
 ```r
@@ -137,10 +140,10 @@ get_xmp(f)[[1]] |> print()
 ## dc:Title : Two Boring Pages
 ## pdf:Keywords : R, xmpdf
 ## pdf:Producer : R 4.2.1
-## xmp:CreateDate : 2022-10-05 04:44:59+0000
+## xmp:CreateDate : 2022-10-05 06:24:16+0000
 ## xmp:CreatorTool : R
-## xmp:ModifyDate : 2022-10-05 04:44:59+0000
-## xmpMM:DocumentID : uuid:04e2faeb-7c85-11f8-0000-2567e21c8552
+## xmp:ModifyDate : 2022-10-05 06:24:16+0000
+## xmpMM:DocumentID : uuid:e3890ba6-7c92-11f8-0000-2567e21c8552
 ```
 
 ```r
@@ -170,6 +173,7 @@ Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Leve
 Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and style but only action supported is to view a particular page
 Get PDF documentation info | **Yes** | **Yes** | **No**
 Set PDF documentation info | **Yes** | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:
 

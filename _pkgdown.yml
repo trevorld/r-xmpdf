@@ -20,6 +20,10 @@ reference:
       - set_docinfo
       - docinfo
       - as_docinfo
+  - title: "Concatenate PDF files together"
+    desc: "Functions for concatenating PDF files together"
+    contents:
+      - cat_pages
   - title: "Get number of pages"
     desc: "Functions for getting number of pages in PDF documents"
     contents:

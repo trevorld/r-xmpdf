@@ -34,9 +34,9 @@ if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quie
  # Create two different two-page pdf files
  make_pdf <- function(f, title) {
    pdf(f, onefile = TRUE, title = title)
-   grid.text("Page 1")
+   grid.text(paste(title, "Page 1"))
    grid.newpage()
-   grid.text("Page 2")
+   grid.text(paste(title, "Page 2"))
    invisible(dev.off())
  }
  f1 <- tempfile(fileext = "_doc1.pdf")
@@ -67,10 +67,21 @@ if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quie
  cat('\nmethod = "title":\n')
  print(bm)
 
+ # `cat_bookmarks()` is useful for setting concatenated pdf files
+ # created with `cat_pages()`
+ if (supports_cat_pages()) {
+    fc <- tempfile(fileext = "_cat.pdf")
+    on.exit(unlink(fc))
+    cat_pages(c(f1, f2), fc)
+    set_bookmarks(bm, fc)
+    unlink(fc)
+ }
+
  unlink(f1)
  unlink(f2)
 }
 }
 \seealso{
-\code{\link[=get_bookmarks]{get_bookmarks()}} and \code{\link[=set_bookmarks]{set_bookmarks()}}.
+\code{\link[=get_bookmarks]{get_bookmarks()}} and \code{\link[=set_bookmarks]{set_bookmarks()}} for setting bookmarks.
+\code{\link[=cat_pages]{cat_pages()}} for concatenating pdf files together.
 }

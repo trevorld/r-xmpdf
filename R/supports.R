@@ -3,12 +3,12 @@
 #' `supports_get_bookmarks()`, `supports_set_bookmarks()`,
 #' `supports_get_docinfo()`, `supports_set_docinfo()`,
 #' `supports_get_xmp()`, `supports_set_xmp()`,
-#' and `supports_n_pages()`
+#' `supports_cat_pages()`, and `supports_n_pages()`
 #' detects support for the functions
 #' [get_bookmarks()], [set_bookmarks()],
 #' [get_docinfo()], [set_docinfo()],
 #' [get_xmp()], [set_xmp()],
-#'  and [n_pages()] respectively.
+#' [cat_pages()], and [n_pages()] respectively.
 #' `supports_exiftool()`, `supports_gs()` and `supports_pdftk()`
 #' detects support for the command-line tools
 #' `exiftool`, `ghostscript` and `pdftk` respectively as used by various lower-level functions.
@@ -16,12 +16,12 @@
 #' * `supports_exiftool()` detects support for the command-line tool `exiftool` which is
 #'   required for [get_xmp_exiftool()], [set_xmp_exiftool()], and [n_pages_exiftool()].
 #' * `supports_gs()` detects support for the command-line tool `ghostscript` which is
-#'   required for [set_docinfo_gs()], [set_bookmarks_gs()], and [n_pages_gs()].
+#'   required for [set_docinfo_gs()], [set_bookmarks_gs()], [cat_pages_gs()], and [n_pages_gs()].
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
 #'   required for [get_bookmarks_pdftk()], [set_bookmarks_pdftk()],
-#'   [get_docinfo_pdftk()], [set_docinfo_pdftk()], and [n_pages_pdftk()].
+#'   [get_docinfo_pdftk()], [set_docinfo_pdftk()], [cat_pages_pdftk()], and [n_pages_pdftk()].
 #' * `requireNamespace("qpdf", quietly = TRUE)` detects support for the R packages `qpdf`
-#'   which is required for [n_pages_qpdf()].
+#'   which is required for [cat_pages_qpdf()] and [n_pages_qpdf()].
 #' * `requireNamespace("pdftools", quietly = TRUE)` detects support for the R package `pdftools`
 #'   which is required for [get_docinfo_pdftools()].
 #' @examples
@@ -32,6 +32,7 @@
 #'   supports_set_bookmarks()
 #'   supports_get_xmp()
 #'   supports_set_xmp()
+#'   supports_cat_pages()
 #'   supports_n_pages()
 #'
 #'   # Detect support for lower-level helper features
@@ -77,6 +78,12 @@ supports_get_xmp <- function() {
 #' @export
 supports_set_xmp <- function() {
     supports_exiftool()
+}
+
+#' @rdname supports
+#' @export
+supports_cat_pages <- function() {
+    supports_qpdf() || supports_pdftk() || supports_gs()
 }
 
 #' @rdname supports

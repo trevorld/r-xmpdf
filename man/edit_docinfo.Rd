@@ -45,7 +45,6 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \code{set_docinfo()} returns the (output) filename invisibly.
 }
 \description{
-\code{docinfo()} creates an object of pdf document info dictionary information from scratch.
 \code{get_docinfo()} gets pdf document info from a file.
 \code{set_docinfo()} sets pdf document info for a file.
 }
@@ -90,7 +89,7 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   grid.text("Page 2")
   invisible(dev.off())
 
-  cat("\nInitial documentation info:\n")
+  cat("\nInitial documentation info:\n\n")
   print(get_docinfo(f)[[1]])
 
   d <- docinfo(author = "John Doe",
@@ -99,7 +98,7 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
                filename = f)
   set_docinfo(d, f)
 
-  cat("\nDocumentation info after setting it:\n")
+  cat("\nDocumentation info after setting it:\n\n")
   print(get_docinfo(f)[[1]])
 
   unlink(f)

@@ -13,6 +13,7 @@ test_that("messages", {
         expect_snapshot_error(set_docinfo(docinfo(), f), class = "xmpdf_suggested_package")
         expect_snapshot_error(get_xmp(f), class = "xmpdf_suggested_package")
         expect_snapshot_error(set_xmp(xmp(), f), class = "xmpdf_suggested_package")
+        expect_snapshot_error(cat_pages(c(f, f)), class = "xmpdf_suggested_package")
         expect_snapshot_error(n_pages(f), class = "xmpdf_suggested_package")
 
         expect_snapshot_error(gs(), class = "xmpdf_suggested_package")
