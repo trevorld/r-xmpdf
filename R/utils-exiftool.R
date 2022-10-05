@@ -17,7 +17,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
             args <- c(cmd[-1L], args)
             cmd <- cmd[1L]
         }
-        output <- system2(cmd, args, stdout=TRUE)
+        output <- xmpdf_system2(cmd, args)
     }
     df <- utils::read.csv(textConnection(output),
                           check.names = FALSE, stringsAsFactors = FALSE)
@@ -58,7 +58,7 @@ set_exiftool_metadata <- function(tags, input, output = input) {
             args <- c(cmd[-1L], args)
             cmd <- cmd[1L]
         }
-        results <- system2(cmd, args, stdout=TRUE)
+        results <- xmpdf_system2(cmd, args)
     }
     if (input == output)
         file.copy(target, output, overwrite = TRUE)
@@ -71,6 +71,6 @@ set_exiftool_metadata <- function(tags, input, output = input) {
 #     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
 #
 #     args <- c(tags, "-G1", "-a", "-j", filename)
-#     output <- system2(cmd, args, stdout=TRUE)
+#     output <- xmpdf_system2(cmd, args)
 #     jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
 # }

@@ -65,3 +65,12 @@ use_filenames <- function(l, use_names, filename) {
         names(l) <- NULL
     l
 }
+
+xmpdf_system2 <- function(cmd, args) {
+    output <- system2(cmd, args, stdout = TRUE)
+    if (!is.null(attr(output, "status"))) {
+        msg <- c(paste(sQuote("system2()"), "command failed."))
+        abort(msg)
+    }
+    invisible(output)
+}

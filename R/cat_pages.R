@@ -73,7 +73,7 @@ cat_pages_gs <- function(input, output) {
     args <- c("-q", "-o", shQuote(output),
               "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
               shQuote(input))
-    system2(cmd, args, stdout=TRUE)
+    xmpdf_system2(cmd, args)
     invisible(output)
 }
 
@@ -84,7 +84,7 @@ cat_pages_pdftk <- function(input, output) {
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)
     args <- c(shQuote(input), "cat", "output", shQuote(output))
-    system2(cmd, args, stdout=TRUE)
+    xmpdf_system2(cmd, args)
     invisible(output)
 }
 

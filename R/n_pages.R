@@ -71,7 +71,7 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 #     cmd <- Sys.which("pdfinfo")
 #     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
 #     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
-#         pdfinfo <- system2(cmd, f, stdout=TRUE)
+#         pdfinfo <- xmpdf_system2(cmd, f)
 #         pdfinfo <- grep("^Pages:", pdfinfo, value=TRUE)
 #         as.integer(strsplit(pdfinfo, " +")[[1]][2])
 #     })
@@ -84,7 +84,7 @@ n_pages_pdftk <- function(filename, use_names = TRUE) {
     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         args <- c(f, "dump_data_utf8")
-        pdfinfo <- system2(cmd, args, stdout=TRUE)
+        pdfinfo <- xmpdf_system2(cmd, args)
         pdfinfo <- grep("^NumberOfPages:", pdfinfo, value=TRUE)
         as.integer(strsplit(pdfinfo, ":")[[1]][2])
     })
@@ -99,6 +99,6 @@ n_pages_gs <- function(filename, use_names = TRUE) {
         args <- c("-q", "-dNODISPLAY", "-dNOSAFER", "-c",
                   paste(paste0('"(', f, ")"),
                         "(r)", "file", "runpdfbegin", "pdfpagecount", "=", 'quit"'))
-        as.integer(system2(cmd, args, stdout=TRUE))
+        as.integer(xmpdf_system2(cmd, args))
     })
 }

@@ -487,7 +487,7 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
     metafile <- normalizePath(metafile, mustWork = TRUE)
     args <- c("-q", "-o", shQuote(target), "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
               shQuote(input), shQuote(metafile))
-    system2(cmd, args, stdout=TRUE)
+    xmpdf_system2(cmd, args)
     if (input == output)
         file.copy(target, output, overwrite = TRUE)
     invisible(output)
@@ -518,7 +518,7 @@ set_docinfo_pdftk <- function(docinfo, input, output = input) {
     args <- c(shQuote(input),
               "update_info_utf8", shQuote(metafile),
               "output", shQuote(target))
-    system2(cmd, args, stdout=TRUE)
+    xmpdf_system2(cmd, args)
     if (input == output)
         file.copy(target, output, overwrite = TRUE)
     invisible(output)
