@@ -14,11 +14,11 @@ test_that("get_xmp() / set_xmp()", {
     expect_equal(length(get_xmp(f)[[1]]), 0L)
 
     expect_snapshot(print(xmp()))
-    xmp <- list(Title = "An XMP title")
-    set_xmp(xmp, f)
+    x <- xmp(`dc:Title` = "An XMP title")
+    expect_snapshot(print(x))
+    set_xmp(x, f)
     x <- get_xmp(f)[[1]]
     expect_equal(x[["dc:Title"]], "An XMP title")
-    expect_snapshot(print(x))
 })
 
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {

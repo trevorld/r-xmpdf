@@ -10,6 +10,5 @@
     Code
       print(x)
     Output
-      x:XMPToolkit : Image::ExifTool 12.40
       dc:Title : An XMP title
 

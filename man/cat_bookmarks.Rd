@@ -53,6 +53,7 @@ if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quie
  set_bookmarks(bookmarks, f1)
  set_bookmarks(bookmarks, f2)
  l <- get_bookmarks(c(f1, f2))
+ print(l)
 
  bm <- cat_bookmarks(l, method = "flat")
  cat('\nmethod = "flat":\n')

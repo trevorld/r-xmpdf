@@ -129,6 +129,7 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #'  set_bookmarks(bookmarks, f1)
 #'  set_bookmarks(bookmarks, f2)
 #'  l <- get_bookmarks(c(f1, f2))
+#'  print(l)
 #'
 #'  bm <- cat_bookmarks(l, method = "flat")
 #'  cat('\nmethod = "flat":\n')
