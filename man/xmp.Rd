@@ -10,7 +10,7 @@ xmp(...)
 \item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
 }
 \value{
-An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as \code{\link[=POSIXlt]{POSIXlt()}} or else a character vector in the \code{"\%Y-\%m-\%dT\%H:\%M:\%S\%z"} format.
+An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as \code{\link[=POSIXlt]{POSIXlt()}}.
 }
 \description{
 \code{xmp()} creates

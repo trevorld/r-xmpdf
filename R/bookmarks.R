@@ -34,7 +34,7 @@
 #' }
 #' @param input Input pdf filename.
 #' @param output Output pdf filename.
-#' @return `get_bookmarks()` returns a list of data frames with bookmark info (see `bookmarks` parameter for details about columns).
+#' @return `get_bookmarks()` returns a list of data frames with bookmark info (see `bookmarks` parameter for details about columns) plus "total_pages", "filename", and "title" attributes.
 #'         `NA` values in the data frame indicates that the backend doesn't report information about this pdf feature.
 #'         `set_bookmarks()` returns the (output) filename invisibly.
 #' @section Known limitations:
@@ -84,12 +84,128 @@ get_bookmarks <- function(filename, use_names = TRUE) {
 #' @export
 get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_bookmarks_pdftk_helper)
-    if (use_names)
-        names(l) <- filename
-    else
-        names(l) <- NULL
-    l
+    l <- use_filenames(l, use_names, filename)
 }
+
+#' Concatenate pdf bookmarks
+#'
+#' `cat_bookmarks()` concatenates a list of bookmarks
+#' into a single bookmarks data frame while updating the page numbers.
+#' Useful if wanting to concatenate multiple pdf files together and
+#' would like to preserve the bookmarks information.
+#' @param l A list of bookmark data frames as returned by [get_bookmarks()].
+#'          Each data frame should have a "total_pages" attribute.
+#'          If `method = "filename"` each data frame should have a "filename" attribute.
+#'          If `method = "title"` each data frame should have a "title" attribute.
+#' @param method If "flat" simply concatenate the bookmarks while updating page numbers.
+#'               If "filename" place each file's bookmarks a level under a new bookmark matching
+#'               the (base)name of the filename and then concatenate the bookmarks while updating page numbers.
+#'               If "title" place each file's bookmarks a level under a new bookmark matching
+#'               the title of the file and then concatenate the bookmarks while updating page numbers.
+#' @return A data frame of bookmark data (as suitable for use with [set_bookmarks()]).
+#'         A "total_pages" attribute will be set for the theoretical total pages of
+#'         the concatenated document represented by the concatenated bookmarks.
+#' @examples
+#' if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quietly = TRUE)) {
+#'  # Create two different two-page pdf files
+#'  make_pdf <- function(f, title) {
+#'    pdf(f, onefile = TRUE, title = title)
+#'    grid.text("Page 1")
+#'    grid.newpage()
+#'    grid.text("Page 2")
+#'    invisible(dev.off())
+#'  }
+#'  f1 <- tempfile(fileext = "_doc1.pdf")
+#'  on.exit(unlink(f1))
+#'  make_pdf(f1, "Document 1")
+#'
+#'  f2 <- tempfile(fileext = "_doc2.pdf")
+#'  on.exit(unlink(f2))
+#'  make_pdf(f2, "Document 2")
+#'
+#'  # Add bookmarks to the two two-page pdf files
+#'  bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+#'                          page = c(1L, 2L))
+#'  set_bookmarks(bookmarks, f1)
+#'  set_bookmarks(bookmarks, f2)
+#'  l <- get_bookmarks(c(f1, f2))
+#'
+#'  bm <- cat_bookmarks(l, method = "flat")
+#'  cat('\nmethod = "flat":\n')
+#'  print(bm)
+#'
+#'  bm <- cat_bookmarks(l, method = "filename")
+#'  cat('\nmethod = "filename":\n')
+#'  print(bm)
+#'
+#'  bm <- cat_bookmarks(l, method = "title")
+#'  cat('\nmethod = "title":\n')
+#'  print(bm)
+#'
+#'  unlink(f1)
+#'  unlink(f2)
+#' }
+#' @seealso [get_bookmarks()] and [set_bookmarks()].
+#' @export
+cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
+    #### Add styling options for new high level bookmarks open, color, style
+    stopifnot(length(l) > 0L)
+    method <- match.arg(method, c("flat", "filename", "title"))
+    l <- lapply(l, as_bookmarks)
+
+    v_total_pages <- vapply(l, function(x) attr(x, "total_pages"), integer(1L), USE.NAMES = FALSE)
+    cum_pages <- cumsum(v_total_pages)
+    n_docs <- length(l)
+    if (method == "filename") {
+        titles <- vapply(l, function(x) basename(attr(x, "filename")), character(1L), USE.NAMES = FALSE)
+    } else if (method == "title") {
+        titles <- vapply(l, function(x) attr(x, "title"), character(1L), USE.NAMES = FALSE)
+    }
+
+    if (method %in% c("filename", "title")) {
+        if (hasName(l[[1]], "level"))
+            l[[1]]$level <- l[[1]]$level + 1L
+        l[[1]] <- rbind(data.frame(title = basename(titles[1L]),
+                                   page = 1L,
+                                   level = 1L,
+                                   count = nrow(l[[1]]),
+                                   color = NA_character_,
+                                   style = NA_integer_,
+                                   stringsAsFactors = FALSE),
+                        l[[1]])
+    }
+    if (n_docs == 1L) {
+        return(l[[1L]])
+    }
+    for (i in seq.int(2L, n_docs)) {
+        if (hasName(l[[i]], "page"))
+            l[[i]]$page <- l[[i]]$page + cum_pages[i - 1L]
+        if (method %in% c("filename", "title")) {
+            if (hasName(l[[i]], "level"))
+                l[[i]]$level <- l[[i]]$level + 1L
+            l[[i]] <- rbind(data.frame(title = basename(titles[i]),
+                                       page = cum_pages[i - 1L] + 1L,
+                                       level = 1L,
+                                       count = nrow(l[[i]]),
+                                       color = NA_character_,
+                                       style = NA_integer_,
+                                       stringsAsFactors = FALSE),
+                            l[[i]])
+        }
+    }
+
+    df <- do.call(function(...) rbind(..., make.row.names = FALSE), l)
+    attr(df, "total_pages") <- sum(v_total_pages)
+    df
+}
+
+df_bookmarks_empty <- data.frame(title = character(0),
+                                 page = integer(0),
+                                 level = integer(0),
+                                 count = integer(0),
+                                 color = character(),
+                                 style = integer(0),
+                                 stringsAsFactors = FALSE)
 
 get_bookmarks_pdftk_helper <- function(filename) {
     meta <- get_pdftk_metadata(filename)
@@ -109,15 +225,15 @@ get_bookmarks_pdftk_helper <- function(filename) {
                    style = NA_integer_,
                    stringsAsFactors = FALSE)
     } else {
-        data.frame(title = character(0),
-                   page = integer(0),
-                   level = integer(0),
-                   count = integer(0),
-                   color = character(),
-                   style = integer(0),
-                   stringsAsFactors = FALSE)
+        df_bookmarks_empty
     }
     tot_pages <- grep("^NumberOfPages:", meta, value=TRUE)
+    if (length(id <- grep("^InfoKey: Title", meta)))
+        title <- gsub("^InfoValue: ", "", meta[id + 1])
+    else
+        title <- NULL
+    attr(df, "filename") <- filename
+    attr(df, "title") <- title
     attr(df, "total_pages") <- as.integer(strsplit(tot_pages, ":")[[1]][2])
     df
 }

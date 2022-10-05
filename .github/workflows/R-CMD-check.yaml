@@ -42,8 +42,9 @@ jobs:
       - name: Install ghostscript/pdftk
         if: always()
         run: |
-            sudo apt-get install -y pdftk
             sudo apt-get install -y ghostscript
+            sudo apt-get install -y libimage-exiftool-perl
+            sudo apt-get install -y pdftk
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v1

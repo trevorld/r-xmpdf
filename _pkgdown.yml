@@ -13,6 +13,7 @@ reference:
     desc: "Functions for getting/setting PDF bookmarks (aka table of contents)"
     contents:
       - set_bookmarks
+      - cat_bookmarks
   - title: "Get/set PDF documentation info"
     desc: "Functions for getting/setting PDF documentation info"
     contents:

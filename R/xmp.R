@@ -43,7 +43,7 @@ NULL
 #' and such objects are returned by [get_xmp()].
 #'
 #' @param ... Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.
-#' @return An xmp object as can be used with [set_xmp()].  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as [POSIXlt()] or else a character vector in the `"%Y-%m-%dT%H:%M:%S%z"` format.
+#' @return An xmp object as can be used with [set_xmp()].  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.  Datetimes should be a datetime object such as [POSIXlt()].
 #' @seealso [get_xmp()] and [set_xmp()] for getting/setting such information from/to a variety of media file formats.
 #'          [as_xmp()] for coercing to this object.
 #'    [as_docinfo()] can be used to coerce `xmp()` objects into [docinfo()] objects.
@@ -100,6 +100,14 @@ as_xmp.docinfo <- function(x, ...) {
 #' @export
 as_xmp.list <- function(x, ...) {
     class(x) <- c("xmp", class(x))
+    for (i in seq_along(x)) {
+        value <- x[[i]]
+        if (is.character(value) &&
+            grepl("^[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}[+-][[:digit:]]{4}$", value)) {
+
+            x[[i]] <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
+        }
+    }
     x
 }
 
@@ -137,11 +145,7 @@ get_xmp <- function(filename, use_names = TRUE) {
 #' @export
 get_xmp_exiftool <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_xmp_exiftool_helper)
-    if (use_names)
-        names(l) <- filename
-    else
-        names(l) <- NULL
-    l
+    use_filenames(l, use_names, filename)
 }
 get_xmp_exiftool_helper <- function(filename) {
     md <- get_exiftool_metadata(filename, tags="-XMP:all")

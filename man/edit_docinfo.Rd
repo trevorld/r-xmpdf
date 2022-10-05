@@ -90,8 +90,8 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   grid.text("Page 2")
   invisible(dev.off())
 
+  cat("\nInitial documentation info:\n")
   print(get_docinfo(f)[[1]])
-  \dontshow{cat("\n")}
 
   d <- docinfo(author = "John Doe",
                title = "Two Boring Pages",
@@ -99,6 +99,7 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
                filename = f)
   set_docinfo(d, f)
 
+  cat("\nDocumentation info after setting it:\n")
   print(get_docinfo(f)[[1]])
 
   unlink(f)

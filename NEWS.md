@@ -4,12 +4,16 @@ xmpdf 0.1.0 (development)
 Initial features
 ----------------
 
+* `cat_bookmarks()` concatenates a list of bookmarks
+  into a single bookmarks data frame while updating the page numbers.
+  Useful if wanting to concatenate multiple pdf files together and
+  would like to preserve the bookmarks information.
 * `get_bookmarks()` returns a data frame with pdf bookmarks information.
   `get_bookmarks()` will try to use the following helper functions in the following order:
 
   1. `get_bookmarks_pdftk()` which wraps `pdftk` command-line tool
 
-* `set_bookmarks()` sets (replaces) pdf bookmarks information (#2).
+* `set_bookmarks()` sets (replaces) pdf bookmarks information.
   `set_bookmarks()` will try to use the following helper functions in the following order:
 
   1. `set_bookmarks_gs()` which wraps `ghostscript` command-line tool

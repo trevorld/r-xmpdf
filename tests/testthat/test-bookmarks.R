@@ -120,3 +120,36 @@ test_that("`get_count()` and `get_level()`", {
     expect_equal(get_level(c(2, 0, 0)), c(1, 2, 2))
     expect_equal(get_level(c(-2, 0, 0)), c(1, 2, 2))
 })
+
+test_that("`cat_bookmarks()` works", {
+    skip_if_not(supports_get_bookmarks() && supports_set_bookmarks())
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+                            page = c(1L, 2L))
+    f2 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f2))
+    set_bookmarks(bookmarks, f1, f2)
+
+    f3 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f3))
+    set_bookmarks(bookmarks, f1, f3)
+
+    l <- get_bookmarks(c(f2, f3))
+    bm <- cat_bookmarks(l, method = "flat")
+    expect_equal(bm$page, 1:4)
+    expect_equal(bm$title, c("Page 1", "Page 2",
+                             "Page 1", "Page 2"))
+
+    bm <- cat_bookmarks(l, method = "filename")
+    expect_equal(bm$page, c(1L, 1L, 2L, 3L, 3L, 4L))
+    expect_equal(bm$level, c(1L, 2L, 2L, 1L, 2L, 2L))
+    expect_equal(bm$count, c(2L, 0L, 0L, 2L, 0L, 0L))
+    expect_equal(bm$title, c(basename(f2), "Page 1", "Page 2",
+                             basename(f3), "Page 1", "Page 2"))
+
+    bm <- cat_bookmarks(l, method = "title")
+    expect_equal(bm$page, c(1L, 1L, 2L, 3L, 3L, 4L))
+    expect_equal(bm$level, c(1L, 2L, 2L, 1L, 2L, 2L))
+    expect_equal(bm$count, c(2L, 0L, 0L, 2L, 0L, 0L))
+    expect_equal(bm$title, c("R Graphics Output", "Page 1", "Page 2",
+                             "R Graphics Output", "Page 1", "Page 2"))
+})

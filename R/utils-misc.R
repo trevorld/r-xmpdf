@@ -57,3 +57,11 @@ install_exiftool_str <- function() {
                 "if installed but not detected on PATH")
     )
 }
+
+use_filenames <- function(l, use_names, filename) {
+    if (use_names)
+        names(l) <- filename
+    else
+        names(l) <- NULL
+    l
+}

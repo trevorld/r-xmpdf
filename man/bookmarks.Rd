@@ -48,7 +48,7 @@ Note many pdf viewers quietly ignore this feature.}
 \item{output}{Output pdf filename.}
 }
 \value{
-\code{get_bookmarks()} returns a list of data frames with bookmark info (see \code{bookmarks} parameter for details about columns).
+\code{get_bookmarks()} returns a list of data frames with bookmark info (see \code{bookmarks} parameter for details about columns) plus "total_pages", "filename", and "title" attributes.
 \code{NA} values in the data frame indicates that the backend doesn't report information about this pdf feature.
 \code{set_bookmarks()} returns the (output) filename invisibly.
 }

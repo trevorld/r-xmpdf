@@ -9,8 +9,7 @@
       Producer: Generic Producer
       Title: Generic Title
       Subject: Generic Subject
-      Keywords: Key
-      Keywords: Word
+      Keywords: Key, Word
       ModDate: 2022-11-11 11:11:11+0000
 
 ---

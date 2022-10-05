@@ -47,8 +47,8 @@
 #'   grid.text("Page 2")
 #'   invisible(dev.off())
 #'
+#'   cat("\nInitial documentation info:\n")
 #'   print(get_docinfo(f)[[1]])
-#'   \dontshow{cat("\n")}
 #'
 #'   d <- docinfo(author = "John Doe",
 #'                title = "Two Boring Pages",
@@ -56,6 +56,7 @@
 #'                filename = f)
 #'   set_docinfo(d, f)
 #'
+#'   cat("\nDocumentation info after setting it:\n")
 #'   print(get_docinfo(f)[[1]])
 #'
 #'   unlink(f)
@@ -117,8 +118,8 @@ NULL
 #'   grid.text("Page 2")
 #'   invisible(dev.off())
 #'
+#'   cat("\nInitial documentation info\n")
 #'   print(get_docinfo(f)[[1]])
-#'   \dontshow{cat("\n")}
 #'
 #'   d <- docinfo(author = "John Doe",
 #'                title = "Two Boring Pages",
@@ -126,6 +127,7 @@ NULL
 #'                filename = f)
 #'   set_docinfo(d, f)
 #'
+#'   cat("\nDocumentation info after setting it\n")
 #'   print(get_docinfo(f)[[1]])
 #'
 #'   unlink(f)
@@ -240,6 +242,7 @@ as.list.docinfo <- function(x, ...) {
 }
 
 tryFormats <- c("%FT%T%z",
+                "%F %T%z",
                 "%Y-%m-%d %H:%M:%OS",
                 "%Y/%m/%d %H:%M:%OS",
                 "%Y-%m-%d %H:%M",
@@ -276,10 +279,10 @@ raw_pdfmark_entry <- function(open, value, close) {
 d_format <- function(value) {
     if (is.null(value)) {
         "NULL"
-    } else if (is.character(value)) {
-        value
     } else if (length(value) > 1) {
         paste(value, collapse = ", ")
+    } else if (is.character(value)) {
+        value
     } else {
         strftime(value, format = "%F %T%z")
     }
@@ -345,11 +348,7 @@ get_docinfo <- function(filename, use_names = TRUE) {
 get_docinfo_pdftools <- function(filename, use_names = TRUE) {
     assert_suggested("pdftools")
     l <- lapply(filename, get_docinfo_pdftools_helper)
-    if (use_names)
-        names(l) <- filename
-    else
-        names(l) <- NULL
-    l
+    use_filenames(l, use_names, filename)
 }
 
 get_docinfo_pdftools_helper <- function(filename) {
@@ -375,11 +374,7 @@ get_docinfo_pdftools_helper <- function(filename) {
 #' @export
 get_docinfo_exiftool <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_docinfo_exiftool_helper)
-    if (use_names)
-        names(l) <- filename
-    else
-        names(l) <- NULL
-    l
+    use_filenames(l, use_names, filename)
 }
 get_docinfo_exiftool_helper <- function(filename) {
     md <- get_exiftool_metadata(filename, tags="-PDF:all")
@@ -417,11 +412,7 @@ set_docinfo_exiftool <- function(docinfo, input, output = input) {
 #' @export
 get_docinfo_pdftk <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_docinfo_pdftk_helper)
-    if (use_names)
-        names(l) <- filename
-    else
-        names(l) <- NULL
-    l
+    use_filenames(l, use_names, filename)
 }
 
 get_docinfo_pdftk_helper <- function(filename) {
@@ -724,62 +715,56 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$author
             } else {
-                private$val$author <- as.character(value)
+                private$val$author <- as_character_value(value)
             }
         },
         creation_date = function(value) {
             if (missing(value)) {
                 private$val$creation_date
             } else {
-                if (is.null(value))
-                    private$val$creation_date <- NULL
-                else
-                    private$val$creation_date <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
+                private$val$creation_date <- as_datetime_value(value)
             }
         },
         creator = function(value) {
             if (missing(value)) {
                 private$val$creator
             } else {
-                private$val$creator <- as.character(value)
+                private$val$creator <- as_character_value(value)
             }
         },
         producer = function(value) {
             if (missing(value)) {
                 private$val$producer
             } else {
-                private$val$producer <- as.character(value)
+                private$val$producer <- as_character_value(value)
             }
         },
         title = function(value) {
             if (missing(value)) {
                 private$val$title
             } else {
-                private$val$title <- as.character(value)
+                private$val$title <- as_character_value(value)
             }
         },
         subject = function(value) {
             if (missing(value)) {
                 private$val$subject
             } else {
-                private$val$subject <- as.character(value)
+                private$val$subject <- as_character_value(value)
             }
         },
         keywords = function(value) {
             if (missing(value)) {
                 private$val$keywords
             } else {
-                private$val$keywords <- keyword_split(as.character(value))
+                private$val$keywords <- keyword_split(value)
             }
         },
         mod_date = function(value) {
             if (missing(value)) {
                 private$val$mod_date
             } else {
-                if (is.null(value))
-                    private$val$mod_date <- NULL
-                else
-                    private$val$mod_date <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
+                private$val$mod_date <- as_datetime_value(value)
             }
         }
     ),
@@ -800,11 +785,31 @@ DocInfo <- R6Class("docinfo",
 )
 
 keyword_split <- function(x) {
-    if (length(x) > 1) {
+    x <- as.character(x)
+    if (length(x) == 0) {
+        NULL
+    } else if (length(x) > 1) {
         x
-    } else if (length(x) == 0 || x == "") {
+    } else if (x == "") {
         ""
     } else {
         strsplit(x, ",[[:blank:]]*")[[1]]
+    }
+}
+
+as_character_value <- function(value) {
+    if (is.null(value))
+        NULL
+    else
+        value
+}
+
+as_datetime_value <- function(value) {
+    if (is.null(value)) {
+        NULL
+    } else if (inherits(value, "POSIXlt")) {
+        value
+    } else {
+        as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
     }
 }

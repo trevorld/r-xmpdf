@@ -63,7 +63,7 @@ A simple example where we create a two page pdf using `pdf()` and then add XMP m
 library("grid")
 library("xmpdf")
 
-# Create a two page pdf
+# Create a two page pdf using `pdf()`
 f <- tempfile(fileext = ".pdf")
 pdf(f, onefile = TRUE)
 grid.text("Page 1")
@@ -71,8 +71,23 @@ grid.newpage()
 grid.text("Page 2")
 invisible(dev.off())
 
-# Edit XMP metadata
-print(get_xmp(f)[[1]])
+# See what default metadata `pdf()` created
+get_docinfo(f)[[1]] |> print()
+```
+
+```
+## Author: NULL
+## CreationDate: 2022-10-04 21:44:59+0000
+## Creator: R
+## Producer: R 4.2.1
+## Title: R Graphics Output
+## Subject: NULL
+## Keywords: NULL
+## ModDate: 2022-10-04 21:44:59+0000
+```
+
+```r
+get_xmp(f)[[1]] |> print()
 ```
 
 ```
@@ -80,57 +95,7 @@ print(get_xmp(f)[[1]])
 ```
 
 ```r
-x <- xmp(title = "Two Boring Pages", creator = "John Doe")
-set_xmp(x, f)
-print(get_xmp(f)[[1]])
-```
-
-```
-## x:XMPToolkit : Image::ExifTool 12.40
-## dc:Creator : John Doe
-## dc:Title : Two Boring Pages
-```
-
-```r
-# Edit PDF documentation info
-print(get_docinfo(f)[[1]])
-```
-
-```
-## Author: NULL
-## CreationDate: 2022-10-04 13:27:45+0000
-## Creator: R
-## Producer: R 4.2.1
-## Title: R Graphics Output
-## Subject: NULL
-## Keywords: NULL
-## ModDate: 2022-10-04 13:27:45+0000
-```
-
-```r
-d <- docinfo(author = "John Doe",
-             title = "Two Boring Pages",
-             keywords = c("R", "xmpdf"),
-             filename = f)
-set_docinfo(d, f)
-print(get_docinfo(f)[[1]])
-```
-
-```
-## Author: John Doe
-## CreationDate: 2022-10-04 13:27:45+0000
-## Creator: R
-## Producer: GPL Ghostscript 9.55.0
-## Title: Two Boring Pages
-## Subject: NULL
-## Keywords: R
-## Keywords: xmpdf
-## ModDate: 2022-10-04 13:27:45+0000
-```
-
-```r
-# Edit PDF bookmarks
-print(get_bookmarks(f)[[1]])
+get_bookmarks(f)[[1]] |> print()
 ```
 
 ```
@@ -139,9 +104,50 @@ print(get_bookmarks(f)[[1]])
 ```
 
 ```r
-bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
-set_bookmarks(bookmarks, f)
-print(get_bookmarks(f)[[1]])
+# Edit PDF documentation info
+d <- docinfo(author = "John Doe",
+             title = "Two Boring Pages",
+             keywords = c("R", "xmpdf"),
+             filename = f)
+set_docinfo(d, f)
+get_docinfo(f)[[1]] |> print()
+```
+
+```
+## Author: John Doe
+## CreationDate: 2022-10-04 21:44:59+0000
+## Creator: R
+## Producer: GPL Ghostscript 9.55.0
+## Title: Two Boring Pages
+## Subject: NULL
+## Keywords: R, xmpdf
+## ModDate: 2022-10-04 21:44:59+0000
+```
+
+```r
+# Edit XMP metadata
+set_xmp(d, f)
+get_xmp(f)[[1]] |> print()
+```
+
+```
+## x:XMPToolkit : Image::ExifTool 12.40
+## dc:Creator : John Doe
+## dc:Format : application/pdf
+## dc:Title : Two Boring Pages
+## pdf:Keywords : R, xmpdf
+## pdf:Producer : R 4.2.1
+## xmp:CreateDate : 2022-10-05 04:44:59+0000
+## xmp:CreatorTool : R
+## xmp:ModifyDate : 2022-10-05 04:44:59+0000
+## xmpMM:DocumentID : uuid:04e2faeb-7c85-11f8-0000-2567e21c8552
+```
+
+```r
+# Edit PDF bookmarks
+bm <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
+set_bookmarks(bm, f)
+get_bookmarks(f)[[1]] |> print()
 ```
 
 ```

@@ -61,7 +61,7 @@ A simple example where we create a two page pdf using `pdf()` and then add XMP m
 library("grid")
 library("xmpdf")
 
-# Create a two page pdf
+# Create a two page pdf using `pdf()`
 f <- tempfile(fileext = ".pdf")
 pdf(f, onefile = TRUE)
 grid.text("Page 1")
@@ -69,26 +69,27 @@ grid.newpage()
 grid.text("Page 2")
 invisible(dev.off())
 
-# Edit XMP metadata
-print(get_xmp(f)[[1]])
-x <- xmp(title = "Two Boring Pages", creator = "John Doe")
-set_xmp(x, f)
-print(get_xmp(f)[[1]])
+# See what default metadata `pdf()` created
+get_docinfo(f)[[1]] |> print()
+get_xmp(f)[[1]] |> print()
+get_bookmarks(f)[[1]] |> print()
 
 # Edit PDF documentation info
-print(get_docinfo(f)[[1]])
 d <- docinfo(author = "John Doe",
              title = "Two Boring Pages",
              keywords = c("R", "xmpdf"),
              filename = f)
 set_docinfo(d, f)
-print(get_docinfo(f)[[1]])
+get_docinfo(f)[[1]] |> print()
+
+# Edit XMP metadata
+set_xmp(d, f)
+get_xmp(f)[[1]] |> print()
 
 # Edit PDF bookmarks
-print(get_bookmarks(f)[[1]])
-bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
-set_bookmarks(bookmarks, f)
-print(get_bookmarks(f)[[1]])
+bm <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
+set_bookmarks(bm, f)
+get_bookmarks(f)[[1]] |> print()
 
 unlink(f)
 ```
