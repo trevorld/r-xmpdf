@@ -34,9 +34,9 @@ Positive count indicates bookmark should start open while
 negative count indicates that this bookmark should start closed.
 If missing will be inferred from \code{level} column else will be assumed to be \code{0L}.
 Note some pdf viewers quietly ignore the initially open/closed feature.}
-\item{style}{Style of the bookmark (optional, integer).
-If \code{NA_integer_} will be unset (defaults to "plain").
-0 is Plain, 1 is Italic, 2 is Bold, and 3 is Bold and italic.
+\item{fontface}{Font face of the bookmark (optional, integer).
+If \code{NA_character_} or \code{NA_integer_} will be unset (defaults to "plain").
+"plain" or 1 is plain, "bold" or 2 is bold, "italic" or 3 is italic,
 Note many pdf viewers quietly ignore this feature.}
 \item{color}{Color of the bookmark (optional, character).
 If \code{NA_character_} will be unset (presumably defaults to "black").
@@ -71,9 +71,10 @@ Note many pdf viewers quietly ignore this feature.}
 \section{Known limitations}{
 
 \itemize{
-\item \code{get_bookmarks_pdftk()} doesn't report information about bookmarks color, style, and whether the bookmarks
+\item \code{get_bookmarks_pdftk()} doesn't report information about bookmarks color, fontface, and whether the bookmarks
 should start open or closed.
-\item \code{set_bookmarks_gs()} supports most bookmarks features including color and style but only action supported is to view a particular page.
+\item \code{set_bookmarks_gs()} supports most bookmarks features including color and font face but
+only action supported is to view a particular page.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.
 }
 }

@@ -24,9 +24,10 @@
 #'                negative count indicates that this bookmark should start closed.
 #'                If missing will be inferred from `level` column else will be assumed to be `0L`.
 #'                Note some pdf viewers quietly ignore the initially open/closed feature.}
-#'   \item{style}{Style of the bookmark (optional, integer).
-#'                If `NA_integer_` will be unset (defaults to "plain").
-#'                0 is Plain, 1 is Italic, 2 is Bold, and 3 is Bold and italic.
+#'   \item{fontface}{Font face of the bookmark (optional, integer).
+#'                If `NA_character_` or `NA_integer_` will be unset (defaults to "plain").
+#'                "plain" or 1 is plain, "bold" or 2 is bold, "italic" or 3 is italic,
+#"                "bold.italic" or 4 is bold and italic.
 #'                Note many pdf viewers quietly ignore this feature.}
 #'   \item{color}{Color of the bookmark (optional, character).
 #'                If `NA_character_` will be unset (presumably defaults to "black").
@@ -39,9 +40,10 @@
 #'         `set_bookmarks()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, style, and whether the bookmarks
+#'   * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, fontface, and whether the bookmarks
 #'     should start open or closed.
-#'   * `set_bookmarks_gs()` supports most bookmarks features including color and style but only action supported is to view a particular page.
+#'   * `set_bookmarks_gs()` supports most bookmarks features including color and font face but
+#'     only action supported is to view a particular page.
 #'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 #'
 #' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.
@@ -160,7 +162,7 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #'          [cat_pages()] for concatenating pdf files together.
 #' @export
 cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
-    #### Add styling options for new high level bookmarks open, color, style
+    #### Add styling options for new high level bookmarks open, color, fontface
     stopifnot(length(l) > 0L)
     method <- match.arg(method, c("flat", "filename", "title"))
     l <- lapply(l, as_bookmarks)
@@ -171,7 +173,7 @@ cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
     if (method == "filename") {
         titles <- vapply(l, function(x) basename(attr(x, "filename")), character(1L), USE.NAMES = FALSE)
     } else if (method == "title") {
-        titles <- vapply(l, function(x) attr(x, "title"), character(1L), USE.NAMES = FALSE)
+        titles <- vapply(l, function(x) attr(x, "title") %||% "Untitled", character(1L), USE.NAMES = FALSE)
     }
 
     if (method %in% c("filename", "title")) {
@@ -182,7 +184,7 @@ cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
                                    level = 1L,
                                    count = nrow(l[[1]]),
                                    color = NA_character_,
-                                   style = NA_integer_,
+                                   fontface = NA_character_,
                                    stringsAsFactors = FALSE),
                         l[[1]])
     }
@@ -200,7 +202,7 @@ cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
                                        level = 1L,
                                        count = nrow(l[[i]]),
                                        color = NA_character_,
-                                       style = NA_integer_,
+                                       fontface = NA_character_,
                                        stringsAsFactors = FALSE),
                             l[[i]])
         }
@@ -216,7 +218,7 @@ df_bookmarks_empty <- data.frame(title = character(0),
                                  level = integer(0),
                                  count = integer(0),
                                  color = character(),
-                                 style = integer(0),
+                                 fontface = integer(0),
                                  stringsAsFactors = FALSE)
 
 get_bookmarks_pdftk_helper <- function(filename) {
@@ -234,7 +236,7 @@ get_bookmarks_pdftk_helper <- function(filename) {
                    level = as.integer(level),
                    count = NA_integer_,
                    color = NA_character_,
-                   style = NA_integer_,
+                   fontface = NA_character_,
                    stringsAsFactors = FALSE)
     } else {
         df_bookmarks_empty
@@ -267,7 +269,7 @@ set_bookmarks <- function(bookmarks, input, output = input) {
 }
 
 should_pdftk_message <- function(bookmarks) {
-    any(bookmarks$count < 0) || any(!is.na(bookmarks$color)) || any(!is.na(bookmarks$style))
+    any(bookmarks$count < 0) || any(!is.na(bookmarks$color)) || any(!is.na(bookmarks$fontface))
 }
 
 #' @rdname bookmarks
@@ -283,9 +285,9 @@ set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
         if (any(!is.na(bookmarks$color)))
             msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
                                       "ignores non-missing", sQuote("color"), "values."))
-        if (any(!is.na(bookmarks$style)))
+        if (any(!is.na(bookmarks$fontface)))
             msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
-                                      "ignores non-missing", sQuote("style"), "values."))
+                                      "ignores non-missing", sQuote("fontface"), "values."))
         msg <- c(msg, "i" = paste(sQuote("set_bookmarks_gs()"), "can handle these features"),
                  "i" = paste("You can suppress these messages with",
                              sQuote('suppressMessages(expr, classes = "xmpdf_inform")')))
@@ -372,7 +374,7 @@ as_bookmarks <- function(bookmarks) {
         bookmarks$level <- integer()
         bookmarks$count <- integer()
         bookmarks$color <- character()
-        bookmarks$style <- integer()
+        bookmarks$fontface <- character()
         return(bookmarks)
     }
     stopifnot(hasName(bookmarks, "title"), hasName(bookmarks, "page"))
@@ -397,13 +399,25 @@ as_bookmarks <- function(bookmarks) {
         bookmarks[["color"]] <- as.character(bookmarks[["color"]])
     else
         bookmarks[["color"]] <- NA_character_
-    if (hasName(bookmarks, "style"))
-        bookmarks[["style"]] <- as.integer(bookmarks[["style"]])
-    else
-        bookmarks[["style"]] <- NA_integer_
+    if (hasName(bookmarks, "fontface")) {
+        bookmarks[["fontface"]] <- as.character(bookmarks[["fontface"]])
+        if (isTRUE(any(bookmarks[["fontface"]] == "1")))
+            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "1")] <- "plain"
+        if (isTRUE(any(bookmarks[["fontface"]] == "2")))
+            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "2")] <- "bold"
+        if (isTRUE(any(bookmarks[["fontface"]] == "3")))
+            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "3")] <- "italic"
+        if (isTRUE(any(bookmarks[["fontface"]] == "4")))
+            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "4")] <- "bold.italic"
+        fontface_nonmissing <- Filter(Negate(is.na), bookmarks[["fontface"]])
+        stopifnot(all(fontface_nonmissing %in% c("plain", "bold", "italic", "bold.italic")))
+    } else {
+        bookmarks[["fontface"]] <- NA_character_
+    }
     bookmarks
 }
 
+# get_count(c(1, 2, 3, 2)) == c(2, 1, 0, 0)
 get_count <- function(levels) {
     levels <- as.integer(levels)
     n <- length(levels)
@@ -412,10 +426,10 @@ get_count <- function(levels) {
         if (i < n) {
             count <- 0
             for (j in seq(i + 1L, n)) {
-                if (levels[j] > levels[i])
-                    count <- count + 1L
-                else
+                if (levels[j] == levels[i])
                     break
+                else if (levels[j] == levels[i] + 1L)
+                    count <- count + 1L
             }
             if (count > 0) counts[i] <- count
         }
@@ -423,16 +437,32 @@ get_count <- function(levels) {
     counts
 }
 
+# get_level(c(2, 1, 0, 0)) == c(1, 2, 3, 2)
 get_level <- function(counts) {
     counts <- as.integer(abs(counts))
     n <- length(counts)
     levels <- rep_len(1L, n)
     for (i in seq_len(n)) {
-        count <- counts[i]
-        if (count > 0) {
-            indices <- seq(i + 1L, i + count)
-            levels[indices] <- levels[indices] + 1L
+        if (counts[i] == 0) next
+        n_left <- counts[i]
+        n_subordinate <- counts[i]
+        j <- i + 1L
+        while (n_left > 0 && j <= n) {
+            if (counts[j] > 0) {
+                n_left <- n_left + counts[j]
+                n_subordinate <- n_subordinate + counts[j]
+            }
+            n_left <- n_left - 1L
+            j <- j + 1L
         }
+        indices <- seq.int(i + 1L, i + n_subordinate)
+        if (max(indices) > n) {
+            msg <- c(paste(sQuote("count"), "column seems mis-specified"),
+                     i = paste("The count should be number of immediate subordinates",
+                               "excluding any subordinates of subordinates"))
+            abort(msg)
+        }
+        levels[indices] <- levels[indices] + 1L
     }
     levels
 }
@@ -444,23 +474,30 @@ bookmark_pdftk <- function(title, level, page, ...) {
       paste("BookmarkPageNumber:", page))
 }
 
-bookmark_gs <- function(title, page, count, style, color, ...) {
-    otc <- bookmark_gs_helper(title, page, count, style, color)
+bookmark_gs <- function(title, page, count, fontface, color, ...) {
+    otc <- bookmark_gs_helper(title, page, count, fontface, color)
     paste(unlist(otc), collapse="")
 }
-bookmark_gs_raw <- function(title, page, count, style, color, ...) {
-    otc <- bookmark_gs_helper(title, page, count, style, color)
+bookmark_gs_raw <- function(title, page, count, fontface, color, ...) {
+    otc <- bookmark_gs_helper(title, page, count, fontface, color)
     do.call(raw_pdfmark_entry, otc)
 }
-bookmark_gs_helper <- function(title, page, count, style, color) {
+bookmark_gs_helper <- function(title, page, count, fontface, color) {
     if (count == 0)
         count_str <- ""
     else
         count_str <- paste(" /Count", count)
-    if (is.na(style))
+    if (is.na(fontface)) {
         style_str <- ""
-    else
+    } else {
+        style <- switch(fontface,
+                        "plain" = 0L,
+                        "italic" = 1L,
+                        "bold" = 2L,
+                        "bold.italic" = 3L)
+
         style_str <- paste0(" /F ", style, "\n")
+    }
     if (is.na(color)) {
         color_str <- ""
     } else {

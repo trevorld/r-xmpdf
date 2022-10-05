@@ -56,8 +56,8 @@ test_that("set_bookmarks_gs", {
     # Negative count (closed)
     bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
                             page = c(1L, 1L, 2L),
-                            count = c(2L, -1L, 0),
-                            style = c(1L, 2L, 3L),
+                            count = c(1L, -1L, 0),
+                            fontface = c("italic", "bold", "bold.italic"),
                             color = c("black", "red", "blue"))
     set_bookmarks_gs(bookmarks, f1, f2)
     bm <- get_bookmarks(f2)[[1]]
@@ -107,18 +107,21 @@ test_that("bookmarks_pdftk", {
 
     # Test unsupported feature messages
     bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
-                            count = c(-2L, 1L, 0L),
+                            count = c(-1L, 1L, 0L),
                             page = c(1L, 1L, 2L),
-                            style = c(2, 1, 0),
+                            fontface = c("italic", "bold", "plain"),
                             color = c("black", "blue", "red"))
     expect_snapshot(set_bookmarks_pdftk(bookmarks, f1, f2))
 
 })
 
 test_that("`get_count()` and `get_level()`", {
-    expect_equal(get_count(c(1, 2, 2)), c(2, 0, 0))
-    expect_equal(get_level(c(2, 0, 0)), c(1, 2, 2))
-    expect_equal(get_level(c(-2, 0, 0)), c(1, 2, 2))
+    expect_equal(get_count(c(1, 2, 3, 2)), c(2, 1, 0, 0))
+    expect_equal(get_count(c(1, 2, 3, 2, 3, 1, 2)), c(2, 1, 0, 1, 0, 1, 0))
+    expect_error(get_level(c(2, 1, 0)), "mis-specified")
+    expect_error(get_level(c(0, 0, 2)), "mis-specified")
+    expect_equal(get_level(c(2, 1, 0, 0)), c(1, 2, 3, 2))
+    expect_equal(get_level(c(-2, 1, 0, 0)), c(1, 2, 3, 2))
 })
 
 test_that("`cat_bookmarks()` works", {
