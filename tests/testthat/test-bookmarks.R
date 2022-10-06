@@ -81,7 +81,6 @@ test_that("set_bookmarks_gs", {
     expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
 
     # input = output
-    skip("`set_bookmarks_gs()` currently appends to existing bookmarks")
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))

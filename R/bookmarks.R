@@ -383,8 +383,12 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
         close(f)
     }
 
-    args <- c("-q", "-o", shQuote(target), "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
-              shQuote(input), shQuote(metafile))
+    args <- c("-q", "-o", shQuote(target),
+              "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
+              shQuote(system.file("gs/pdfmark_noop.txt", package = "xmpdf")),
+              shQuote(input),
+              shQuote(system.file("gs/pdfmark_restore.txt", package = "xmpdf")),
+              shQuote(metafile))
     xmpdf_system2(cmd, args)
     if (input == output) {
         file.copy(target, output, overwrite = TRUE)

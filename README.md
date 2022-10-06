@@ -80,13 +80,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-05 21:31:42+0000
+## CreationDate: 2022-10-05 23:21:33+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-05 21:31:42+0000
+## ModDate: 2022-10-05 23:21:33+0000
 ```
 
 ```r
@@ -118,13 +118,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-05 21:31:42+0000
+## CreationDate: 2022-10-05 23:21:33+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R, xmpdf
-## ModDate: 2022-10-05 21:31:42+0000
+## ModDate: 2022-10-05 23:21:33+0000
 ```
 
 ```r
@@ -140,10 +140,10 @@ get_xmp(f)[[1]] |> print()
 ## dc:Title : Two Boring Pages
 ## pdf:Keywords : R, xmpdf
 ## pdf:Producer : R 4.2.1
-## xmp:CreateDate : 2022-10-06 04:31:42+0000
+## xmp:CreateDate : 2022-10-06 06:21:33+0000
 ## xmp:CreatorTool : R
-## xmp:ModifyDate : 2022-10-06 04:31:42+0000
-## xmpMM:DocumentID : uuid:544031c3-7d4c-11f8-0000-2567e21c8552
+## xmp:ModifyDate : 2022-10-06 06:21:33+0000
+## xmpMM:DocumentID : uuid:accafb84-7d5b-11f8-0000-2567e21c8552
 ```
 
 ```r
