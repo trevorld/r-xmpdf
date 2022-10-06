@@ -80,13 +80,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-04 23:24:16+0000
+## CreationDate: 2022-10-05 21:31:42+0000
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-04 23:24:16+0000
+## ModDate: 2022-10-05 21:31:42+0000
 ```
 
 ```r
@@ -102,7 +102,7 @@ get_bookmarks(f)[[1]] |> print()
 ```
 
 ```
-## [1] title page  level count color style
+## [1] title    page     level    count    open     color    fontface
 ## <0 rows> (or 0-length row.names)
 ```
 
@@ -118,13 +118,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-04 23:24:16+0000
+## CreationDate: 2022-10-05 21:31:42+0000
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R, xmpdf
-## ModDate: 2022-10-04 23:24:16+0000
+## ModDate: 2022-10-05 21:31:42+0000
 ```
 
 ```r
@@ -140,10 +140,10 @@ get_xmp(f)[[1]] |> print()
 ## dc:Title : Two Boring Pages
 ## pdf:Keywords : R, xmpdf
 ## pdf:Producer : R 4.2.1
-## xmp:CreateDate : 2022-10-05 06:24:16+0000
+## xmp:CreateDate : 2022-10-06 04:31:42+0000
 ## xmp:CreatorTool : R
-## xmp:ModifyDate : 2022-10-05 06:24:16+0000
-## xmpMM:DocumentID : uuid:e3890ba6-7c92-11f8-0000-2567e21c8552
+## xmp:ModifyDate : 2022-10-06 04:31:42+0000
+## xmpMM:DocumentID : uuid:544031c3-7d4c-11f8-0000-2567e21c8552
 ```
 
 ```r
@@ -154,9 +154,9 @@ get_bookmarks(f)[[1]] |> print()
 ```
 
 ```
-##    title page level count color style
-## 1 Page 1    1     1    NA  <NA>    NA
-## 2 Page 2    2     1    NA  <NA>    NA
+##    title page level count open color fontface
+## 1 Page 1    1     1    NA   NA  <NA>     <NA>
+## 2 Page 2    2     1    NA   NA  <NA>     <NA>
 ```
 
 ```r
@@ -170,16 +170,16 @@ unlink(f)
 Get XMP metadata | **Yes** | **No** | **No**
 Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata is set then as a side effect it seems the documentation info metadata will also be set as XMP metadata
 Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
-Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and style but only action supported is to view a particular page
+Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but only action supported is to view a particular page
 Get PDF documentation info | **Yes** | **Yes** | **No**
 Set PDF documentation info | **Yes** | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
 Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:
 
-* `get_bookmarks_pdftk()` doesn't report information about bookmarks color, style, and whether the bookmarks
+* `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
-* `set_bookmarks_gs()` supports most bookmarks features including color and style but only action supported is to view a particular page.
+* `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * Datetimes are often converted to UTC time (any original "UTF offsets" may not be preserved).
@@ -250,3 +250,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 
 * [{tabulizer}](https://github.com/ropensci/tabulizer)
 * [tabula-java](https://github.com/tabulapdf/tabula-java/)
+
+### xpdf
+
+* [xpdf](http://www.xpdfreader.com/about.html)'s `pdfinfo` tool

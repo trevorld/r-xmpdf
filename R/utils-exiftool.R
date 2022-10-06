@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 get_exiftool_metadata <- function(filename, tags=NULL) {
     stopifnot(supports_exiftool())
     filename <- normalizePath(filename, mustWork = TRUE)

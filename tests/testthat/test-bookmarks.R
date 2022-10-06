@@ -20,6 +20,10 @@ test_that("set_bookmarks", {
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
 
+    bookmarks <- get_bookmarks(f1)[[1]]
+    set_bookmarks(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 0L)
+
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks(bookmarks, f1, f2)
@@ -36,6 +40,10 @@ test_that("set_bookmarks_gs", {
     skip_if_not(supports_gs())
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
+
+    bookmarks <- get_bookmarks(f1)[[1]]
+    set_bookmarks_gs(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 0L)
 
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
@@ -71,6 +79,15 @@ test_that("set_bookmarks_gs", {
     set_bookmarks_gs(bookmarks, f1, f2)
     bm <- get_bookmarks(f2)[[1]]
     expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
+
+    # input = output
+    skip("`set_bookmarks_gs()` currently appends to existing bookmarks")
+    bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
+                            level = c(1, 2, 2),
+                            page = c(1L, 1L, 2L))
+    set_bookmarks_gs(bookmarks, f2, f2)
+    bm <- get_bookmarks(f2)[[1]]
+    expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
 })
 
 test_that("bookmarks_pdftk", {
@@ -80,6 +97,10 @@ test_that("bookmarks_pdftk", {
 
     f2 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f2))
+
+    bookmarks <- get_bookmarks(f1)[[1]]
+    set_bookmarks_pdftk(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks(f2)[[1]]), 0L)
 
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
@@ -101,7 +122,7 @@ test_that("bookmarks_pdftk", {
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
-    set_bookmarks_pdftk(bookmarks, f1, f2)
+    set_bookmarks_pdftk(bookmarks, f2, f2)
     bm <- get_bookmarks_pdftk(f2)[[1]]
     expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
 
@@ -116,8 +137,10 @@ test_that("bookmarks_pdftk", {
 })
 
 test_that("`get_count()` and `get_level()`", {
-    expect_equal(get_count(c(1, 2, 3, 2)), c(2, 1, 0, 0))
-    expect_equal(get_count(c(1, 2, 3, 2, 3, 1, 2)), c(2, 1, 0, 1, 0, 1, 0))
+    expect_equal(get_count(c(1, 2, 3, 2), c(TRUE, FALSE, NA, NA)),
+                           c(2, -1, 0, 0))
+    expect_equal(get_count(c(1, 2, 3, 2, 3, 1, 2), c(TRUE, FALSE, NA, TRUE, NA, FALSE, NA)),
+                 c(2, -1, 0, 1, 0, -1, 0))
     expect_error(get_level(c(2, 1, 0)), "mis-specified")
     expect_error(get_level(c(0, 0, 2)), "mis-specified")
     expect_equal(get_level(c(2, 1, 0, 0)), c(1, 2, 3, 2))

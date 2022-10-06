@@ -4,7 +4,13 @@
 \alias{cat_bookmarks}
 \title{Concatenate pdf bookmarks}
 \usage{
-cat_bookmarks(l, method = c("flat", "filename", "title"))
+cat_bookmarks(
+  l,
+  method = c("flat", "filename", "title"),
+  open = NA,
+  color = NA_character_,
+  fontface = NA_character_
+)
 }
 \arguments{
 \item{l}{A list of bookmark data frames as returned by \code{\link[=get_bookmarks]{get_bookmarks()}}.
@@ -17,6 +23,19 @@ If "filename" place each file's bookmarks a level under a new bookmark matching
 the (base)name of the filename and then concatenate the bookmarks while updating page numbers.
 If "title" place each file's bookmarks a level under a new bookmark matching
 the title of the file and then concatenate the bookmarks while updating page numbers.}
+
+\item{open}{If \code{method = "filename"} or \code{method = "title"} a logical for whether the new top level bookmarks should start open?
+If missing will default to open.
+Note some pdf viewers quietly ignore the initially open/closed feature.}
+
+\item{color}{If \code{method = "filename"} or \code{method = "title"} the color of the new top level bookmarks.
+If \code{NA_character_} will be unset (presumably defaults to "black").
+Note many pdf viewers quietly ignore this feature.}
+
+\item{fontface}{If \code{method = "filename"} or \code{method = "title"} should the fontface of the new top level bookmarks.
+If \code{NA_character_} or \code{NA_integer_} will be unset (defaults to "plain").
+"plain" or 1 is plain, "bold" or 2 is bold, "italic" or 3 is italic,
+Note many pdf viewers quietly ignore this feature.}
 }
 \value{
 A data frame of bookmark data (as suitable for use with \code{\link[=set_bookmarks]{set_bookmarks()}}).

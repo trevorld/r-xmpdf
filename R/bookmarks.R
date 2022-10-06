@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Set/get pdf bookmarks
 #'
 #' `get_bookmarks()` gets pdf bookmarks from a file.
@@ -20,10 +22,18 @@
 #'   \item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer).
 #'                If missing will be inferred from `count` column else will be assumed to be `1L`.}
 #'   \item{count}{Number of bookmarks immediately subordinate (optional, integer).
+#'                Excludes subordinates of subordinates.
 #'                Positive count indicates bookmark should start open while
 #'                negative count indicates that this bookmark should start closed.
-#'                If missing will be inferred from `level` column else will be assumed to be `0L`.
+#'                If missing will be inferred from `level` column
+#'                and (if specified) the `open` column else will be assumed to be `0L`.
 #'                Note some pdf viewers quietly ignore the initially open/closed feature.}
+#'   \item{open}{Whether the bookmark starts open or closed if it has
+#'               subordinate bookmarks (optional, logical).
+#'               If missing will default to open.
+#'               Ignored if the `count` column is specified (instead use a negative count
+#'               if the bookmark should start closed).
+#'               Note some pdf viewers quietly ignore the initially open/closed feature.}
 #'   \item{fontface}{Font face of the bookmark (optional, integer).
 #'                If `NA_character_` or `NA_integer_` will be unset (defaults to "plain").
 #'                "plain" or 1 is plain, "bold" or 2 is bold, "italic" or 3 is italic,
@@ -104,6 +114,17 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #'               the (base)name of the filename and then concatenate the bookmarks while updating page numbers.
 #'               If "title" place each file's bookmarks a level under a new bookmark matching
 #'               the title of the file and then concatenate the bookmarks while updating page numbers.
+#' @param open If `method = "filename"` or `method = "title"` a logical for whether the new top level bookmarks should start open?
+#'               If missing will default to open.
+#'               Note some pdf viewers quietly ignore the initially open/closed feature.
+#' @param color If `method = "filename"` or `method = "title"` the color of the new top level bookmarks.
+#'                If `NA_character_` will be unset (presumably defaults to "black").
+#'                Note many pdf viewers quietly ignore this feature.
+#' @param fontface If `method = "filename"` or `method = "title"` should the fontface of the new top level bookmarks.
+#'                If `NA_character_` or `NA_integer_` will be unset (defaults to "plain").
+#'                "plain" or 1 is plain, "bold" or 2 is bold, "italic" or 3 is italic,
+#"                "bold.italic" or 4 is bold and italic.
+#'                Note many pdf viewers quietly ignore this feature.
 #' @return A data frame of bookmark data (as suitable for use with [set_bookmarks()]).
 #'         A "total_pages" attribute will be set for the theoretical total pages of
 #'         the concatenated document represented by the concatenated bookmarks.
@@ -161,8 +182,8 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #' @seealso [get_bookmarks()] and [set_bookmarks()] for setting bookmarks.
 #'          [cat_pages()] for concatenating pdf files together.
 #' @export
-cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
-    #### Add styling options for new high level bookmarks open, color, fontface
+cat_bookmarks <- function(l, method = c("flat", "filename", "title"),
+                          open = NA, color = NA_character_, fontface = NA_character_) {
     stopifnot(length(l) > 0L)
     method <- match.arg(method, c("flat", "filename", "title"))
     l <- lapply(l, as_bookmarks)
@@ -182,9 +203,10 @@ cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
         l[[1]] <- rbind(data.frame(title = basename(titles[1L]),
                                    page = 1L,
                                    level = 1L,
-                                   count = nrow(l[[1]]),
-                                   color = NA_character_,
-                                   fontface = NA_character_,
+                                   count = NA_integer_,
+                                   open = open,
+                                   color = color,
+                                   fontface = fontface,
                                    stringsAsFactors = FALSE),
                         l[[1]])
     }
@@ -200,15 +222,17 @@ cat_bookmarks <- function(l, method = c("flat", "filename", "title")) {
             l[[i]] <- rbind(data.frame(title = basename(titles[i]),
                                        page = cum_pages[i - 1L] + 1L,
                                        level = 1L,
-                                       count = nrow(l[[i]]),
-                                       color = NA_character_,
-                                       fontface = NA_character_,
+                                       count = NA_integer_,
+                                       open = open,
+                                       color = color,
+                                       fontface = fontface,
                                        stringsAsFactors = FALSE),
                             l[[i]])
         }
     }
 
     df <- do.call(function(...) rbind(..., make.row.names = FALSE), l)
+    df$count <- get_count(df$level, df$open)
     attr(df, "total_pages") <- sum(v_total_pages)
     df
 }
@@ -217,6 +241,7 @@ df_bookmarks_empty <- data.frame(title = character(0),
                                  page = integer(0),
                                  level = integer(0),
                                  count = integer(0),
+                                 open = logical(0),
                                  color = character(),
                                  fontface = integer(0),
                                  stringsAsFactors = FALSE)
@@ -235,6 +260,7 @@ get_bookmarks_pdftk_helper <- function(filename) {
                    page = as.integer(page),
                    level = as.integer(level),
                    count = NA_integer_,
+                   open = NA,
                    color = NA_character_,
                    fontface = NA_character_,
                    stringsAsFactors = FALSE)
@@ -353,15 +379,16 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
         bookmarks_gs <- unlist(purrr::pmap(bookmarks, bookmark_gs))
         f <- file(metafile, encoding = "latin1")
         open(f, "w")
-        writeLines(bookmarks_gs, metafile)
+        writeLines(bookmarks_gs %||% character(0), metafile)
         close(f)
     }
 
     args <- c("-q", "-o", shQuote(target), "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
               shQuote(input), shQuote(metafile))
     xmpdf_system2(cmd, args)
-    if (input == output)
+    if (input == output) {
         file.copy(target, output, overwrite = TRUE)
+    }
     invisible(output)
 }
 
@@ -373,6 +400,7 @@ as_bookmarks <- function(bookmarks) {
         bookmarks$page <- integer()
         bookmarks$level <- integer()
         bookmarks$count <- integer()
+        bookmarks$open <- logical()
         bookmarks$color <- character()
         bookmarks$fontface <- character()
         return(bookmarks)
@@ -380,16 +408,37 @@ as_bookmarks <- function(bookmarks) {
     stopifnot(hasName(bookmarks, "title"), hasName(bookmarks, "page"))
     bookmarks[["title"]] <- as.character(bookmarks[["title"]])
     bookmarks[["page"]] <- as.integer(bookmarks[["page"]])
+
+    if (hasName(bookmarks, "open")) {
+        bookmarks[["open"]] <- as.logical(bookmarks[["open"]])
+    } else if (hasName(bookmarks, "count")) {
+        count <- as.integer(bookmarks[["count"]])
+        if (any(is.na(count)))
+            count[which(is.na(count))] <- 0L
+        open <- rep_len(NA, nrow(bookmarks))
+        if (length(which(count > 0)))
+            open[which(count > 0)] <- TRUE
+        if (length(which(count < 0)))
+            open[which(count < 0)] <- FALSE
+        bookmarks[["open"]] <- open
+    } else {
+        bookmarks[["open"]] <- NA
+    }
+
     if (hasName(bookmarks, "level") && hasName(bookmarks, "count")) {
         bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
         bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
         if (any(is.na(bookmarks[["count"]])))
-            bookmarks[["count"]] <- get_count(bookmarks[["level"]])
+            bookmarks[["count"]] <- get_count(bookmarks[["level"]],
+                                              bookmarks[["open"]])
     } else if (hasName(bookmarks, "level")) {
         bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
-        bookmarks[["count"]] <- get_count(bookmarks[["level"]])
+        bookmarks[["count"]] <- get_count(bookmarks[["level"]],
+                                          bookmarks[["open"]])
     } else if (hasName(bookmarks, "count")) {
         bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
+        if (any(is.na(bookmarks[["count"]])))
+            bookmarks[["count"]][which(is.na(bookmarks[["count"]]))] <- 0L
         bookmarks[["level"]] <- get_level(bookmarks[["count"]])
     } else {
         bookmarks[["level"]] <- 1L
@@ -414,11 +463,16 @@ as_bookmarks <- function(bookmarks) {
     } else {
         bookmarks[["fontface"]] <- NA_character_
     }
-    bookmarks
+    reordered <- bookmarks[, c("title", "page", "level", "count", "open", "color", "fontface")]
+    attr(reordered, "filename") <- attr(bookmarks, "filename")
+    attr(reordered, "title") <- attr(bookmarks, "title")
+    attr(reordered, "total_pages") <- attr(bookmarks, "total_pages")
+    reordered
 }
 
 # get_count(c(1, 2, 3, 2)) == c(2, 1, 0, 0)
-get_count <- function(levels) {
+get_count <- function(levels, open) {
+    closed <- vapply(open, isFALSE, logical(1))
     levels <- as.integer(levels)
     n <- length(levels)
     counts <- integer(n)
@@ -434,6 +488,8 @@ get_count <- function(levels) {
             if (count > 0) counts[i] <- count
         }
     }
+    if (any(closed))
+        counts[which(closed)] <- -counts[which(closed)]
     counts
 }
 

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Set/get xmp metadata
 #'
 #' `get_xmp()` gets xmp metadata from a file.

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 assert_suggested <- function(package) {
     calling_fn <- deparse(sys.calls()[[sys.nframe()-1]])
     if (!requireNamespace(package, quietly = TRUE)) {

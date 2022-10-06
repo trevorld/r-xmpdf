@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Get number of pages in a document
 #'
 #' `n_pages()` returns the number of pages in the (pdf) file(s).

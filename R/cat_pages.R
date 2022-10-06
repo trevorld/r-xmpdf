@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Concatenate pdf documents together
 #'
 #' `cat_pages()` concatenates pdf documents together.

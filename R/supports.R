@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Detect support for features
 #'
 #' `supports_get_bookmarks()`, `supports_set_bookmarks()`,

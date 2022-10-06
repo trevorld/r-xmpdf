@@ -30,9 +30,17 @@ set_bookmarks_gs(bookmarks, input, output = input)
 \item{level}{Level of bookmark e.g. 1 top level, 2 second level, etc. (optional, integer).
 If missing will be inferred from \code{count} column else will be assumed to be \code{1L}.}
 \item{count}{Number of bookmarks immediately subordinate (optional, integer).
+Excludes subordinates of subordinates.
 Positive count indicates bookmark should start open while
 negative count indicates that this bookmark should start closed.
-If missing will be inferred from \code{level} column else will be assumed to be \code{0L}.
+If missing will be inferred from \code{level} column
+and (if specified) the \code{open} column else will be assumed to be \code{0L}.
+Note some pdf viewers quietly ignore the initially open/closed feature.}
+\item{open}{Whether the bookmark starts open or closed if it has
+subordinate bookmarks (optional, logical).
+If missing will default to open.
+Ignored if the \code{count} column is specified (instead use a negative count
+if the bookmark should start closed).
 Note some pdf viewers quietly ignore the initially open/closed feature.}
 \item{fontface}{Font face of the bookmark (optional, integer).
 If \code{NA_character_} or \code{NA_integer_} will be unset (defaults to "plain").

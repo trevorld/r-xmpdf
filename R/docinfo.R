@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Set/get pdf document info dictionary
 #'
 #' `get_docinfo()` gets pdf document info from a file.
