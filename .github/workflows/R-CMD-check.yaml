@@ -51,7 +51,7 @@ jobs:
         if: always()
         run: |
             install.packages("remotes")
-        remotes::install_github("trevorld/r-datetimeoffset")
+            remotes::install_github("trevorld/r-datetimeoffset")
         shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
