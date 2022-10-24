@@ -26,6 +26,15 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     as.list(df)
 }
 
+# use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z] when writing datetimes
+as_exif_dt <- function(value) {
+    value <- datetimeoffset::as_datetimeoffset(value)
+    value <- datetimeoffset::format_ISO8601(value)
+    value <- gsub("^([[:digit:]]{4})-", "\\1:", value)
+    value <- gsub("^([[:digit:]]{4}):([[:digit:]]{2})-", "\\1:\\2:", value)
+    gsub("T", " ", value)
+}
+
 #' @param tags Named list of metadata tags to set
 #' @noRd
 set_exiftool_metadata <- function(tags, input, output = input) {
@@ -39,13 +48,17 @@ set_exiftool_metadata <- function(tags, input, output = input) {
         target <- output
     }
     for (name in names(tags)) {
-        # We're using a date format equivalent to R's "%FTT%z"
-        tags[[name]] <- as.character(tags[[name]], format = "%FT%T%z")
+        if (inherits(tags[[name]], "datetimeoffset")) {
+            tags[[name]] <- as_exif_dt(tags[[name]])
+        } else if (inherits(tags[[name]], "POSIXt")) {
+            tags[[name]] <- as_exif_dt(tags[[name]])
+        } else {
+            tags[[name]] <- as.character(tags[[name]])
+        }
     }
     nms <- names(tags)
     values <- unlist(tags)
     tags <- paste0("-", nms, "=", values)
-    # Date format equivalent to R's "%FT%T%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
         args <- c(tags, "-n", "-o", target, input)
         results <- exiftoolr::exif_call(args, quiet = TRUE)
