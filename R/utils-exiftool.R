@@ -6,13 +6,13 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
 
     # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-G1", "-a", "-d", "%FT%T%z", "-csv", filename)
+        args <- c(tags, "-G1", "-a", "-n", "-csv", filename)
         output <- exiftoolr::exif_call(args, quiet = TRUE)
     } else {
         cmd <- exiftool()
         f <- tempfile(fileext = ".txt")
         on.exit(unlink(f))
-        args <- c(tags, "-G1", "-a", "-d", "%FT%T%z", "-csv", filename)
+        args <- c(tags, "-G1", "-a", "-n", "-csv", filename)
         writeLines(args, f)
         args <- c("-@", shQuote(f))
         if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
@@ -47,13 +47,13 @@ set_exiftool_metadata <- function(tags, input, output = input) {
     tags <- paste0("-", nms, "=", values)
     # Date format equivalent to R's "%FT%T%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-d", "%FT%T%z", "-o", target, input)
+        args <- c(tags, "-n", "-o", target, input)
         results <- exiftoolr::exif_call(args, quiet = TRUE)
     } else {
         cmd <- exiftool()
         f <- tempfile(fileext = ".txt")
         on.exit(unlink(f))
-        args <- c(tags, "-d", "%FT%T%z", "-o", target, input)
+        args <- c(tags, "-n", "-o", target, input)
         writeLines(args, f)
         args <- c("-@", shQuote(f))
         if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")

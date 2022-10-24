@@ -27,8 +27,6 @@
 ---
 
     ! You must install (only) one suggested R package or system command to use 'get_docinfo()'
-    x The suggested package 'pdftools' is not installed
-    i 'install.packages("pdftools")'
     x The system command 'exiftool' is not installed (or detected)
     i <https://exiftool.org/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
@@ -42,6 +40,8 @@
     i 'brew install pdftk-java' (Homebrew)
     i 'choco install pdftk-java' (Chocolately)
     i 'Sys.setenv(PDFTK_PATH = "/path/to/pdftk")' if installed but not detected on PATH
+    x The suggested package 'pdftools' is not installed
+    i 'install.packages("pdftools")'
 
 ---
 

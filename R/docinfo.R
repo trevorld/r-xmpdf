@@ -7,9 +7,9 @@
 #'
 #' `get_docinfo()` will try to use the following helper functions in the following order:
 #'
-#' 1. `get_docinfo_pdftools()` which wraps [pdftools::pdf_info()]
-#' 2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
-#' 3. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 1. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
+#' 2. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 3. `get_docinfo_pdftools()` which wraps [pdftools::pdf_info()]
 #'
 #' `set_docinfo()` will try to use the following helper functions in the following order:
 #'
@@ -242,23 +242,13 @@ as.list.docinfo <- function(x, ...) {
     l
 }
 
-tryFormats <- c("%FT%T%z",
-                "%F %T%z",
-                "%Y-%m-%d %H:%M:%OS",
-                "%Y/%m/%d %H:%M:%OS",
-                "%Y-%m-%d %H:%M",
-                "%Y/%m/%d %H:%M",
-                "%Y-%m-%d",
-                "%Y/%m/%d")
-
 to_date_pdfmark <- function(date) {
     if (is.null(date)) {
         NULL
     } else if (is.character(date)) {
         ""
     } else {
-        val <- format(date, format = "D:%Y%m%d%H%M%S%z")
-        paste0(substr(val, 1, 19), "'", substr(val, 20, 21), "'")
+        datetimeoffset::format_pdfmark(date)
     }
 }
 
@@ -285,38 +275,8 @@ d_format <- function(value) {
     } else if (is.character(value)) {
         value
     } else {
-        strftime(value, format = "%F %T%z")
+        format(value)
     }
-}
-
-from_date_pdfmark <- function(string) {
-    destring <- gsub("^(D:)*", "\\2", string)
-    destring <- gsub("'", "", destring) # GMT offset
-    date <- if (nchar(destring) == 4) {
-        destring <- paste0(destring, "0101000000+0000")
-    } else if (nchar(destring) == 6) {
-        destring <- paste0(destring, "01000000+0000")
-    } else if (nchar(destring) == 8) {
-        destring <- paste0(destring, "000000+0000")
-    } else if (nchar(destring) == 10) {
-        destring <- paste0(destring, "0000+0000")
-    } else if (nchar(destring) == 12) {
-        destring <- paste0(destring, "00+0000")
-    } else if (nchar(destring) == 14) {
-        destring <- paste0(destring, "+0000")
-    } else if (nchar(destring) == 17) {
-        destring <- paste0(destring, "00")
-    }
-    if (nchar(destring) == "19") {
-        tz <- substr(destring, 15, 19)
-        date <- strptime(destring, tz = "GMT", format = "%Y%m%d%H%M%S%z")
-    } else {
-        date <- NA
-    }
-    if (is.na(date)) {
-        abort(paste("Couldn't parse pdfmark date", sQuote(string)))
-    }
-    date
 }
 
 entry_pdftk <- function(key, value) {
@@ -328,17 +288,17 @@ entry_pdftk <- function(key, value) {
 #' @rdname edit_docinfo
 #' @export
 get_docinfo <- function(filename, use_names = TRUE) {
-    if (supports_pdftools()) {
-        get_docinfo_pdftools(filename, use_names = use_names)
-    } else if (supports_exiftool()) {
+    if (supports_exiftool()) {
         get_docinfo_exiftool(filename, use_names = use_names)
     } else if (supports_pdftk()) {
         get_docinfo_pdftk(filename, use_names = use_names)
+    } else if (supports_pdftools()) {
+        get_docinfo_pdftools(filename, use_names = use_names)
     } else {
         msg <- c(need_to_install_str("get_docinfo()"),
-                 install_package_str("pdftools"),
                  install_exiftool_str(),
-                 install_pdftk_str()
+                 install_pdftk_str(),
+                 install_package_str("pdftools")
         )
         abort(msg, class = "xmpdf_suggested_package")
     }
@@ -422,7 +382,7 @@ get_docinfo_pdftk_helper <- function(filename) {
     if (length(id <- grep("^InfoKey: Author", info)))
         dinfo$author <- gsub("^InfoValue: ", "", info[id + 1])
     if (length(id <- grep("^InfoKey: CreationDate", info))) {
-        dinfo$creation_date <- from_date_pdfmark(gsub("^InfoValue: ", "", info[id + 1]))
+        dinfo$creation_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
     }
     if (length(id <- grep("^InfoKey: Creator", info)))
         dinfo$creator <- gsub("^InfoValue: ", "", info[id + 1])
@@ -435,7 +395,7 @@ get_docinfo_pdftk_helper <- function(filename) {
     if (length(id <- grep("^InfoKey: Keywords", info)))
         dinfo$keywords <- gsub("^InfoValue: ", "", info[id + 1])
     if (length(id <- grep("^InfoKey: ModDate", info))) {
-        dinfo$mod_date <- from_date_pdfmark(gsub("^InfoValue: ", "", info[id + 1]))
+        dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
     }
     dinfo
 }
@@ -570,8 +530,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$author))
                 tags[["PDF:Author"]] <- self$author
             if (!is.null(self$creation_date))
-                tags[["PDF:CreateDate"]] <- format(self$creation_date,
-                                                     format = "%Y-%m-%dT%H:%M:%S%z")
+                tags[["PDF:CreateDate"]] <- datetimeoffset::format_ISO8601(self$creation_date)
             if (!is.null(self$creator))
                 tags[["PDF:Creator"]] <- self$creator
             if (!is.null(self$producer))
@@ -583,14 +542,12 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$keywords))
                 tags[["PDF:Keywords"]] <- paste(self$keywords, collapse = ", ")
             if (!is.null(self$mod_date))
-                tags[["PDF:ModifyDate"]] <-  format(self$mod_date,
-                                                    format = "%Y-%m-%dT%H:%M:%S%z")
+                tags[["PDF:ModifyDate"]] <-  datetimeoffset::format_ISO8601(self$mod_date)
             tags
         },
         xmp = function() {
             # these are the XMP tags that `ghostscript` chooses as equivalent
             # to the eight documentation info dictionary entries
-            # With `exiftool` we're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
             tags <- list()
             if (!is.null(self$title))
                 tags[["dc:Title"]] <- self$title
@@ -808,9 +765,7 @@ as_character_value <- function(value) {
 as_datetime_value <- function(value) {
     if (is.null(value)) {
         NULL
-    } else if (inherits(value, "POSIXlt")) {
-        value
     } else {
-        as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
+        datetimeoffset::as_datetimeoffset(value)
     }
 }

@@ -80,13 +80,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-05 23:21:33+0000
+## CreationDate: 2022-10-24T12:50:52
 ## Creator: R
 ## Producer: R 4.2.1
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-05 23:21:33+0000
+## ModDate: 2022-10-24T12:50:52
 ```
 
 ```r
@@ -118,32 +118,40 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-05 23:21:33+0000
+## CreationDate: 2022-10-24T12:50:52
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R, xmpdf
-## ModDate: 2022-10-05 23:21:33+0000
+## ModDate: 2022-10-24T12:50:52
 ```
 
 ```r
 # Edit XMP metadata
 set_xmp(d, f)
+```
+
+```
+## Error in `as.character()`:
+## ! Can't convert `x` <datetimeoffset> to <character>.
+```
+
+```r
 get_xmp(f)[[1]] |> print()
 ```
 
 ```
-## x:XMPToolkit : Image::ExifTool 12.40
-## dc:Creator : John Doe
+## x:XMPToolkit : XMP toolkit 2.9.1-13, framework 1.6
+## pdf:Producer : GPL Ghostscript 9.55.0
+## pdf:Keywords : R, xmpdf
+## xmp:ModifyDate : 2022:10:24 12:50:52Z
+## xmp:CreateDate : 2022:10:24 12:50:52Z
+## xmp:CreatorTool : R
+## xmpMM:DocumentID : uuid:b83eb22a-8bf1-11f8-0000-2567e21c8552
 ## dc:Format : application/pdf
 ## dc:Title : Two Boring Pages
-## pdf:Keywords : R, xmpdf
-## pdf:Producer : R 4.2.1
-## xmp:CreateDate : 2022-10-06 06:21:33+0000
-## xmp:CreatorTool : R
-## xmp:ModifyDate : 2022-10-06 06:21:33+0000
-## xmpMM:DocumentID : uuid:accafb84-7d5b-11f8-0000-2567e21c8552
+## dc:Creator : John Doe
 ```
 
 ```r

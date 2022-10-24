@@ -107,7 +107,7 @@ as_xmp.list <- function(x, ...) {
         if (is.character(value) &&
             grepl("^[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}[+-][[:digit:]]{4}$", value)) {
 
-            x[[i]] <- as.POSIXlt(value, tz = "GMT", tryFormats = tryFormats)
+            x[[i]] <- datetimeoffset::as_datetimeoffset(value)
         }
     }
     x

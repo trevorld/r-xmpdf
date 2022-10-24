@@ -16,7 +16,7 @@
 #' `exiftool`, `ghostscript` and `pdftk` respectively as used by various lower-level functions.
 #'
 #' * `supports_exiftool()` detects support for the command-line tool `exiftool` which is
-#'   required for [get_xmp_exiftool()], [set_xmp_exiftool()], and [n_pages_exiftool()].
+#'   required for [get_docinfo_exiftool()], [get_xmp_exiftool()], [set_xmp_exiftool()], and [n_pages_exiftool()].
 #' * `supports_gs()` detects support for the command-line tool `ghostscript` which is
 #'   required for [set_docinfo_gs()], [set_bookmarks_gs()], [cat_pages_gs()], and [n_pages_gs()].
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
@@ -24,8 +24,6 @@
 #'   [get_docinfo_pdftk()], [set_docinfo_pdftk()], [cat_pages_pdftk()], and [n_pages_pdftk()].
 #' * `requireNamespace("qpdf", quietly = TRUE)` detects support for the R packages `qpdf`
 #'   which is required for [cat_pages_qpdf()] and [n_pages_qpdf()].
-#' * `requireNamespace("pdftools", quietly = TRUE)` detects support for the R package `pdftools`
-#'   which is required for [get_docinfo_pdftools()].
 #' @examples
 #'   # Detect for higher-level features
 #'   supports_get_docinfo()
@@ -61,7 +59,7 @@ supports_set_bookmarks <- function() {
 #' @rdname supports
 #' @export
 supports_get_docinfo <- function() {
-    supports_pdftools() || supports_pdftk()
+    supports_exiftool() || supports_pdftk() || supports_pdftools()
 }
 
 #' @rdname supports

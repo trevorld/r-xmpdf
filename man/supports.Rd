@@ -54,7 +54,7 @@ detects support for the command-line tools
 \details{
 \itemize{
 \item \code{supports_exiftool()} detects support for the command-line tool \code{exiftool} which is
-required for \code{\link[=get_xmp_exiftool]{get_xmp_exiftool()}}, \code{\link[=set_xmp_exiftool]{set_xmp_exiftool()}}, and \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
+required for \code{\link[=get_docinfo_exiftool]{get_docinfo_exiftool()}}, \code{\link[=get_xmp_exiftool]{get_xmp_exiftool()}}, \code{\link[=set_xmp_exiftool]{set_xmp_exiftool()}}, and \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
 \item \code{supports_gs()} detects support for the command-line tool \code{ghostscript} which is
 required for \code{\link[=set_docinfo_gs]{set_docinfo_gs()}}, \code{\link[=set_bookmarks_gs]{set_bookmarks_gs()}}, \code{\link[=cat_pages_gs]{cat_pages_gs()}}, and \code{\link[=n_pages_gs]{n_pages_gs()}}.
 \item \code{supports_pdftk()} detects support for the command-line tool \code{pdftk} which is
@@ -62,8 +62,6 @@ required for \code{\link[=get_bookmarks_pdftk]{get_bookmarks_pdftk()}}, \code{\l
 \code{\link[=get_docinfo_pdftk]{get_docinfo_pdftk()}}, \code{\link[=set_docinfo_pdftk]{set_docinfo_pdftk()}}, \code{\link[=cat_pages_pdftk]{cat_pages_pdftk()}}, and \code{\link[=n_pages_pdftk]{n_pages_pdftk()}}.
 \item \code{requireNamespace("qpdf", quietly = TRUE)} detects support for the R packages \code{qpdf}
 which is required for \code{\link[=cat_pages_qpdf]{cat_pages_qpdf()}} and \code{\link[=n_pages_qpdf]{n_pages_qpdf()}}.
-\item \code{requireNamespace("pdftools", quietly = TRUE)} detects support for the R package \code{pdftools}
-which is required for \code{\link[=get_docinfo_pdftools]{get_docinfo_pdftools()}}.
 }
 }
 \examples{
