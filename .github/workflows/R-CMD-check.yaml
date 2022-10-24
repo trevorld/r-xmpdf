@@ -47,13 +47,6 @@ jobs:
             sudo apt-get install -y pdftk
         shell: bash
 
-      - name: Install datetimeoffset
-        if: always()
-        run: |
-            install.packages("remotes")
-            remotes::install_github("trevorld/r-datetimeoffset")
-        shell: Rscript {0}
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck

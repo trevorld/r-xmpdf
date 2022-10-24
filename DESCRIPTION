@@ -32,7 +32,7 @@ Suggests:
     pdftools,
     testthat (>= 3.0.0)
 Remotes: 
-    trevorld/r-datetimeoffset
+    datetimeoffset=trevorld/r-datetimeoffset
 SystemRequirements: 'ghostscript' or 'pdftk' for editing pdf bookmarks
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
