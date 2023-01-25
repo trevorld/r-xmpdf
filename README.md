@@ -63,15 +63,14 @@ A simple example where we create a two page pdf using `pdf()` and then add XMP m
 
 
 ```r
-library("grid")
 library("xmpdf")
 
 # Create a two page pdf using `pdf()`
 f <- tempfile(fileext = ".pdf")
 pdf(f, onefile = TRUE)
-grid.text("Page 1")
-grid.newpage()
-grid.text("Page 2")
+grid::grid.text("Page 1")
+grid::grid.newpage()
+grid::grid.text("Page 2")
 invisible(dev.off())
 
 # See what default metadata `pdf()` created
@@ -108,10 +107,10 @@ get_bookmarks(f)[[1]] |> print()
 
 ```r
 # Edit PDF documentation info
-d <- docinfo(author = "John Doe",
-             title = "Two Boring Pages",
-             keywords = c("R", "xmpdf"),
-             filename = f)
+d <- get_docinfo(f)[[1]] |> 
+       update(author = "John Doe",
+              title = "Two Boring Pages",
+              keywords = c("R", "xmpdf"))
 set_docinfo(d, f)
 get_docinfo(f)[[1]] |> print()
 ```

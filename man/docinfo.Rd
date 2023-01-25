@@ -12,8 +12,7 @@ docinfo(
   title = NULL,
   subject = NULL,
   keywords = NULL,
-  mod_date = NULL,
-  filename = NULL
+  mod_date = NULL
 )
 }
 \arguments{
@@ -38,9 +37,6 @@ Matching xmp metadata tag is \code{pdf:Keywords}.}
 \item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt(tz = "GMT")}.
 If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.
 Matching xmp metadata tag is \code{xmp:ModifyDate}.}
-
-\item{filename}{A pdf filename to extract info dictionary entries from:
-any such entries will be overridden by any manually set entries in \code{\link[=docinfo]{docinfo()}} call.}
 }
 \description{
 \code{docinfo()} creates a PDF documentation info dictionary object
@@ -59,6 +55,8 @@ and such objects are returned by \code{\link[=get_docinfo]{get_docinfo()}}.
 \item{\code{print()}}{Print out the documentation info entries.}
 \item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.
 Can also use the relevant active bindings to set documentation info keys.}
+\item{\code{update(x)}}{Update documentation info key entries
+using non-\code{NULL} entries in \code{\link[=docinfo]{docinfo()}} (coercible) object \code{x}.}
 }
 }
 
@@ -85,12 +83,13 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   invisible(dev.off())
 
   cat("\nInitial documentation info\n")
-  print(get_docinfo(f)[[1]])
+  d <- get_docinfo(f)[[1]]
+  print(d)
 
-  d <- docinfo(author = "John Doe",
-               title = "Two Boring Pages",
-               keywords = c("R", "xmpdf"),
-               filename = f)
+  d <- update(d,
+              author = "John Doe",
+              title = "Two Boring Pages",
+              keywords = c("R", "xmpdf"))
   set_docinfo(d, f)
 
   cat("\nDocumentation info after setting it\n")

@@ -31,7 +31,7 @@ test_that("docinfo_pdftk", {
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")
 
-    di_set <- docinfo(filename = f2)
+    di_set <- get_docinfo(f2)[[1]]
     set_docinfo_pdftk(di_set, f1, f2)
     di_get <- get_docinfo_pdftk(f2)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
@@ -143,4 +143,12 @@ test_that("conversion to/from docinfo()", {
     names(x2) <- gsub("^[[:alpha:]]+:", "", names(x2))
     d3 <- as_docinfo(as_xmp(x2))
     expect_equal(d3$subject, "Generic Subject")
+})
+
+test_that("update", {
+    d <- docinfo(author = "John Doe")
+    expect_equal(d$author, "John Doe")
+    d2 <- update(d, author = "Jane Doe")
+    expect_equal(d$author, "John Doe")
+    expect_equal(d2$author, "Jane Doe")
 })
