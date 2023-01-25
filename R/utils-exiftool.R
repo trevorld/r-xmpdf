@@ -29,7 +29,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
 # use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z] when writing datetimes
 as_exif_dt <- function(value) {
     value <- datetimeoffset::as_datetimeoffset(value)
-    value <- datetimeoffset::format_ISO8601(value)
+    value <- datetimeoffset::format_iso8601(value)
     value <- gsub("^([[:digit:]]{4})-", "\\1:", value)
     value <- gsub("^([[:digit:]]{4}):([[:digit:]]{2})-", "\\1:\\2:", value)
     gsub("T", " ", value)

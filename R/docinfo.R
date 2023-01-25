@@ -530,7 +530,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$author))
                 tags[["PDF:Author"]] <- self$author
             if (!is.null(self$creation_date))
-                tags[["PDF:CreateDate"]] <- datetimeoffset::format_ISO8601(self$creation_date)
+                tags[["PDF:CreateDate"]] <- datetimeoffset::format_iso8601(self$creation_date)
             if (!is.null(self$creator))
                 tags[["PDF:Creator"]] <- self$creator
             if (!is.null(self$producer))
@@ -542,7 +542,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$keywords))
                 tags[["PDF:Keywords"]] <- paste(self$keywords, collapse = ", ")
             if (!is.null(self$mod_date))
-                tags[["PDF:ModifyDate"]] <-  datetimeoffset::format_ISO8601(self$mod_date)
+                tags[["PDF:ModifyDate"]] <-  datetimeoffset::format_iso8601(self$mod_date)
             tags
         },
         xmp = function() {
