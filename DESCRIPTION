@@ -10,12 +10,14 @@ Description: Edit 'xmp' metadata <https://en.wikipedia.org/wiki/Extensible_Metad
     'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>, 
     and/or 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
 Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
-             email="trevor.l.davis@gmail.com",
-             comment = c(ORCID = "0000-0001-6341-4639")),
-             person("W. Trevor King", role = "ctb", "Some pdf code adapted from 'pdf-merge.py'"))
+                    email="trevor.l.davis@gmail.com", comment = c(ORCID = "0000-0001-6341-4639")),
+             person("W. Trevor King", role = "ctb", "Some pdf code adapted from 'pdf-merge.py'"),
+             person("Linux Foundation", role="dtc",
+                    comment = 'Uses some data from the "SPDX License List" <https://github.com/spdx/license-list-XML>'))
 License: GPL (>=3)
 URL: https://trevorldavis.com/R/xmpdf/dev/
 BugReports: https://github.com/trevorld/r-xmpdf/issues
+LazyData: true
 LazyLoad: yes
 Imports:
     datetimeoffset (>= 0.1.2),

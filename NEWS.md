@@ -80,3 +80,5 @@ Initial features
   * `supports_exiftool()` detects support for `exiftool`
   * `supports_gs()` detects support for `ghostscript`
   * `supports_pdftk()` detects support for `pdftk`
+
+* The `spdx_licenses` data set contains the [SPDX License List](https://spdx.org/licenses/).
