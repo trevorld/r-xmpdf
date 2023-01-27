@@ -134,7 +134,7 @@ test_that("conversion to/from docinfo()", {
 
     x <- as_xmp(d)
     expect_snapshot(print(x))
-    expect_equal(x[["dc:Creator"]], "John Doe")
+    expect_equal(x$creator, "John Doe")
 
     d2 <- as_docinfo(x)
     expect_equal(d2$title, "Generic Title")

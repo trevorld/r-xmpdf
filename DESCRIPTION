@@ -22,8 +22,9 @@ LazyLoad: yes
 Imports:
     datetimeoffset (>= 0.1.2),
     grDevices,
-    R6,
+    jsonlite,
     purrr,
+    R6,
     rlang,
     tools,
     utils

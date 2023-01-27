@@ -11,14 +11,27 @@ test_that("get_xmp() / set_xmp()", {
     grid.text("Page 2")
     invisible(dev.off())
 
-    expect_equal(length(get_xmp(f)[[1]]), 0L)
-
     expect_snapshot(print(xmp()))
-    x <- xmp(`dc:Title` = "An XMP title")
+    x <- xmp(creator = "A Creator", #### Vector
+             create_date = "2020-10-10",
+             creator_tool = "A creator tool",
+             keywords = "R, xmpdf",
+             modify_date = "2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]",
+             producer = "R",
+             description = "A description",
+             title = "An XMP title", #### alt-lang
+             spdx_id = "CC-BY-4.0"
+    )
     expect_snapshot(print(x))
     set_xmp(x, f)
-    x <- get_xmp(f)[[1]]
-    expect_equal(x[["dc:Title"]], "An XMP title")
+    x2 <- get_xmp(f)[[1]]
+    expect_snapshot(print(x2))
+    expect_equal(x$title, "An XMP title")
+
+    x <- xmp(creator = c("Creator 1", "Creator 2"))
+    set_xmp(x, f)
+    x3 <- get_xmp(f)[[1]]
+    expect_equal(x3$creator, c("Creator 1", "Creator 2"))
 })
 
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
@@ -31,9 +44,14 @@ test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
     grid.text("Page 2")
     invisible(dev.off())
 
-    expect_equal(length(get_xmp_exiftool(f)[[1]]), 0L)
-
-    xmp <- xmp(title = "An XMP title", `dc:Creator` = "An XMP creator")
+    xmp <- xmp(title = "An XMP title", creator = "An XMP creator")
     set_xmp_exiftool(xmp, f)
-    expect_equal(get_xmp_exiftool(f, use_names = FALSE)[[1]][["dc:Title"]], "An XMP title")
+    expect_equal(get_xmp_exiftool(f, use_names = FALSE)[[1]]$title, "An XMP title")
+})
+
+test_that("as_xmp()", {
+    df <- data.frame(`dc.Creator` = "John Doe", `dc:Title` = "A Title",
+                     check.names = FALSE, stringsAsFactors = FALSE)
+    x <- as_xmp(df)
+    expect_equal(x$title, "A Title")
 })

@@ -18,7 +18,8 @@ docinfo(
 \arguments{
 \item{author}{The document's author.  Matching xmp metadata tag is \code{dc:Creator}.}
 
-\item{creation_date}{The date the document was created. Will be coerced by \code{as.POSIXlt(tz = "GMT")}.
+\item{creation_date}{The date the document was created.
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Matching xmp metadata tag is \code{xmp:CreateDate}.}
 
 \item{creator}{The name of the application that originally created the document (if converted to pdf).
@@ -34,12 +35,12 @@ Matching xmp metadata tag is \code{pdf:Producer}.}
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
 Matching xmp metadata tag is \code{pdf:Keywords}.}
 
-\item{mod_date}{The date the document was last modified. Will be coerced by \code{as.POSIXlt(tz = "GMT")}.
-If left \code{NULL} will default to \code{Sys.Date()} when used to set documentation info entry.
+\item{mod_date}{The date the document was last modified.
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Matching xmp metadata tag is \code{xmp:ModifyDate}.}
 }
 \description{
-\code{docinfo()} creates a PDF documentation info dictionary object
+\code{docinfo()} creates a PDF documentation info dictionary object.
 Such objects can be used with \code{\link[=set_docinfo]{set_docinfo()}} to edit PDF documentation info dictionary entries
 and such objects are returned by \code{\link[=get_docinfo]{get_docinfo()}}.
 }
@@ -52,11 +53,12 @@ and such objects are returned by \code{\link[=get_docinfo]{get_docinfo()}}.
 
 \section{\code{docinfo} R6 Class Methods}{
 \describe{
-\item{\code{print()}}{Print out the documentation info entries.}
+\item{\code{get_item(key)}}{Get documentation info value for key \code{key}.
+Can also use the relevant active bindings to get documentation info values.}
 \item{\code{set_item(key, value)}}{Set documentation info key \code{key} with value \code{value}.
-Can also use the relevant active bindings to set documentation info keys.}
+Can also use the relevant active bindings to set documentation info values.}
 \item{\code{update(x)}}{Update documentation info key entries
-using non-\code{NULL} entries in \code{\link[=docinfo]{docinfo()}} (coercible) object \code{x}.}
+using non-\code{NULL} entries in object \code{x} coerced by \code{\link[=as_docinfo]{as_docinfo()}}.}
 }
 }
 

@@ -6,13 +6,13 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
 
     # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-G1", "-a", "-n", "-csv", filename)
+        args <- c(tags, "-G1", "-a", "-n", "-j", filename)
         output <- exiftoolr::exif_call(args, quiet = TRUE)
     } else {
         cmd <- exiftool()
         f <- tempfile(fileext = ".txt")
         on.exit(unlink(f))
-        args <- c(tags, "-G1", "-a", "-n", "-csv", filename)
+        args <- c(tags, "-G1", "-a", "-n", "-j", filename)
         writeLines(args, f)
         args <- c("-@", shQuote(f))
         if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
@@ -21,9 +21,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
         }
         output <- xmpdf_system2(cmd, args)
     }
-    df <- utils::read.csv(textConnection(output),
-                          check.names = FALSE, stringsAsFactors = FALSE)
-    as.list(df)
+    jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
 }
 
 # use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z] when writing datetimes
@@ -33,6 +31,13 @@ as_exif_dt <- function(value) {
     value <- gsub("^([[:digit:]]{4})-", "\\1:", value)
     value <- gsub("^([[:digit:]]{4}):([[:digit:]]{2})-", "\\1:\\2:", value)
     gsub("T", " ", value)
+}
+
+as_exif_value <- function(x) {
+    if (inherits(x, c("datetimeoffset", "POSIXt")))
+        as_exif_dt(x)
+    else
+        as.character(x)
 }
 
 #' @param tags Named list of metadata tags to set
@@ -47,26 +52,30 @@ set_exiftool_metadata <- function(tags, input, output = input) {
     } else {
         target <- output
     }
+    nms <- character(0)
+    values <- character(0)
+    ops <- character(0)
     for (name in names(tags)) {
-        if (inherits(tags[[name]], "datetimeoffset")) {
-            tags[[name]] <- as_exif_dt(tags[[name]])
-        } else if (inherits(tags[[name]], "POSIXt")) {
-            tags[[name]] <- as_exif_dt(tags[[name]])
+        value <- as_exif_value(tags[[name]])
+        values <- append(values, value)
+        if (length(value) > 1) {
+            n <- length(value)
+            nms <- append(nms, rep_len(name, n))
+            ops <- c(ops, rep_len("=", n))
         } else {
-            tags[[name]] <- as.character(tags[[name]])
+            nms <- append(nms, name)
+            ops <- append(ops, "=")
         }
     }
-    nms <- names(tags)
-    values <- unlist(tags)
-    tags <- paste0("-", nms, "=", values)
+    args <- paste0("-", nms, ops, values)
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-n", "-o", target, input)
+        args <- c(args, "-n", "-o", target, input)
         results <- exiftoolr::exif_call(args, quiet = TRUE)
     } else {
         cmd <- exiftool()
         f <- tempfile(fileext = ".txt")
         on.exit(unlink(f))
-        args <- c(tags, "-n", "-o", target, input)
+        args <- c(args, "-n", "-o", target, input)
         writeLines(args, f)
         args <- c("-@", shQuote(f))
         if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")

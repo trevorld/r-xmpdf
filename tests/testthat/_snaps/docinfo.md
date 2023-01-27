@@ -17,12 +17,12 @@
     Code
       print(x)
     Output
-      dc:Title : Generic Title
-      dc:Creator : John Doe
-      dc:Description : Generic Subject
-      pdf:Producer : Generic Producer
-      pdf:Keywords : Key, Word
-      xmp:CreateDate : 2022-11-11T11:11:11
-      xmp:CreatorTool : Generic Creator
-      xmp:ModifyDate : 2022-11-11T11:11:11
+      dc:Creator := John Doe
+      dc:Description := Generic Subject
+      dc:Title := Generic Title
+      pdf:Keywords := Key, Word
+      pdf:Producer := Generic Producer
+      xmp:CreateDate := 2022-11-11T11:11:11
+      xmp:CreatorTool := Generic Creator
+      xmp:ModifyDate := 2022-11-11T11:11:11
 
