@@ -118,6 +118,22 @@ test_that("docinfo_exiftool", {
     expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
 
+test_that("docinfo()", {
+
+    d <- docinfo(author = "John Doe",
+                 creation_date = "2022-11-11 11:11:11",
+                 creator = "Generic Creator",
+                 producer = "Generic Producer",
+                 title = "Generic Title",
+                 subject = "Generic Subject",
+                 keywords = c("Key", "Word"),
+                 mod_date = "2022-11-11 11:11:11")
+
+    d2 <- docinfo()
+    d2$update(d)
+    expect_equal(d2$mod_date, d$mod_date)
+})
+
 test_that("conversion to/from docinfo()", {
     d <- docinfo(author = "John Doe",
                  creation_date = "2022-11-11 11:11:11",

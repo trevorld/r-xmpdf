@@ -115,21 +115,21 @@ DocInfo <- R6Class("docinfo",
             invisible(cat(text, sep="\n"))
         },
         get_item = function(key) {
-            if (key == "Author") {
+            if (key %in% c("author", "Author")) {
                 self$author
-            } else if (key == "CreationDate") {
+            } else if (key %in% c("creation_date", "CreationDate")) {
                 self$creation_date
-            } else if (key == "Creator") {
+            } else if (key %in% c("creator", "Creator")) {
                 self$creator
-            } else if (key == "Producer") {
+            } else if (key %in% c("producer", "Producer")) {
                 self$producer
-            } else if (key == "Title") {
+            } else if (key %in% c("title", "Title")) {
                 self$title
-            } else if (key == "Subject") {
+            } else if (key %in% c("subject", "Subject")) {
                 self$subject
-            } else if (key == "Keywords") {
+            } else if (key %in% c("keywords", "Keywords")) {
                 self$keywords
-            } else if (key == "ModDate") {
+            } else if (key %in% c("mod_date", "ModDate")) {
                 self$mod_date
             } else {
                 msg <- sprintf("We don't support key '%s' yet.", key)
@@ -160,23 +160,29 @@ DocInfo <- R6Class("docinfo",
         },
         update = function(x) {
             di <- as_docinfo(x)
-            if (!is.null(di$author))
-                self$author <- di$author
-            if (!is.null(di$creation_date))
-                self$creation_date <- di$creation_date
-            if (!is.null(di$creator))
-                self$creator <- di$creator
-            if (!is.null(di$producer))
-                self$producer <- di$producer
-            if (!is.null(di$title))
-                self$title <- di$title
-            if (!is.null(di$subject))
-                self$subject <- di$subject
-            if (!is.null(di$keywords))
-                self$keywords <- di$keywords
-            if (!is.null(di$mod_date))
-                self$mod_date <-  di$mod_date
+            for (key in x$get_nonnull_keys())
+                self$set_item(key, x$get_item(key))
             invisible(NULL)
+        },
+        get_nonnull_keys = function() {
+            keys <- character(0)
+            if (!is.null(self$author))
+                keys <- append(keys, "Author")
+            if (!is.null(self$creation_date))
+                keys <- append(keys, "CreationDate")
+            if (!is.null(self$creator))
+                keys <- append(keys, "Creator")
+            if (!is.null(self$producer))
+                keys <- append(keys, "Producer")
+            if (!is.null(self$title))
+                keys <- append(keys, "Title")
+            if (!is.null(self$subject))
+                keys <- append(keys, "Subject")
+            if (!is.null(self$keywords))
+                keys <- append(keys, "Keywords")
+            if (!is.null(self$mod_date))
+                keys <- append(keys, "ModDate")
+            keys
         },
         exiftool_tags = function() {
             # We're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
@@ -401,15 +407,9 @@ update.docinfo <- function(object, ...) {
 to_date_pdfmark <- function(date) {
     if (is.null(date)) {
         NULL
-    } else if (is.character(date)) {
-        ""
     } else {
         datetimeoffset::format_pdfmark(date)
     }
-}
-
-pdfmark_string <- function(value) {
-    paste0("(", value, ")")
 }
 
 raw_pdfmark_entry <- function(open, value, close) {

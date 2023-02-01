@@ -31,48 +31,14 @@ as_docinfo.default <- function(x, ...) {
 #' @rdname as_docinfo
 #' @export
 as_docinfo.xmp <- function(x, ...) {
-    l <- as.list(x)
-    names(l) <- tolower(names(l))
-    di <- docinfo()
-    if (hasName(l, "dc:title"))
-        di$title <- l[["dc:title"]]
-    else if (hasName(l, "title"))
-        di$title <- l[["title"]]
-
-    if (hasName(l, "dc:creator"))
-        di$author <- l[["dc:creator"]]
-    else if (hasName(l, "creator"))
-        di$creator <- l[["creator"]]
-
-    if (hasName(l, "dc:description"))
-        di$subject <- l[["dc:description"]]
-    else if (hasName(l, "description"))
-        di$subject <- l[["description"]]
-
-    if (hasName(l, "pdf:producer"))
-       di$producer <- l[["pdf:producer"]]
-    else if (hasName(l, "producer"))
-       di$producer <- l[["producer"]]
-
-    if (hasName(l, "pdf:keywords"))
-       di$keywords <- l[["pdf:keywords"]]
-    else if (hasName(l, "keywords"))
-       di$keywords <- l[["keywords"]]
-
-    if (hasName(l, "xmp:createdate"))
-        di$creation_date <- l[["xmp:createdate"]]
-    else if (hasName(l, "createdate"))
-        di$creation_date <- l[["createdate"]]
-
-    if (hasName(l, "xmp:creatortool"))
-        di$creator <- l[["xmp:creatortool"]]
-    else if (hasName(l, "creatortool"))
-        di$creator <- l[["creatortool"]]
-
-    if (hasName(l, "xmp:modifydate"))
-        di$creation_date <- l[["xmp:modifydate"]]
-    else if (hasName(l, "modifydate"))
-        di$creation_date <- l[["modifydate"]]
-
-    di
+    d <- docinfo()
+    d$title <- x$title
+    d$author <- paste(x$creator, collapse = " and ")
+    d$subject <- x$description
+    d$producer <- x$producer
+    d$keywords <- x$keywords
+    d$creation_date <- x$create_date
+    d$creator <- x$creator_tool
+    d$mod_date <- x$modify_date
+    d
 }

@@ -32,8 +32,9 @@ Matching xmp metadata tag is \code{pdf:Producer}.}
 
 \item{subject}{The document's subject.  Matching xmp metadata tag is \code{dc:Description}.}
 
-\item{keywords}{Character vector of keywords for this document (for cross-document searching).
-Matching xmp metadata tag is \code{pdf:Keywords}.}
+\item{keywords}{Keywords for this document (for cross-document searching).
+Matching xmp metadata tag is \code{pdf:Keywords}.
+Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
 
 \item{mod_date}{The date the document was last modified.
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
@@ -70,7 +71,7 @@ using non-\code{NULL} entries in object \code{x} coerced by \code{\link[=as_doci
 \item{\code{producer}}{The name of the application that converted the document to pdf.}
 \item{\code{title}}{The document's title.}
 \item{\code{subject}}{The document's subject.}
-\item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
+\item{\code{keywords}}{Keywords for this document (for cross-document searching).}
 \item{\code{mod_date}}{The date the document was last modified.}
 }
 }
@@ -91,7 +92,7 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
   d <- update(d,
               author = "John Doe",
               title = "Two Boring Pages",
-              keywords = c("R", "xmpdf"))
+              keywords = "R, xmpdf")
   set_docinfo(d, f)
 
   cat("\nDocumentation info after setting it\n")
