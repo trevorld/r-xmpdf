@@ -34,10 +34,16 @@ as_exif_dt <- function(value) {
 }
 
 as_exif_value <- function(x) {
-    if (inherits(x, c("datetimeoffset", "POSIXt")))
+    if (inherits(x, c("datetimeoffset", "POSIXt"))) {
         as_exif_dt(x)
-    else
+    } else if (is.logical(x)) {
+        n <- length(x)
+        ifelse(x, rep_len("True", n), rep_len("False", n))
+    } else if (is.character(x)) {
+        x
+    } else {
         as.character(x)
+    }
 }
 
 #' @param tags Named list of metadata tags to set
@@ -57,6 +63,7 @@ set_exiftool_metadata <- function(tags, input, output = input) {
     ops <- character(0)
     for (name in names(tags)) {
         value <- as_exif_value(tags[[name]])
+        #### lang-alt?
         values <- append(values, value)
         if (length(value) > 1) {
             n <- length(value)

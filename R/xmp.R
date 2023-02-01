@@ -6,33 +6,36 @@
 #' Such objects can be used with [set_xmp()] to edit XMP medata for a variety of media formats
 #' and such objects are returned by [get_xmp()].
 #'
-#' @section XMP tag recommendations:
-#'
-#' * <https://exiftool.org/TagNames/XMP.html> recommends "dc", "xmp", "iptcCore", and "iptcExt" schemas if possible
-#' * <https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers> is popular for photos
-#' * <https://exiftool.org/TagNames/XMP.html#cc> are Creative Commons license recommendations
-#'
-#' @param creator The document's author(s) (XMP tag `dc:Creator`).
-#'                Related pdf documentation info key is `Author`.
 #' @param create_date The date the document was created (XMP tag `xmp:CreateDate`).
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                Related pdf documentation info key is `CreationDate`.
-#' @param creator_tool The name of the application that originally created the document (if converted to pdf).
-#'                Related pdf documentation info key is `xmp:CreatorTool`.
+#' @param creator The document's author(s) (XMP tag `dc:Creator`).
+#'                Related pdf documentation info key is `Author`.
+#'                Core IPTC photo metadata used by Google Photos.
+#'                If `credit` is missing and `"photoshop:Credit"` in `auto_xmp` then
+#'                we'll also use this for the `photoshop:Credit` XMP tag.
+#' @param creator_tool The name of the application that originally created the document.
+#'                Related pdf documentation info key is `Creator`.
+#' @param credit Credit line field (XMP tag `photoshop:Credit`).
+#'               Core IPTC photo metadata used by Google Photos.
+#'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:Creator` non-missing
+#'               then will automatically use `paste(creator, collapse = " and ")`.
+#' @param description The document's subject (XMP tag `dc:Description`).
+#'                Related pdf documentation info key is `Subject`.
+#' @param modify_date The date the document was last modified (XMP tag `xmp:ModifyDate`).
+#'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
+#'                 Related pdf documentation info key is `ModDate`.
+#' @param keywords Character vector of keywords for this document (for cross-document searching).
+#'                 Related pdf documentation info key is `pdf:Keywords`.
+#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
 #' @param producer The name of the application that converted the document to pdf (XMP tag `pdf:Producer`).
 #'                Related pdf documentation info key is `Producer`.
 #' @param title The document's title (XMP tag `dc:Title`).
 #'                Related pdf documentation info key is `Title`.
-#' @param description The document's subject (XMP tag `dc:Description`).
-#'                Related pdf documentation info key is `Subject`.
-#' @param keywords Character vector of keywords for this document (for cross-document searching).
-#'                 Related pdf documentation info key is `pdf:Keywords`.
-#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
-#' @param modify_date The date the document was last modified (XMP tag `xmp:ModifyDate`).
-#'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
-#'                 Related pdf documentation info key is `ModDate`.
-#' @param spdx_id The id of a license in the SPDX license list.  See [spdx_licenses].
 #' @param ... Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.
+#' @param spdx_id The id of a license in the SPDX license list.  See [spdx_licenses].
+#' @param auto_xmp Character vector of XMP metadata we should try to automatically determine
+#'                 if missing from other XMP metadata and `spdx_id`.
 #' @return An xmp object as can be used with [set_xmp()].  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.
 #'         Datetimes should be a datetime object such as [POSIXlt()].
 #' @seealso [get_xmp()] and [set_xmp()] for getting/setting such information from/to a variety of media file formats.
@@ -50,13 +53,25 @@
 #'    \item{`creator`}{The document's author.}
 #'    \item{`create_date`}{The date the document was created.}
 #'    \item{`creator_tool`}{The name of the application that originally created the document.}
+#'    \item{`credit`}{Credit line.}
 #'    \item{`description`}{The document's description (subject).}
 #'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
 #'    \item{`modify_date`}{The date the document was last modified.}
 #'    \item{`producer`}{The name of the application that converted the document (to pdf).}
-#'    \item{`spdx_id`}{The id of a license in the SPDX license list.  See [spdx_licenses].}
 #'    \item{`title`}{The document's title.}
+#'    \item{`spdx_id`}{The id of a license in the SPDX license list.  See [spdx_licenses].}
+#'    \item{`auto_xmp`}{Character vector of XMP metadata we should try to automatically determine
+#'                      if missing from other XMP metadata and `spdx_id`.}
 #' }
+#'
+#' @section XMP tag recommendations:
+#'
+#' * <https://exiftool.org/TagNames/XMP.html> recommends "dc", "xmp", "iptcCore", and "iptcExt" schemas if possible
+#' * <https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces> are descriptions of some common XMP tags
+#' * <https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers> is popular for photos
+#' * <https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata#iptc-photo-metadata> are the subset of IPTC photo metadata which Google Photos uses (if no structured data on web page)
+#' * <https://wiki.creativecommons.org/wiki/XMP> are Creative Commons license recommendations
+#'
 #' @examples
 #' if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE)) {
 #'   f <- tempfile(fileext = ".pdf")
@@ -73,15 +88,17 @@
 #' @name xmp
 #' @export
 xmp <- function(...,
-                creator = NULL,  description = NULL, title = NULL,
-                create_date = NULL, creator_tool = NULL, modify_date = NULL,
-                keywords = NULL, producer = NULL,
-                spdx_id = NULL) {
+                creator = NULL,  description = NULL, title = NULL, # dc
+                create_date = NULL, creator_tool = NULL, modify_date = NULL, # xmp
+                keywords = NULL, producer = NULL, # pdf
+                credit = NULL, # photoshop
+                spdx_id = NULL, auto_xmp = c("photoshop:Credit")) {
     Xmp$new(...,
             creator = creator,  description = description, title = title,
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date,
             keywords = keywords, producer = producer,
-            spdx_id = spdx_id)
+            credit = credit,
+            spdx_id = spdx_id, auto_xmp = auto_xmp)
 }
 
 Xmp <- R6Class("xmp",
@@ -97,30 +114,23 @@ Xmp <- R6Class("xmp",
         },
         print = function() {
             text <- character(0)
-            if (!is.null(self$spdx_id))
-                text <- append(text, paste("spdx_id (not XMP tag) :=", d_format(self$spdx_id)))
-            if (!is.null(self$creator))
-                text <- append(text, paste("dc:Creator :=", d_format(self$creator)))
-            if (!is.null(self$description))
-                text <- append(text, paste("dc:Description :=", d_format(self$description)))
-            if (!is.null(self$title))
-                text <- append(text, paste("dc:Title :=", d_format(self$title)))
-            if (!is.null(self$keywords))
-                text <- append(text, paste("pdf:Keywords :=",  d_format(self$keywords)))
-            if (!is.null(self$producer))
-                text <- append(text, paste("pdf:Producer :=", d_format(self$producer)))
-            if (!is.null(self$create_date))
-                text <- append(text, paste("xmp:CreateDate :=", d_format(self$create_date)))
-            if (!is.null(self$creator_tool))
-                text <- append(text, paste("xmp:CreatorTool :=", d_format(self$creator_tool)))
-            if (!is.null(self$modify_date))
-                text <- append(text, paste("xmp:ModifyDate :=", d_format(self$modify_date)))
-            for (key in names(private$tags$other))
-                text <- append(text, paste(key, ":=", d_format(private$tags$other[[key]])))
-            if (length(text))
+            for (key in KNOWN_XMP_TAGS) {
+                value <- self$get_item(key)
+                if (is.null(value)) next
+                if (private$is_auto(key))
+                    text <- append(text, paste("=>", key, "=", x_format(value)))
+                else
+                    text <- append(text, paste(key, ":=", x_format(value)))
+            }
+            if (length(text)) {
+                if (length(self$auto_xmp))
+                    text <- c(paste("auto_xmp (not XMP tag): ", x_format(self$auto_xmp)), text)
+                if (!is.null(self$spdx_id))
+                    text <- c(paste("spdx_id (not XMP tag) :=", x_format(self$spdx_id)), text)
                 invisible(cat(text, sep="\n"))
-            else
+            } else {
                 invisible(cat("No XMP metadata found\n"))
+            }
         },
         get_item = function(key) {
             if (key %in% c("creator", "Creator", "dc:Creator")) {
@@ -133,6 +143,8 @@ Xmp <- R6Class("xmp",
                 self$producer
             } else if (key %in% c("keywords", "Keywords", "pdf:Keywords")) {
                 self$keywords
+            } else if (key %in% c("credit", "Credit", "photoshop:Credit")) {
+                self$credit
             } else if (key %in% c("create_date", "CreateDate", "xmp:CreateDate")) {
                 self$create_date
             } else if (key %in% c("creator_tool", "CreatorTool", "xmp:CreatorTool")) {
@@ -141,6 +153,8 @@ Xmp <- R6Class("xmp",
                 self$modify_date
             } else if (key %in% c("spdx_id")) {
                 self$spdx_id
+            } else if (key %in% c("auto_xmp")) {
+                self$auto_xmp
             } else {
                 private$tags$other[[key]]
             }
@@ -164,6 +178,8 @@ Xmp <- R6Class("xmp",
                 self$modify_date <- value
             } else if (key %in% c("spdx_id")) {
                 self$spdx_id <- value
+            } else if (key %in% c("auto_xmp")) {
+                self$auto_xmp <- value
             } else {
                 private$tags$other[[key]] <- value
             }
@@ -224,10 +240,11 @@ Xmp <- R6Class("xmp",
     ),
     active = list(
         creator = function(value) {
-            if (missing(value))
+            if (missing(value)) {
                 private$tags$creator
-            else
+            } else {
                 private$tags$creator <- as_character_value(value) #### string+?
+            }
         },
         create_date = function(value) {
             if (missing(value))
@@ -240,6 +257,16 @@ Xmp <- R6Class("xmp",
                 private$tags$creator_tool
             else
                 private$tags$creator_tool <- as_character_value(value)
+        },
+        credit = function(value) {
+            if (missing(value)) {
+                value <- private$tags$credit
+                if (is.null(value) && !is.null(private$tags$creator))
+                    value <- paste(private$tags$creator, collapse = " and ")
+                value
+            } else {
+                private$tags$credit <- as_character_value(value)
+            }
         },
         description = function(value) {
             if (missing(value))
@@ -265,6 +292,12 @@ Xmp <- R6Class("xmp",
             else
                 private$tags$producer <- as_character_value(value)
         },
+        title = function(value) {
+            if (missing(value))
+                private$tags$title
+            else
+                private$tags$title <- as_character_value(value)
+        },
         spdx_id = function(value) {
             if (missing(value)) {
                 private$tags$spdx_id
@@ -273,17 +306,32 @@ Xmp <- R6Class("xmp",
                 private$tags$spdx_id <- as_character_value(value)
             }
         },
-        title = function(value) {
-            if (missing(value))
-                private$tags$title
-            else
-                private$tags$title <- as_character_value(value)
+        auto_xmp = function(value) {
+            if (missing(value)) {
+                private$tags$auto_xmp
+            } else {
+                private$tags$auto_xmp <- value
+            }
         }
     ),
     private = list(
+        is_auto = function(key) {
+            if (key %in% c("credit", "Credit", "photoshop:Credit")) {
+                is.null(private$tags$credit)
+            } else {
+                FALSE
+            }
+        },
         tags = list(other = list())
     )
 )
+
+x_format <- d_format
+
+KNOWN_XMP_TAGS <- c("dc:Creator", "dc:Description", "dc:Title",
+                    "pdf:Keywords", "pdf:Producer",
+                    "photoshop:Credit",
+                    "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate")
 
 #' @export
 update.xmp <- function(object, ...) {

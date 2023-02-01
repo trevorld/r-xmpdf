@@ -12,7 +12,7 @@ test_that("get_xmp() / set_xmp()", {
     invisible(dev.off())
 
     expect_snapshot(print(xmp()))
-    x <- xmp(creator = "A Creator", #### Vector
+    x <- xmp(creator = "A creator", #### Vector
              create_date = "2020-10-10",
              creator_tool = "A creator tool",
              keywords = "R, xmpdf",
@@ -20,9 +20,13 @@ test_that("get_xmp() / set_xmp()", {
              producer = "R",
              description = "A description",
              title = "An XMP title", #### alt-lang
-             spdx_id = "CC-BY-4.0"
+             spdx_id = "CC-BY-4.0",
+             `dc:Contributor` = "A contributor"
     )
+    x <- update(x, `dc:Contributor` = "An updated contributor")
     expect_snapshot(print(x))
+    xc <- x$clone()
+    x$update(xc)
     set_xmp(x, f)
     x2 <- get_xmp(f)[[1]]
     expect_snapshot(print(x2))

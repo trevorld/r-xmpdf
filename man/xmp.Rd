@@ -14,14 +14,19 @@ xmp(
   modify_date = NULL,
   keywords = NULL,
   producer = NULL,
-  spdx_id = NULL
+  credit = NULL,
+  spdx_id = NULL,
+  auto_xmp = c("photoshop:Credit")
 )
 }
 \arguments{
 \item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
 
 \item{creator}{The document's author(s) (XMP tag \code{dc:Creator}).
-Related pdf documentation info key is \code{Author}.}
+Related pdf documentation info key is \code{Author}.
+Core IPTC photo metadata used by Google Photos.
+If \code{credit} is missing and \code{"photoshop:Credit"} in \code{auto_xmp} then
+we'll also use this for the \code{photoshop:Credit} XMP tag.}
 
 \item{description}{The document's subject (XMP tag \code{dc:Description}).
 Related pdf documentation info key is \code{Subject}.}
@@ -33,20 +38,29 @@ Related pdf documentation info key is \code{Title}.}
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Related pdf documentation info key is \code{CreationDate}.}
 
-\item{creator_tool}{The name of the application that originally created the document (if converted to pdf).
-Related pdf documentation info key is \code{xmp:CreatorTool}.}
+\item{creator_tool}{The name of the application that originally created the document.
+Related pdf documentation info key is \code{Creator}.}
 
 \item{modify_date}{The date the document was last modified (XMP tag \code{xmp:ModifyDate}).
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Related pdf documentation info key is \code{ModDate}.}
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
-Related pdf documentation info key is \code{pdf:Keywords}.}
+Related pdf documentation info key is \code{pdf:Keywords}.
+Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
 
 \item{producer}{The name of the application that converted the document to pdf (XMP tag \code{pdf:Producer}).
 Related pdf documentation info key is \code{Producer}.}
 
+\item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
+Core IPTC photo metadata used by Google Photos.
+If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:Creator} non-missing
+then will automatically use \code{paste(creator, collapse = " and ")}.}
+
 \item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
+
+\item{auto_xmp}{Character vector of XMP metadata we should try to automatically determine
+if missing from other XMP metadata and \code{spdx_id}.}
 }
 \value{
 An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.
@@ -57,15 +71,6 @@ Datetimes should be a datetime object such as \code{\link[=POSIXlt]{POSIXlt()}}.
 Such objects can be used with \code{\link[=set_xmp]{set_xmp()}} to edit XMP medata for a variety of media formats
 and such objects are returned by \code{\link[=get_xmp]{get_xmp()}}.
 }
-\section{XMP tag recommendations}{
-
-\itemize{
-\item \url{https://exiftool.org/TagNames/XMP.html} recommends "dc", "xmp", "iptcCore", and "iptcExt" schemas if possible
-\item \url{https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers} is popular for photos
-\item \url{https://exiftool.org/TagNames/XMP.html#cc} are Creative Commons license recommendations
-}
-}
-
 \section{\code{xmp} R6 Class Methods}{
 \describe{
 \item{\code{get_item(key)}}{Get XMP metadata value for key \code{key}.
@@ -82,12 +87,26 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{creator}}{The document's author.}
 \item{\code{create_date}}{The date the document was created.}
 \item{\code{creator_tool}}{The name of the application that originally created the document.}
+\item{\code{credit}}{Credit line.}
 \item{\code{description}}{The document's description (subject).}
 \item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
 \item{\code{modify_date}}{The date the document was last modified.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
-\item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 \item{\code{title}}{The document's title.}
+\item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
+\item{\code{auto_xmp}}{Character vector of XMP metadata we should try to automatically determine
+if missing from other XMP metadata and \code{spdx_id}.}
+}
+}
+
+\section{XMP tag recommendations}{
+
+\itemize{
+\item \url{https://exiftool.org/TagNames/XMP.html} recommends "dc", "xmp", "iptcCore", and "iptcExt" schemas if possible
+\item \url{https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces} are descriptions of some common XMP tags
+\item \url{https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers} is popular for photos
+\item \url{https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata#iptc-photo-metadata} are the subset of IPTC photo metadata which Google Photos uses (if no structured data on web page)
+\item \url{https://wiki.creativecommons.org/wiki/XMP} are Creative Commons license recommendations
 }
 }
 
