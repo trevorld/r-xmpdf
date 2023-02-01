@@ -27,6 +27,6 @@ An \code{\link[=xmp]{xmp()}} object.
  di <- docinfo(author = "John Doe", title = "A Title")
  as_xmp(di)
 
- l <- list(`dc:Creator` = "John Doe", `dc:Title` = "A Title")
+ l <- list(`dc:creator` = "John Doe", `dc:title` = "A Title")
  as_xmp(l)
 }

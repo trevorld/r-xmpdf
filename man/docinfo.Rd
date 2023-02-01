@@ -16,7 +16,7 @@ docinfo(
 )
 }
 \arguments{
-\item{author}{The document's author.  Matching xmp metadata tag is \code{dc:Creator}.}
+\item{author}{The document's author.  Matching xmp metadata tag is \code{dc:creator}.}
 
 \item{creation_date}{The date the document was created.
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
@@ -28,9 +28,9 @@ Matching xmp metadata tag is \code{xmp:CreatorTool}.}
 \item{producer}{The name of the application that converted the document to pdf.
 Matching xmp metadata tag is \code{pdf:Producer}.}
 
-\item{title}{The document's title.  Matching xmp metadata tag is \code{dc:Title}.}
+\item{title}{The document's title.  Matching xmp metadata tag is \code{dc:title}.}
 
-\item{subject}{The document's subject.  Matching xmp metadata tag is \code{dc:Description}.}
+\item{subject}{The document's subject.  Matching xmp metadata tag is \code{dc:description}.}
 
 \item{keywords}{Keywords for this document (for cross-document searching).
 Matching xmp metadata tag is \code{pdf:Keywords}.

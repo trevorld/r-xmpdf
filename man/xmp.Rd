@@ -22,16 +22,16 @@ xmp(
 \arguments{
 \item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
 
-\item{creator}{The document's author(s) (XMP tag \code{dc:Creator}).
+\item{creator}{The document's author(s) (XMP tag \code{dc:creator}).
 Related pdf documentation info key is \code{Author}.
 Core IPTC photo metadata used by Google Photos.
 If \code{credit} is missing and \code{"photoshop:Credit"} in \code{auto_xmp} then
 we'll also use this for the \code{photoshop:Credit} XMP tag.}
 
-\item{description}{The document's subject (XMP tag \code{dc:Description}).
+\item{description}{The document's subject (XMP tag \code{dc:description}).
 Related pdf documentation info key is \code{Subject}.}
 
-\item{title}{The document's title (XMP tag \code{dc:Title}).
+\item{title}{The document's title (XMP tag \code{dc:title}).
 Related pdf documentation info key is \code{Title}.}
 
 \item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
@@ -54,7 +54,7 @@ Related pdf documentation info key is \code{Producer}.}
 
 \item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
 Core IPTC photo metadata used by Google Photos.
-If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:Creator} non-missing
+If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
 then will automatically use \code{paste(creator, collapse = " and ")}.}
 
 \item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}

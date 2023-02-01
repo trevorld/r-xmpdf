@@ -9,7 +9,7 @@
 #' @param create_date The date the document was created (XMP tag `xmp:CreateDate`).
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                Related pdf documentation info key is `CreationDate`.
-#' @param creator The document's author(s) (XMP tag `dc:Creator`).
+#' @param creator The document's author(s) (XMP tag `dc:creator`).
 #'                Related pdf documentation info key is `Author`.
 #'                Core IPTC photo metadata used by Google Photos.
 #'                If `credit` is missing and `"photoshop:Credit"` in `auto_xmp` then
@@ -18,9 +18,9 @@
 #'                Related pdf documentation info key is `Creator`.
 #' @param credit Credit line field (XMP tag `photoshop:Credit`).
 #'               Core IPTC photo metadata used by Google Photos.
-#'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:Creator` non-missing
+#'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:creator` non-missing
 #'               then will automatically use `paste(creator, collapse = " and ")`.
-#' @param description The document's subject (XMP tag `dc:Description`).
+#' @param description The document's subject (XMP tag `dc:description`).
 #'                Related pdf documentation info key is `Subject`.
 #' @param modify_date The date the document was last modified (XMP tag `xmp:ModifyDate`).
 #'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
@@ -30,7 +30,7 @@
 #'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
 #' @param producer The name of the application that converted the document to pdf (XMP tag `pdf:Producer`).
 #'                Related pdf documentation info key is `Producer`.
-#' @param title The document's title (XMP tag `dc:Title`).
+#' @param title The document's title (XMP tag `dc:title`).
 #'                Related pdf documentation info key is `Title`.
 #' @param ... Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.
 #' @param spdx_id The id of a license in the SPDX license list.  See [spdx_licenses].
@@ -133,52 +133,54 @@ Xmp <- R6Class("xmp",
             }
         },
         get_item = function(key) {
-            if (key %in% c("creator", "Creator", "dc:Creator")) {
+            lkey <- tolower(key)
+            if (lkey %in% c("creator", "dc:creator")) {
                 self$creator
-            } else if (key %in% c("description", "Description", "dc:Description")) {
+            } else if (lkey %in% c("description", "dc:description")) {
                 self$description
-            } else if (key %in% c("title", "Title", "dc:Title")) {
+            } else if (lkey %in% c("title", "dc:title")) {
                 self$title
-            } else if (key %in% c("producer", "Producer", "pdf:Producer")) {
+            } else if (lkey %in% c("producer", "pdf:producer")) {
                 self$producer
-            } else if (key %in% c("keywords", "Keywords", "pdf:Keywords")) {
+            } else if (lkey %in% c("keywords", "pdf:keywords")) {
                 self$keywords
-            } else if (key %in% c("credit", "Credit", "photoshop:Credit")) {
+            } else if (lkey %in% c("credit", "credit", "photoshop:credit")) {
                 self$credit
-            } else if (key %in% c("create_date", "CreateDate", "xmp:CreateDate")) {
+            } else if (lkey %in% c("create_date", "createdate", "xmp:createdate")) {
                 self$create_date
-            } else if (key %in% c("creator_tool", "CreatorTool", "xmp:CreatorTool")) {
+            } else if (lkey %in% c("creator_tool", "creatortool", "xmp:creatortool")) {
                 self$creator_tool
-            } else if (key %in% c("modify_date", "ModifyDate", "xmp:ModifyDate")) {
+            } else if (lkey %in% c("modify_date", "modifydate", "xmp:modifydate")) {
                 self$modify_date
-            } else if (key %in% c("spdx_id")) {
+            } else if (lkey %in% c("spdx_id")) {
                 self$spdx_id
-            } else if (key %in% c("auto_xmp")) {
+            } else if (lkey %in% c("auto_xmp")) {
                 self$auto_xmp
             } else {
                 private$tags$other[[key]]
             }
         },
         set_item = function(key, value) {
-            if (key %in% c("creator", "Creator", "dc:Creator")) {
+            lkey <- tolower(key)
+            if (lkey %in% c("creator", "dc:creator")) {
                 self$creator <- value
-            } else if (key %in% c("description", "Description", "dc:Description")) {
+            } else if (lkey %in% c("description", "dc:description")) {
                 self$description <- value
-            } else if (key %in% c("title", "Title", "dc:Title")) {
+            } else if (lkey %in% c("title", "dc:title")) {
                 self$title <- value
-            } else if (key %in% c("producer", "Producer", "pdf:Producer")) {
+            } else if (lkey %in% c("producer", "pdf:producer")) {
                 self$producer <- value
-            } else if (key %in% c("keywords", "Keywords", "pdf:Keywords")) {
+            } else if (lkey %in% c("keywords", "pdf:keywords")) {
                 self$keywords <- value
-            } else if (key %in% c("create_date", "CreateDate", "xmp:CreateDate")) {
+            } else if (lkey %in% c("create_date", "createdate", "xmp:createdate")) {
                 self$create_date <- value
-            } else if (key %in% c("creator_tool", "CreatorTool", "xmp:CreatorTool")) {
+            } else if (lkey %in% c("creator_tool", "creatortool", "xmp:creatortool")) {
                 self$creator_tool <- value
-            } else if (key %in% c("modify_date", "ModifyDate", "xmp:ModifyDate")) {
+            } else if (lkey %in% c("modify_date", "modifydate", "xmp:modifydate")) {
                 self$modify_date <- value
-            } else if (key %in% c("spdx_id")) {
+            } else if (lkey %in% c("spdx_id")) {
                 self$spdx_id <- value
-            } else if (key %in% c("auto_xmp")) {
+            } else if (lkey %in% c("auto_xmp")) {
                 self$auto_xmp <- value
             } else {
                 private$tags$other[[key]] <- value
@@ -193,7 +195,7 @@ Xmp <- R6Class("xmp",
         exiftool_tags = function() {
             tags <- list()
             if (!is.null(self$creator))
-                tags[["XMP-dc:Creator"]] <- self$creator
+                tags[["XMP-dc:creator"]] <- self$creator
             if (!is.null(self$create_date))
                 tags[["XMP-xmp:CreateDate"]] <- self$create_date
             if (!is.null(self$creator))
@@ -201,9 +203,9 @@ Xmp <- R6Class("xmp",
             if (!is.null(self$producer))
                 tags[["XMP-pdf:Producer"]] <- self$producer
             if (!is.null(self$title))
-                tags[["XMP-dc:Title"]] <- self$title
+                tags[["XMP-dc:title"]] <- self$title
             if (!is.null(self$description))
-                tags[["XMP-dc:Description"]] <- self$description
+                tags[["XMP-dc:description"]] <- self$description
             if (!is.null(self$keywords))
                 tags[["XMP-pdf:Keywords"]] <- self$keywords
             if (!is.null(self$modify_date))
@@ -217,7 +219,7 @@ Xmp <- R6Class("xmp",
         get_nonnull_keys = function() {
             keys <- character(0)
             if (!is.null(private$tags$creator))
-                keys <- append(keys, "dc:Creator")
+                keys <- append(keys, "dc:creator")
             if (!is.null(private$tags$create_date))
                 keys <- append(keys, "xmp:CreateDate")
             if (!is.null(private$tags$creator_tool))
@@ -328,7 +330,7 @@ Xmp <- R6Class("xmp",
 
 x_format <- d_format
 
-KNOWN_XMP_TAGS <- c("dc:Creator", "dc:Description", "dc:Title",
+KNOWN_XMP_TAGS <- c("dc:creator", "dc:description", "dc:title",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate")

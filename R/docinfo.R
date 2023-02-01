@@ -5,7 +5,7 @@
 #' `docinfo()` creates a PDF documentation info dictionary object.
 #' Such objects can be used with [set_docinfo()] to edit PDF documentation info dictionary entries
 #' and such objects are returned by [get_docinfo()].
-#' @param author The document's author.  Matching xmp metadata tag is `dc:Creator`.
+#' @param author The document's author.  Matching xmp metadata tag is `dc:creator`.
 #' @param creation_date The date the document was created.
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                Matching xmp metadata tag is `xmp:CreateDate`.
@@ -13,8 +13,8 @@
 #'                Matching xmp metadata tag is `xmp:CreatorTool`.
 #' @param producer The name of the application that converted the document to pdf.
 #'                Matching xmp metadata tag is `pdf:Producer`.
-#' @param title The document's title.  Matching xmp metadata tag is `dc:Title`.
-#' @param subject The document's subject.  Matching xmp metadata tag is `dc:Description`.
+#' @param title The document's title.  Matching xmp metadata tag is `dc:title`.
+#' @param subject The document's subject.  Matching xmp metadata tag is `dc:description`.
 #' @param keywords Keywords for this document (for cross-document searching).
 #'                 Matching xmp metadata tag is `pdf:Keywords`.
 #'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
@@ -239,11 +239,11 @@ DocInfo <- R6Class("docinfo",
             # to the eight documentation info dictionary entries
             tags <- list()
             if (!is.null(self$title))
-                tags[["dc:Title"]] <- self$title
+                tags[["dc:title"]] <- self$title
             if (!is.null(self$author))
-                tags[["dc:Creator"]] <- self$author
+                tags[["dc:creator"]] <- self$author
             if (!is.null(self$subject))
-                tags[["dc:Description"]] <- self$subject
+                tags[["dc:description"]] <- self$subject
 
             if (!is.null(self$producer))
                 tags[["pdf:Producer"]] <- self$producer

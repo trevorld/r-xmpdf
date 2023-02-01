@@ -18,9 +18,9 @@
       print(x)
     Output
       auto_xmp (not XMP tag):  photoshop:Credit
-      dc:Creator := John Doe
-      dc:Description := Generic Subject
-      dc:Title := Generic Title
+      dc:creator := John Doe
+      dc:description := Generic Subject
+      dc:title := Generic Title
       pdf:Keywords := Key, Word
       pdf:Producer := Generic Producer
       => photoshop:Credit = John Doe

@@ -12,9 +12,9 @@
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
       auto_xmp (not XMP tag):  photoshop:Credit
-      dc:Creator := A creator
-      dc:Description := A description
-      dc:Title := An XMP title
+      dc:creator := A creator
+      dc:description := A description
+      dc:title := An XMP title
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
       => photoshop:Credit = A creator
@@ -28,9 +28,9 @@
       print(x2)
     Output
       auto_xmp (not XMP tag):  photoshop:Credit
-      dc:Creator := A creator
-      dc:Description := A description
-      dc:Title := An XMP title
+      dc:creator := A creator
+      dc:description := A description
+      dc:title := An XMP title
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
       => photoshop:Credit = A creator
