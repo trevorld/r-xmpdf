@@ -16,7 +16,7 @@ xmp(
   producer = NULL,
   credit = NULL,
   spdx_id = NULL,
-  auto_xmp = c("photoshop:Credit")
+  auto_xmp = c("photoshop:Credit", "xmpRights:WebStatement")
 )
 }
 \arguments{
@@ -61,6 +61,11 @@ then will automatically use \code{paste(creator, collapse = " and ")}.}
 
 \item{auto_xmp}{Character vector of XMP metadata we should try to automatically determine
 if missing from other XMP metadata and \code{spdx_id}.}
+
+\item{web_statement}{Web Statement of Rights (XMP tag \code{xmpRights:WebStatement}):
+a string of a full URL with license information about the page.
+If \code{xmpRights:WebStatement} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.}
 }
 \value{
 An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.
@@ -93,6 +98,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{modify_date}}{The date the document was last modified.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
 \item{\code{title}}{The document's title.}
+\item{\code{web_statement}}{Web statement of rights for the document}
 \item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 \item{\code{auto_xmp}}{Character vector of XMP metadata we should try to automatically determine
 if missing from other XMP metadata and \code{spdx_id}.}
