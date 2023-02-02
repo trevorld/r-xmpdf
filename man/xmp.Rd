@@ -15,6 +15,7 @@ xmp(
   modify_date = NULL,
   marked = NULL,
   web_statement = NULL,
+  attribution_url = NULL,
   license = NULL,
   keywords = NULL,
   producer = NULL,
@@ -66,10 +67,13 @@ we'll automatically use an URL from \link{spdx_licenses} corresponding to that l
 Core IPTC photo metadata used by Google Photos.
 Also recommended by Creative Commons (who also recommends using a "verifying" web statement).}
 
+\item{attribution_url}{The URL to be used when attributing the work (XMP tag \code{cc:attributionURL}).
+Recommended by Creative Commons.}
+
 \item{license}{The URL of (open source) license terms (XMP tag \code{cc:license}).
 Recommended by Creative Commons.
-Note \code{xmpRights:WebStatement} is a more popular XMP tag (used by Google Images)
-that can also hold the URL of license terms.
+Note \code{xmpRights:WebStatement} set in \code{web_statement} is a more popular XMP tag (e.g. used by Google Images)
+that can also hold the URL of license terms or a verifying web statement.
 If \code{cc:license} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
 we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.}
 
@@ -112,6 +116,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 
 \section{\code{xmp} R6 Active Bindings}{
 \describe{
+\item{\code{attribution_url}}{The URL to attribute the document.}
 \item{\code{creator}}{The document's author.}
 \item{\code{create_date}}{The date the document was created.}
 \item{\code{creator_tool}}{The name of the application that originally created the document.}

@@ -6,6 +6,8 @@
 #' Such objects can be used with [set_xmp()] to edit XMP medata for a variety of media formats
 #' and such objects are returned by [get_xmp()].
 #'
+#' @param attribution_url The URL to be used when attributing the work (XMP tag `cc:attributionURL`).
+#'                Recommended by Creative Commons.
 #' @param create_date The date the document was created (XMP tag `xmp:CreateDate`).
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                Related pdf documentation info key is `CreationDate`.
@@ -24,8 +26,8 @@
 #'                Related pdf documentation info key is `Subject`.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
 #'                Recommended by Creative Commons.
-#'                Note `xmpRights:WebStatement` is a more popular XMP tag (used by Google Images)
-#'                that can also hold the URL of license terms.
+#'                Note `xmpRights:WebStatement` set in `web_statement` is a more popular XMP tag (e.g. used by Google Images)
+#'                that can also hold the URL of license terms or a verifying web statement.
 #'                If `cc:license` in `auto_xmp` and `spdx_id` is not `NULL` then
 #'                we'll automatically use an URL from [spdx_licenses] corresponding to that license.
 #' @param marked Whether the document is a rights-managed resource (XMP tag `xmpRights:Marked`).
@@ -69,6 +71,7 @@
 #'                        using non-`NULL` entries in `x` coerced by [as_xmp()].}
 #' }
 #' @section `xmp` R6 Active Bindings:\describe{
+#'    \item{`attribution_url`}{The URL to attribute the document.}
 #'    \item{`creator`}{The document's author.}
 #'    \item{`create_date`}{The date the document was created.}
 #'    \item{`creator_tool`}{The name of the application that originally created the document.}
@@ -114,7 +117,7 @@ xmp <- function(...,
                 creator = NULL,  description = NULL, rights = NULL, title = NULL, # dc
                 create_date = NULL, creator_tool = NULL, modify_date = NULL, # xmp
                 marked = NULL, web_statement = NULL, # xmpRights
-                license = NULL, # cc
+                attribution_url = NULL, license = NULL, # cc
                 keywords = NULL, producer = NULL, # pdf
                 credit = NULL, # photoshop
                 spdx_id = NULL,
@@ -122,7 +125,7 @@ xmp <- function(...,
     Xmp$new(...,
             creator = creator,  description = description, rights = rights, title = title,
             keywords = keywords, producer = producer,
-            license = license,
+            attribution_url = attribution_url, license = license,
             credit = credit,
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date,
             marked = marked, web_statement = web_statement,
@@ -162,7 +165,9 @@ Xmp <- R6Class("xmp",
         },
         get_item = function(key) {
             lkey <- tolower(key)
-            if (lkey %in% c("license", "cc:license")) {
+            if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
+                self$attribution_url
+            } else if (lkey %in% c("license", "cc:license")) {
                 self$license
             } else if (lkey %in% c("creator", "dc:creator")) {
                 self$creator
@@ -198,7 +203,9 @@ Xmp <- R6Class("xmp",
         },
         set_item = function(key, value) {
             lkey <- tolower(key)
-            if (lkey %in% c("license", "cc:license")) {
+            if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
+                self$attribution_url <- value
+            } else if (lkey %in% c("license", "cc:license")) {
                 self$license <- value
             } else if (lkey %in% c("creator", "dc:creator")) {
                 self$creator <- value
@@ -240,6 +247,8 @@ Xmp <- R6Class("xmp",
         },
         exiftool_tags = function() {
             tags <- list()
+            if (!is.null(self$attribution_url))
+                tags[["XMP-cc:attributionURL"]] <- self$attribution_url
             if (!is.null(self$creator))
                 tags[["XMP-dc:creator"]] <- self$creator
             if (!is.null(self$create_date))
@@ -274,6 +283,8 @@ Xmp <- R6Class("xmp",
         },
         get_nonnull_keys = function() {
             keys <- character(0)
+            if (!is.null(private$tags$attribution_url))
+                keys <- append(keys, "cc:attributionURL")
             if (!is.null(private$tags$creator))
                 keys <- append(keys, "dc:creator")
             if (!is.null(private$tags$description))
@@ -305,6 +316,7 @@ Xmp <- R6Class("xmp",
         }
     ),
     active = list(
+        attribution_url = function(value) private$active_helper("attribution_url", value, as_url_value),
         creator = function(value) private$active_helper("creator", value),
         create_date = function(value) private$active_helper("create_date", value, as_datetime_value),
         creator_tool = function(value) private$active_helper("creator_tool", value),
@@ -403,7 +415,7 @@ Xmp <- R6Class("xmp",
 
 x_format <- d_format
 
-KNOWN_XMP_TAGS <- c("cc:license",
+KNOWN_XMP_TAGS <- c("cc:attributionURL", "cc:license",
                     "dc:creator", "dc:description", "dc:rights", "dc:title",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit",
