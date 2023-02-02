@@ -19,6 +19,7 @@ to more closely match the full name used by Creative Commons Foundation. }
 Manually created for a subset of Creative Commons licenses.
 Others taken from \url{https://github.com/sindresorhus/spdx-license-list}.
 }
+\item{pd}{Is this license a "public domain" license?  Manually created.}
 }
 }
 \usage{

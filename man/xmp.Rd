@@ -9,14 +9,16 @@ xmp(
   creator = NULL,
   description = NULL,
   title = NULL,
-  create_date = NULL,
-  creator_tool = NULL,
-  modify_date = NULL,
   keywords = NULL,
   producer = NULL,
   credit = NULL,
+  create_date = NULL,
+  creator_tool = NULL,
+  modify_date = NULL,
+  marked = NULL,
+  web_statement = NULL,
   spdx_id = NULL,
-  auto_xmp = c("photoshop:Credit", "xmpRights:WebStatement")
+  auto_xmp = c("photoshop:Credit", "xmpRights:Marked", "xmpRights:WebStatement")
 )
 }
 \arguments{
@@ -34,17 +36,6 @@ Related pdf documentation info key is \code{Subject}.}
 \item{title}{The document's title (XMP tag \code{dc:title}).
 Related pdf documentation info key is \code{Title}.}
 
-\item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
-Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Related pdf documentation info key is \code{CreationDate}.}
-
-\item{creator_tool}{The name of the application that originally created the document.
-Related pdf documentation info key is \code{Creator}.}
-
-\item{modify_date}{The date the document was last modified (XMP tag \code{xmp:ModifyDate}).
-Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Related pdf documentation info key is \code{ModDate}.}
-
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
 Related pdf documentation info key is \code{pdf:Keywords}.
 Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
@@ -57,15 +48,34 @@ Core IPTC photo metadata used by Google Photos.
 If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
 then will automatically use \code{paste(creator, collapse = " and ")}.}
 
-\item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
+\item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
+Related pdf documentation info key is \code{CreationDate}.}
 
-\item{auto_xmp}{Character vector of XMP metadata we should try to automatically determine
-if missing from other XMP metadata and \code{spdx_id}.}
+\item{creator_tool}{The name of the application that originally created the document.
+Related pdf documentation info key is \code{Creator}.}
+
+\item{modify_date}{The date the document was last modified (XMP tag \code{xmp:ModifyDate}).
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
+Related pdf documentation info key is \code{ModDate}.}
+
+\item{marked}{Whether the document is a rights-managed resource (XMP tag \code{xmpRights:Marked}).
+Use \code{TRUE} if rights-managed, \code{FALSE} if public domain, and \code{NULL} if unknown.
+Creative Commons recommends setting this.
+If \code{xmpRights:Marked} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we can automatically set this for a subset of SPDX licenses (including all Creative Commons licenses).}
 
 \item{web_statement}{Web Statement of Rights (XMP tag \code{xmpRights:WebStatement}):
 a string of a full URL with license information about the page.
 If \code{xmpRights:WebStatement} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
-we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.}
+we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.
+Core IPTC photo metadata used by Google Photos.
+Also recommended by Creative Commons (who also recommends using a "verifying" web statement).}
+
+\item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
+
+\item{auto_xmp}{Character vector of XMP metadata we should try to automatically determine
+if missing from other XMP metadata and \code{spdx_id}.}
 }
 \value{
 An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.
@@ -95,10 +105,11 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{credit}}{Credit line.}
 \item{\code{description}}{The document's description (subject).}
 \item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
+\item{\code{marked}}{Boolean of whether this is a rights-managed document.}
 \item{\code{modify_date}}{The date the document was last modified.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
 \item{\code{title}}{The document's title.}
-\item{\code{web_statement}}{Web statement of rights for the document}
+\item{\code{web_statement}}{A URL string for the web statement of rights for the document.}
 \item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 \item{\code{auto_xmp}}{Character vector of XMP metadata we should try to automatically determine
 if missing from other XMP metadata and \code{spdx_id}.}

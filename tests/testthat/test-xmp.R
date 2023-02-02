@@ -23,6 +23,7 @@ test_that("get_xmp() / set_xmp()", {
              spdx_id = "CC-BY-4.0",
              `dc:Contributor` = "A contributor"
     )
+    expect_true(x$marked)
     x <- update(x, `dc:Contributor` = "An updated contributor")
     expect_snapshot(print(x))
     xc <- x$clone()

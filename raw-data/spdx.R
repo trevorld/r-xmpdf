@@ -65,7 +65,25 @@ if (TRUE) {
                      url_alt = ifelse(id == "CC-BY-SA-2.5", "https://creativecommons.org/licenses/by-sa/2.5/", url_alt),
                      url_alt = ifelse(id == "CC-BY-SA-3.0", "https://creativecommons.org/licenses/by-sa/3.0/", url_alt),
                      url_alt = ifelse(id == "CC-BY-SA-4.0", "https://creativecommons.org/licenses/by-sa/4.0/", url_alt),
-                     url_alt = ifelse(id == "CC0-1.0", "https://creativecommons.org/publicdomain/zero/4.0/", url_alt)
+                     url_alt = ifelse(id == "CC0-1.0", "https://creativecommons.org/publicdomain/zero/4.0/", url_alt),
+                     pd = NA,
+                     pd = ifelse(grepl("^AGPL", id), FALSE, pd),
+                     pd = ifelse(grepl("^Apache", id), FALSE, pd),
+                     pd = ifelse(grepl("^Artistic", id), FALSE, pd),
+                     pd = ifelse(grepl("^BSD", id), FALSE, pd),
+                     pd = ifelse(grepl("^CC", id), FALSE, pd),
+                     pd = ifelse(grepl("^GFDL", id), FALSE, pd),
+                     pd = ifelse(grepl("^GPL", id), FALSE, pd),
+                     pd = ifelse(grepl("^LGPL", id), FALSE, pd),
+                     pd = ifelse(grepl("^MPL", id), FALSE, pd),
+                     pd = ifelse(id %in% c("0BSD", "ANTLR-PD", "ANTLR-PD-fallback",
+                                           "blessing", "CC-PDDC", "CC0-1.0",
+                                           "libselinux-1.0", "MIT-0",
+                                           "NIST-PD", "NIST-PD-fallback",
+                                           "PDDL-1.0", "SAX-PD", "Unlicense", "WTFPL"),
+                                 TRUE, pd),
+                     pd = ifelse(id %in% c("MIT"),
+                                 FALSE, pd)
     )
     which_cc <- grep("^Creative Commons", spdx_licenses$name)
     spdx_licenses$name[which_cc] <- gsub(" Non Commercial", "-NonCommercial", spdx_licenses$name[which_cc])
@@ -73,7 +91,7 @@ if (TRUE) {
     spdx_licenses$name[which_cc] <- gsub(" No Deriv", "-NoDeriv", spdx_licenses$name[which_cc])
     spdx_licenses <- as.data.frame(spdx_licenses)
 
-    spdx_licenses <- select(spdx_licenses, id, name, url, fsf, osi, deprecated, url_alt) |> as.data.frame()
+    spdx_licenses <- select(spdx_licenses, id, name, url, fsf, osi, deprecated, url_alt, pd) |> as.data.frame()
     rownames(spdx_licenses) <- spdx_licenses$id
 }
 
