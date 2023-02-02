@@ -371,7 +371,10 @@ Xmp <- R6Class("xmp",
     active = list(
         attribution_name = function(value) {
             if (missing(value)) {
-                private$fill_credit(private$tags$attribution_name)
+                value <- private$tags$attribution_name
+                if (is.null(value) && "cc:attributionName" %in% self$auto_xmp)
+                    value <- private$auto_credit()
+                value
             } else {
                 private$tags$attribution_name <- as_character_value(value)
             }
@@ -382,7 +385,10 @@ Xmp <- R6Class("xmp",
         creator_tool = function(value) private$active_helper("creator_tool", value),
         credit = function(value) {
             if (missing(value)) {
-                private$fill_credit(NULL)
+                value <- private$tags$credit
+                if (is.null(value) && "photoshop:Credit" %in% self$auto_xmp)
+                    value <- private$auto_credit()
+                value
             } else {
                 private$tags$credit <- as_character_value(value)
             }
@@ -397,7 +403,9 @@ Xmp <- R6Class("xmp",
         license = function(value) {
             if (missing(value)) {
                 value <- private$tags$license
-                private$fill_spdx_url(value)
+                if (is.null(value) && "cc:license" %in% self$auto_xmp)
+                    value <- private$auto_spdx_url()
+                value
             } else {
                 private$tags$license <- as_url_value(value)
             }
@@ -405,7 +413,9 @@ Xmp <- R6Class("xmp",
         marked = function(value) {
             if (missing(value)) {
                 value <- private$tags$marked
-                if (is.null(value) && !is.null(private$tags$spdx_id)) {
+                if (is.null(value) &&
+                    "xmpRights:Marked" %in% self$auto_xmp &&
+                    !is.null(private$tags$spdx_id)) {
                     value <- !xmpdf::spdx_licenses[self$spdx_id, "pd"]
                     if (is.na(value))
                         value <- NULL
@@ -424,7 +434,9 @@ Xmp <- R6Class("xmp",
         usage_terms = function(value) {
             if (missing(value)) {
                 value <- private$tags$usage_terms
-                private$fill_usage_terms(value)
+                if (is.null(value) && "xmpRights:UsageTerms" %in% self$auto_xmp)
+                    value <- private$auto_usage_terms()
+                value
             } else {
                 private$tags$usage_terms <- as_character_value(value)
             }
@@ -432,7 +444,9 @@ Xmp <- R6Class("xmp",
         web_statement = function(value) {
             if (missing(value)) {
                 value <- private$tags$web_statement
-                private$fill_spdx_url(value)
+                if (is.null(value) && "xmpRights:WebStatement" %in% self$auto_xmp)
+                    value <- private$auto_spdx_url()
+                value
             } else {
                 private$tags$web_statement <- as_url_value(value)
             }
@@ -472,23 +486,25 @@ Xmp <- R6Class("xmp",
             else
                 private$tags[[key]] <- as_fn(value)
         },
-        fill_credit = function(value) {
-            if (is.null(value))
-                value <- private$tags$credit
+        auto_credit = function() {
+            value <- private$tags$credit
             if (is.null(value) && !is.null(private$tags$creator))
                 value <- paste(private$tags$creator, collapse = " and ")
             value
         },
-        fill_spdx_url = function(value) {
-            if (is.null(value) && !is.null(private$tags$spdx_id)) {
-                value <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
-                if (is.na(value))
-                    value <- xmpdf::spdx_licenses[self$spdx_id, "url"]
+        auto_spdx_url = function() {
+            if (!is.null(private$tags$spdx_id)) {
+                url <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
+                if (is.na(url))
+                    url <- xmpdf::spdx_licenses[self$spdx_id, "url"]
+                url
+            } else {
+                NULL
             }
-            value
         },
-        fill_usage_terms = function(value) {
-            if (is.null(value) && !is.null(private$tags$spdx_id)) {
+        auto_usage_terms = function() {
+            value <- NULL
+            if (!is.null(private$tags$spdx_id)) {
                 name <- xmpdf::spdx_licenses[self$spdx_id, "name"]
                 url <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
                 if (is.na(url))

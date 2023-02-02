@@ -41,6 +41,13 @@ test_that("get_xmp() / set_xmp()", {
     expect_equal(x3$creator, c("Creator 1", "Creator 2"))
 })
 
+test_that("auto_xmp", {
+    x <- xmp(spdx_id = "CC-BY-SA-4.0")
+    expect_true(x$marked)
+    x$auto_xmp <- base::setdiff(x$auto_xmp, "xmpRights:Marked")
+    expect_null(x$marked)
+})
+
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
     skip_if_not(supports_exiftool())
     f <- tempfile(fileext = ".pdf")
