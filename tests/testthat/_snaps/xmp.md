@@ -11,7 +11,8 @@
       print(x)
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      => cc:license = https://creativecommons.org/licenses/by/4.0/
       dc:creator := A creator
       dc:description := A description
       dc:title := An XMP title
@@ -29,7 +30,8 @@
     Code
       print(x2)
     Output
-      auto_xmp (not XMP tag):  photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      cc:license := https://creativecommons.org/licenses/by/4.0/
       dc:creator := A creator
       dc:description := A description
       dc:title := An XMP title

@@ -17,7 +17,7 @@
     Code
       print(x)
     Output
-      auto_xmp (not XMP tag):  photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
       dc:creator := John Doe
       dc:description := Generic Subject
       dc:title := Generic Title

@@ -22,6 +22,12 @@
 #'               then will automatically use `paste(creator, collapse = " and ")`.
 #' @param description The document's subject (XMP tag `dc:description`).
 #'                Related pdf documentation info key is `Subject`.
+#' @param license The URL of (open source) license terms (XMP tag `cc:license`).
+#'                Recommended by Creative Commons.
+#'                Note `xmpRights:WebStatement` is a more popular XMP tag (used by Google Images)
+#'                that can also hold the URL of license terms.
+#'                If `cc:license` in `auto_xmp` and `spdx_id` is not `NULL` then
+#'                we'll automatically use an URL from [spdx_licenses] corresponding to that license.
 #' @param marked Whether the document is a rights-managed resource (XMP tag `xmpRights:Marked`).
 #'               Use `TRUE` if rights-managed, `FALSE` if public domain, and `NULL` if unknown.
 #'               Creative Commons recommends setting this.
@@ -69,6 +75,7 @@
 #'    \item{`credit`}{Credit line.}
 #'    \item{`description`}{The document's description (subject).}
 #'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
+#'    \item{`license`}{URL of (open-source) license terms the document is licensed under.}
 #'    \item{`marked`}{Boolean of whether this is a rights-managed document.}
 #'    \item{`modify_date`}{The date the document was last modified.}
 #'    \item{`producer`}{The name of the application that converted the document (to pdf).}
@@ -105,15 +112,17 @@
 #' @export
 xmp <- function(...,
                 creator = NULL,  description = NULL, rights = NULL, title = NULL, # dc
-                keywords = NULL, producer = NULL, # pdf
-                credit = NULL, # photoshop
                 create_date = NULL, creator_tool = NULL, modify_date = NULL, # xmp
                 marked = NULL, web_statement = NULL, # xmpRights
+                license = NULL, # cc
+                keywords = NULL, producer = NULL, # pdf
+                credit = NULL, # photoshop
                 spdx_id = NULL,
-                auto_xmp = c("photoshop:Credit", "xmpRights:Marked", "xmpRights:WebStatement")) {
+                auto_xmp = c("cc:license", "photoshop:Credit", "xmpRights:Marked", "xmpRights:WebStatement")) {
     Xmp$new(...,
             creator = creator,  description = description, rights = rights, title = title,
             keywords = keywords, producer = producer,
+            license = license,
             credit = credit,
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date,
             marked = marked, web_statement = web_statement,
@@ -153,7 +162,9 @@ Xmp <- R6Class("xmp",
         },
         get_item = function(key) {
             lkey <- tolower(key)
-            if (lkey %in% c("creator", "dc:creator")) {
+            if (lkey %in% c("license", "cc:license")) {
+                self$license
+            } else if (lkey %in% c("creator", "dc:creator")) {
                 self$creator
             } else if (lkey %in% c("description", "dc:description")) {
                 self$description
@@ -187,7 +198,9 @@ Xmp <- R6Class("xmp",
         },
         set_item = function(key, value) {
             lkey <- tolower(key)
-            if (lkey %in% c("creator", "dc:creator")) {
+            if (lkey %in% c("license", "cc:license")) {
+                self$license <- value
+            } else if (lkey %in% c("creator", "dc:creator")) {
                 self$creator <- value
             } else if (lkey %in% c("description", "dc:description")) {
                 self$description <- value
@@ -239,6 +252,8 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-dc:description"]] <- self$description
             if (!is.null(self$keywords))
                 tags[["XMP-pdf:Keywords"]] <- self$keywords
+            if (!is.null(self$license))
+                tags[["XMP-cc:license"]] <- self$license
             if (!is.null(self$modify_date))
                 tags[["XMP-xmp:ModifyDate"]] <-  self$modify_date
             if (!is.null(self$marked))
@@ -263,10 +278,6 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "dc:creator")
             if (!is.null(private$tags$description))
                 keys <- append(keys, "dc:description")
-            if (!is.null(private$tags$rights))
-                keys <- append(keys, "dc:rights")
-            if (!is.null(private$tags$title))
-                keys <- append(keys, "dc:title")
             if (!is.null(private$tags$create_date))
                 keys <- append(keys, "xmp:CreateDate")
             if (!is.null(private$tags$creator_tool))
@@ -275,10 +286,16 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "pdf:Producer")
             if (!is.null(private$tags$keywords))
                 keys <- append(keys, "pdf:Keywords")
+            if (!is.null(private$tags$license))
+                keys <- append(keys, "cc:license")
             if (!is.null(private$tags$modify_date))
                 keys <- append(keys, "xmp:ModifyDate")
             if (!is.null(private$tags$marked))
                 keys <- append(keys, "xmpRights:Marked")
+            if (!is.null(private$tags$rights))
+                keys <- append(keys, "dc:rights")
+            if (!is.null(private$tags$title))
+                keys <- append(keys, "dc:title")
             if (!is.null(private$tags$web_statement))
                 keys <- append(keys, "xmpRights:WebStatement")
             keys <- append(keys, names(private$tags$other))
@@ -308,6 +325,14 @@ Xmp <- R6Class("xmp",
             else
                 private$tags$keywords <- paste(value, collapse = ", ")
         },
+        license = function(value) {
+            if (missing(value)) {
+                value <- private$tags$license
+                private$fill_spdx_url(value)
+            } else {
+                private$tags$license <- as_url_value(value)
+            }
+        },
         marked = function(value) {
             if (missing(value)) {
                 value <- private$tags$marked
@@ -328,12 +353,7 @@ Xmp <- R6Class("xmp",
         web_statement = function(value) {
             if (missing(value)) {
                 value <- private$tags$web_statement
-                if (is.null(value) && !is.null(private$tags$spdx_id)) {
-                    value <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
-                    if (is.na(value))
-                        value <- xmpdf::spdx_licenses[self$spdx_id, "url"]
-                }
-                value
+                private$fill_spdx_url(value)
             } else {
                 private$tags$web_statement <- as_url_value(value)
             }
@@ -353,6 +373,8 @@ Xmp <- R6Class("xmp",
             lkey <- tolower(key)
             if (lkey %in% c("credit", "photoshop:credit")) {
                 is.null(private$tags$credit)
+            } else if (lkey %in% c("license", "cc:license")) {
+                is.null(private$tags$license)
             } else if (lkey %in% c("marked", "xmprights:marked")) {
                 is.null(private$tags$marked)
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
@@ -367,13 +389,22 @@ Xmp <- R6Class("xmp",
             else
                 private$tags[[key]] <- as_fn(value)
         },
+        fill_spdx_url = function(value) {
+            if (is.null(value) && !is.null(private$tags$spdx_id)) {
+                value <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
+                if (is.na(value))
+                    value <- xmpdf::spdx_licenses[self$spdx_id, "url"]
+            }
+            value
+        },
         tags = list(other = list())
     )
 )
 
 x_format <- d_format
 
-KNOWN_XMP_TAGS <- c("dc:creator", "dc:description", "dc:rights", "dc:title",
+KNOWN_XMP_TAGS <- c("cc:license",
+                    "dc:creator", "dc:description", "dc:rights", "dc:title",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate",

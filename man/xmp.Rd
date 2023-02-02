@@ -8,17 +8,20 @@ xmp(
   ...,
   creator = NULL,
   description = NULL,
+  rights = NULL,
   title = NULL,
-  keywords = NULL,
-  producer = NULL,
-  credit = NULL,
   create_date = NULL,
   creator_tool = NULL,
   modify_date = NULL,
   marked = NULL,
   web_statement = NULL,
+  license = NULL,
+  keywords = NULL,
+  producer = NULL,
+  credit = NULL,
   spdx_id = NULL,
-  auto_xmp = c("photoshop:Credit", "xmpRights:Marked", "xmpRights:WebStatement")
+  auto_xmp = c("cc:license", "photoshop:Credit", "xmpRights:Marked",
+    "xmpRights:WebStatement")
 )
 }
 \arguments{
@@ -33,20 +36,11 @@ we'll also use this for the \code{photoshop:Credit} XMP tag.}
 \item{description}{The document's subject (XMP tag \code{dc:description}).
 Related pdf documentation info key is \code{Subject}.}
 
+\item{rights}{(copy)right information about the document.
+Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.}
+
 \item{title}{The document's title (XMP tag \code{dc:title}).
 Related pdf documentation info key is \code{Title}.}
-
-\item{keywords}{Character vector of keywords for this document (for cross-document searching).
-Related pdf documentation info key is \code{pdf:Keywords}.
-Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
-
-\item{producer}{The name of the application that converted the document to pdf (XMP tag \code{pdf:Producer}).
-Related pdf documentation info key is \code{Producer}.}
-
-\item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
-Core IPTC photo metadata used by Google Photos.
-If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
-then will automatically use \code{paste(creator, collapse = " and ")}.}
 
 \item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
@@ -71,6 +65,25 @@ If \code{xmpRights:WebStatement} in \code{auto_xmp} and \code{spdx_id} is not \c
 we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.
 Core IPTC photo metadata used by Google Photos.
 Also recommended by Creative Commons (who also recommends using a "verifying" web statement).}
+
+\item{license}{The URL of (open source) license terms (XMP tag \code{cc:license}).
+Recommended by Creative Commons.
+Note \code{xmpRights:WebStatement} is a more popular XMP tag (used by Google Images)
+that can also hold the URL of license terms.
+If \code{cc:license} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.}
+
+\item{keywords}{Character vector of keywords for this document (for cross-document searching).
+Related pdf documentation info key is \code{pdf:Keywords}.
+Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
+
+\item{producer}{The name of the application that converted the document to pdf (XMP tag \code{pdf:Producer}).
+Related pdf documentation info key is \code{Producer}.}
+
+\item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
+Core IPTC photo metadata used by Google Photos.
+If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
+then will automatically use \code{paste(creator, collapse = " and ")}.}
 
 \item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 
@@ -105,9 +118,11 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{credit}}{Credit line.}
 \item{\code{description}}{The document's description (subject).}
 \item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
+\item{\code{license}}{URL of (open-source) license terms the document is licensed under.}
 \item{\code{marked}}{Boolean of whether this is a rights-managed document.}
 \item{\code{modify_date}}{The date the document was last modified.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
+\item{\code{rights}}{The document's copy(right) information.}
 \item{\code{title}}{The document's title.}
 \item{\code{web_statement}}{A URL string for the web statement of rights for the document.}
 \item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
