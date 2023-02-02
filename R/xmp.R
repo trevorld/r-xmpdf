@@ -51,7 +51,7 @@
 #'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
 #' @param producer The name of the application that converted the document to pdf (XMP tag `pdf:Producer`).
 #'                Related pdf documentation info key is `Producer`.
-#' @param rights (copy)right information about the document.
+#' @param rights (copy)right information about the document (XMP tag `dc:rights`).
 #'                Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 #' @param title The document's title (XMP tag `dc:title`).
 #'                Related pdf documentation info key is `Title`.
@@ -77,6 +77,13 @@
 #' @section `xmp` R6 Class Methods:\describe{
 #'     \item{`get_item(key)`}{Get XMP metadata value for key `key`.
 #'           Can also use the relevant active bindings to get more common values.}
+#'     \item{`print(mode = c("nonnull", "google_images", "creative_commons", "all"))`}{
+#'           Print out XMP metadata values.  If `mode` is "nonnull" print out
+#'           which metadata would be embedded.  If `mode` is "google images" print out
+#'           values for the five fields Google Images uses.  If `mode` is `creative_commons`
+#'           print out the values for the fields Creative Commons recommends be set when
+#'           using their licenses.  If mode is `all` print out values for all
+#'           XMP metadata that we provide active bindings for.}
 #'     \item{`set_item(key, value)`}{Set XMP metadata key `key` with value `value`.
 #'           Can also use the relevant active bindings to set XMP metadata values.}
 #'     \item{`update(x)`}{Update XMP metadata entries
@@ -171,11 +178,26 @@ Xmp <- R6Class("xmp",
             }
             invisible(NULL)
         },
-        print = function() {
+        print = function(mode = c("nonnull", "google_images", "creative_commons", "all")) {
+            mode <- match.arg(mode)
             text <- character(0)
-            for (key in KNOWN_XMP_TAGS) {
+            tags <- switch(mode,
+                           google_images = c("dc:creator",
+                                             "photoshop:Credit",
+                                             "dc:rights",
+                                             "xmpRights:WebStatement"),
+                           creative_commons = c("cc:attributionName",
+                                                "cc:attributionURL",
+                                                "cc:license",
+                                                "cc:morePermissions",
+                                                "dc:rights",
+                                                "xmpRights:Marked",
+                                                "xmpRights:UsageTerms",
+                                                "xmpRights:WebStatement"),
+                           KNOWN_XMP_TAGS)
+            for (key in tags) {
                 value <- self$get_item(key)
-                if (is.null(value)) next
+                if (is.null(value) && mode == "nonnull") next
                 if (private$is_auto(key))
                     text <- append(text, paste("=>", key, "=", x_format(value)))
                 else
@@ -186,6 +208,8 @@ Xmp <- R6Class("xmp",
                     text <- c(paste("auto_xmp (not XMP tag): ", x_format(self$auto_xmp)), text)
                 if (!is.null(self$spdx_id))
                     text <- c(paste("spdx_id (not XMP tag) :=", x_format(self$spdx_id)), text)
+                if (mode == "google_images")
+                    text <- c(text, "(We don't currently support the 'plus:Licensor' tag's 'LicensorURL')")
                 invisible(cat(text, sep="\n"))
             } else {
                 invisible(cat("No XMP metadata found\n"))
