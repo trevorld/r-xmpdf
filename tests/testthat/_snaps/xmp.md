@@ -13,7 +13,9 @@
       spdx_id (not XMP tag) := CC-BY-4.0
       auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
       => cc:attributionName = A creator
+      cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
+      cc:morePermissions := https://example.com/more-permissions
       dc:creator := A creator
       dc:description := A description
       dc:title := An XMP title
@@ -33,7 +35,9 @@
     Output
       auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
       cc:attributionName := A creator
+      cc:attributionURL := https://example.com/attribution
       cc:license := https://creativecommons.org/licenses/by/4.0/
+      cc:morePermissions := https://example.com/more-permissions
       dc:creator := A creator
       dc:description := A description
       dc:title := An XMP title

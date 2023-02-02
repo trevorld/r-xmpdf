@@ -12,11 +12,13 @@ test_that("get_xmp() / set_xmp()", {
     invisible(dev.off())
 
     expect_snapshot(print(xmp()))
-    x <- xmp(creator = "A creator", #### Vector
+    x <- xmp(attribution_url = "https://example.com/attribution",
+             creator = "A creator", #### Vector
              create_date = "2020-10-10",
              creator_tool = "A creator tool",
              keywords = "R, xmpdf",
              modify_date = "2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]",
+             more_permissions = "https://example.com/more-permissions",
              producer = "R",
              description = "A description",
              title = "An XMP title", #### alt-lang

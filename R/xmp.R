@@ -43,6 +43,9 @@
 #' @param modify_date The date the document was last modified (XMP tag `xmp:ModifyDate`).
 #'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                 Related pdf documentation info key is `ModDate`.
+#' @param more_permissions A URL for additional permissions beyond the `license` (XMP tag `cc:license`).
+#'                 Recommended by Creative Commons.
+#'                 Contrast with the `LicensorURL` property of `plus:Licensor` XMP tag.
 #' @param keywords Character vector of keywords for this document (for cross-document searching).
 #'                 Related pdf documentation info key is `pdf:Keywords`.
 #'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
@@ -87,6 +90,7 @@
 #'    \item{`license`}{URL of (open-source) license terms the document is licensed under.}
 #'    \item{`marked`}{Boolean of whether this is a rights-managed document.}
 #'    \item{`modify_date`}{The date the document was last modified.}
+#'    \item{`more_permissions`}{URL for acquiring additional permissions beyond `license`.}
 #'    \item{`producer`}{The name of the application that converted the document (to pdf).}
 #'    \item{`rights`}{The document's copy(right) information.}
 #'    \item{`title`}{The document's title.}
@@ -123,7 +127,8 @@ xmp <- function(...,
                 creator = NULL,  description = NULL, rights = NULL, title = NULL, # dc
                 create_date = NULL, creator_tool = NULL, modify_date = NULL, # xmp
                 marked = NULL, web_statement = NULL, # xmpRights
-                attribution_name = NULL, attribution_url = NULL, license = NULL, # cc
+                attribution_name = NULL, attribution_url = NULL, # cc
+                license = NULL, more_permissions = NULL,
                 keywords = NULL, producer = NULL, # pdf
                 credit = NULL, # photoshop
                 spdx_id = NULL,
@@ -132,7 +137,8 @@ xmp <- function(...,
     Xmp$new(...,
             creator = creator,  description = description, rights = rights, title = title,
             keywords = keywords, producer = producer,
-            attribution_name = attribution_name, attribution_url = attribution_url, license = license,
+            attribution_name = attribution_name, attribution_url = attribution_url,
+            license = license, more_permissions = more_permissions,
             credit = credit,
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date,
             marked = marked, web_statement = web_statement,
@@ -200,6 +206,8 @@ Xmp <- R6Class("xmp",
                 self$modify_date
             } else if (lkey %in% c("marked", "xmprights:marked")) {
                 self$marked
+            } else if (lkey %in% c("more_permissions", "morepermissions", "cc:morepermissions")) {
+                self$more_permissions
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
                 self$web_statement
             } else if (lkey %in% c("spdx_id")) {
@@ -218,6 +226,8 @@ Xmp <- R6Class("xmp",
                 self$attribution_url <- value
             } else if (lkey %in% c("license", "cc:license")) {
                 self$license <- value
+            } else if (lkey %in% c("more_permissions", "morepermissions", "cc:morepermissions")) {
+                self$more_permissions <- value
             } else if (lkey %in% c("creator", "dc:creator")) {
                 self$creator <- value
             } else if (lkey %in% c("description", "dc:description")) {
@@ -276,10 +286,12 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-pdf:Keywords"]] <- self$keywords
             if (!is.null(self$license))
                 tags[["XMP-cc:license"]] <- self$license
-            if (!is.null(self$modify_date))
-                tags[["XMP-xmp:ModifyDate"]] <-  self$modify_date
             if (!is.null(self$marked))
                 tags[["XMP-xmpRights:Marked"]] <- self$marked
+            if (!is.null(self$modify_date))
+                tags[["XMP-xmp:ModifyDate"]] <-  self$modify_date
+            if (!is.null(self$more_permissions))
+                tags[["XMP-cc:morePermissions"]] <- self$more_permissions
             if (!is.null(self$producer))
                 tags[["XMP-pdf:Producer"]] <- self$producer
             if (!is.null(self$rights))
@@ -315,10 +327,12 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "pdf:Keywords")
             if (!is.null(private$tags$license))
                 keys <- append(keys, "cc:license")
-            if (!is.null(private$tags$modify_date))
-                keys <- append(keys, "xmp:ModifyDate")
             if (!is.null(private$tags$marked))
                 keys <- append(keys, "xmpRights:Marked")
+            if (!is.null(private$tags$modify_date))
+                keys <- append(keys, "xmp:ModifyDate")
+            if (!is.null(private$tags$more_permissions))
+                keys <- append(keys, "cc:morePermissions")
             if (!is.null(private$tags$rights))
                 keys <- append(keys, "dc:rights")
             if (!is.null(private$tags$title))
@@ -379,6 +393,8 @@ Xmp <- R6Class("xmp",
             }
         },
         modify_date = function(value) private$active_helper("modify_date", value, as_datetime_value),
+        more_permissions = function(value) private$active_helper("more_permissions",
+                                                                 value, as_url_value),
         producer = function(value) private$active_helper("producer", value),
         rights = function(value) private$active_helper("rights", value),
         title = function(value) private$active_helper("title", value),
@@ -444,7 +460,8 @@ Xmp <- R6Class("xmp",
 
 x_format <- d_format
 
-KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL", "cc:license",
+KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
+                    "cc:license", "cc:morePermissions",
                     "dc:creator", "dc:description", "dc:rights", "dc:title",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit",
