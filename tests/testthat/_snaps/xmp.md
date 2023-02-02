@@ -11,7 +11,7 @@
       print(x)
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       => cc:attributionName = A creator
       cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
@@ -26,6 +26,7 @@
       xmp:CreatorTool := A creator tool
       xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]
       => xmpRights:Marked = TRUE
+      => xmpRights:UsageTerms = This work is licensed to the public under the Creative Commons Attribution 4.0 International license https://creativecommons.org/licenses/by/4.0/
       => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
 
 ---
@@ -33,7 +34,7 @@
     Code
       print(x2)
     Output
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       cc:attributionName := A creator
       cc:attributionURL := https://example.com/attribution
       cc:license := https://creativecommons.org/licenses/by/4.0/
@@ -48,5 +49,6 @@
       xmp:CreatorTool := A creator tool
       xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00
       xmpRights:Marked := TRUE
+      xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons Attribution 4.0 International license https://creativecommons.org/licenses/by/4.0/
       xmpRights:WebStatement := https://creativecommons.org/licenses/by/4.0/
 

@@ -6,27 +6,43 @@
 \usage{
 xmp(
   ...,
+  attribution_name = NULL,
+  attribution_url = NULL,
+  create_date = NULL,
   creator = NULL,
+  creator_tool = NULL,
+  credit = NULL,
   description = NULL,
+  keywords = NULL,
+  license = NULL,
+  marked = NULL,
+  modify_date = NULL,
+  more_permissions = NULL,
+  producer = NULL,
   rights = NULL,
   title = NULL,
-  create_date = NULL,
-  creator_tool = NULL,
-  modify_date = NULL,
-  marked = NULL,
+  usage_terms = NULL,
   web_statement = NULL,
-  attribution_url = NULL,
-  license = NULL,
-  keywords = NULL,
-  producer = NULL,
-  credit = NULL,
-  spdx_id = NULL,
-  auto_xmp = c("cc:license", "photoshop:Credit", "xmpRights:Marked",
-    "xmpRights:WebStatement")
+  auto_xmp = c("cc:attributionName", "cc:license", "photoshop:Credit",
+    "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
+  spdx_id = NULL
 )
 }
 \arguments{
 \item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
+
+\item{attribution_name}{The name to be used when attributing the work (XMP tag \code{cc:attributionName}).
+Recommended by Creative Commons.
+If missing and \code{"cc:attributionName"} in \code{auto_xmp} and
+and \code{photoshop:Credit} non-missing will use that else if \code{dc:creator} non-missing
+then will automatically use \code{paste(creator, collapse = " and ")}.}
+
+\item{attribution_url}{The URL to be used when attributing the work (XMP tag \code{cc:attributionURL}).
+Recommended by Creative Commons.}
+
+\item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
+Related pdf documentation info key is \code{CreationDate}.}
 
 \item{creator}{The document's author(s) (XMP tag \code{dc:creator}).
 Related pdf documentation info key is \code{Author}.
@@ -34,41 +50,20 @@ Core IPTC photo metadata used by Google Photos.
 If \code{credit} is missing and \code{"photoshop:Credit"} in \code{auto_xmp} then
 we'll also use this for the \code{photoshop:Credit} XMP tag.}
 
-\item{description}{The document's subject (XMP tag \code{dc:description}).
-Related pdf documentation info key is \code{Subject}.}
-
-\item{rights}{(copy)right information about the document.
-Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.}
-
-\item{title}{The document's title (XMP tag \code{dc:title}).
-Related pdf documentation info key is \code{Title}.}
-
-\item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
-Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Related pdf documentation info key is \code{CreationDate}.}
-
 \item{creator_tool}{The name of the application that originally created the document.
 Related pdf documentation info key is \code{Creator}.}
 
-\item{modify_date}{The date the document was last modified (XMP tag \code{xmp:ModifyDate}).
-Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Related pdf documentation info key is \code{ModDate}.}
-
-\item{marked}{Whether the document is a rights-managed resource (XMP tag \code{xmpRights:Marked}).
-Use \code{TRUE} if rights-managed, \code{FALSE} if public domain, and \code{NULL} if unknown.
-Creative Commons recommends setting this.
-If \code{xmpRights:Marked} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
-we can automatically set this for a subset of SPDX licenses (including all Creative Commons licenses).}
-
-\item{web_statement}{Web Statement of Rights (XMP tag \code{xmpRights:WebStatement}):
-a string of a full URL with license information about the page.
-If \code{xmpRights:WebStatement} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
-we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.
+\item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
 Core IPTC photo metadata used by Google Photos.
-Also recommended by Creative Commons (who also recommends using a "verifying" web statement).}
+If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
+then will automatically use \code{paste(creator, collapse = " and ")}.}
 
-\item{attribution_url}{The URL to be used when attributing the work (XMP tag \code{cc:attributionURL}).
-Recommended by Creative Commons.}
+\item{description}{The document's subject (XMP tag \code{dc:description}).
+Related pdf documentation info key is \code{Subject}.}
+
+\item{keywords}{Character vector of keywords for this document (for cross-document searching).
+Related pdf documentation info key is \code{pdf:Keywords}.
+Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
 
 \item{license}{The URL of (open source) license terms (XMP tag \code{cc:license}).
 Recommended by Creative Commons.
@@ -77,22 +72,45 @@ that can also hold the URL of license terms or a verifying web statement.
 If \code{cc:license} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
 we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.}
 
-\item{keywords}{Character vector of keywords for this document (for cross-document searching).
-Related pdf documentation info key is \code{pdf:Keywords}.
-Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
+\item{marked}{Whether the document is a rights-managed resource (XMP tag \code{xmpRights:Marked}).
+Use \code{TRUE} if rights-managed, \code{FALSE} if public domain, and \code{NULL} if unknown.
+Creative Commons recommends setting this.
+If \code{xmpRights:Marked} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we can automatically set this for a subset of SPDX licenses (including all Creative Commons licenses).}
+
+\item{modify_date}{The date the document was last modified (XMP tag \code{xmp:ModifyDate}).
+Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
+Related pdf documentation info key is \code{ModDate}.}
+
+\item{more_permissions}{A URL for additional permissions beyond the \code{license} (XMP tag \code{cc:license}).
+Recommended by Creative Commons.
+Contrast with the \code{LicensorURL} property of \code{plus:Licensor} XMP tag.}
 
 \item{producer}{The name of the application that converted the document to pdf (XMP tag \code{pdf:Producer}).
 Related pdf documentation info key is \code{Producer}.}
 
-\item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
-Core IPTC photo metadata used by Google Photos.
-If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
-then will automatically use \code{paste(creator, collapse = " and ")}.}
+\item{rights}{(copy)right information about the document.
+Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.}
 
-\item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
+\item{title}{The document's title (XMP tag \code{dc:title}).
+Related pdf documentation info key is \code{Title}.}
+
+\item{usage_terms}{A string describing legal terms of use for the document (XMP tag \code{xmpRights:UsageTerms}).
+Core IPTC photo metadata and recommended by Creative Commons.
+If \code{xmpRights:UsageTerms} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we can automatically set this with that license's name and URL.}
+
+\item{web_statement}{Web Statement of Rights (XMP tag \code{xmpRights:WebStatement}):
+a string of a full URL with license information about the page.
+If \code{xmpRights:WebStatement} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
+we'll automatically use an URL from \link{spdx_licenses} corresponding to that license.
+Core IPTC photo metadata used by Google Photos.
+Also recommended by Creative Commons (who also recommends using a "verifying" web statement).}
 
 \item{auto_xmp}{Character vector of XMP metadata we should try to automatically determine
 if missing from other XMP metadata and \code{spdx_id}.}
+
+\item{spdx_id}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 }
 \value{
 An xmp object as can be used with \code{\link[=set_xmp]{set_xmp()}}.  Basically a named list whose names are the (optional) xmp namespace and tag names separated by ":" and the values are the xmp values.
@@ -116,6 +134,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 
 \section{\code{xmp} R6 Active Bindings}{
 \describe{
+\item{\code{attribution_name}}{The name to attribute the document.}
 \item{\code{attribution_url}}{The URL to attribute the document.}
 \item{\code{creator}}{The document's author.}
 \item{\code{create_date}}{The date the document was created.}
@@ -126,9 +145,11 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{license}}{URL of (open-source) license terms the document is licensed under.}
 \item{\code{marked}}{Boolean of whether this is a rights-managed document.}
 \item{\code{modify_date}}{The date the document was last modified.}
+\item{\code{more_permissions}}{URL for acquiring additional permissions beyond \code{license}.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
 \item{\code{rights}}{The document's copy(right) information.}
 \item{\code{title}}{The document's title.}
+\item{\code{usage_terms}}{The document's rights usage terms.}
 \item{\code{web_statement}}{A URL string for the web statement of rights for the document.}
 \item{\code{spdx_id}}{The id of a license in the SPDX license list.  See \link{spdx_licenses}.}
 \item{\code{auto_xmp}}{Character vector of XMP metadata we should try to automatically determine
@@ -139,7 +160,7 @@ if missing from other XMP metadata and \code{spdx_id}.}
 \section{XMP tag recommendations}{
 
 \itemize{
-\item \url{https://exiftool.org/TagNames/XMP.html} recommends "dc", "xmp", "iptcCore", and "iptcExt" schemas if possible
+\item \url{https://exiftool.org/TagNames/XMP.html} recommends "dc", "xmp", "Iptc4xmpCore", and "Iptc4xmpExt" schemas if possible
 \item \url{https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces} are descriptions of some common XMP tags
 \item \url{https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers} is popular for photos
 \item \url{https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata#iptc-photo-metadata} are the subset of IPTC photo metadata which Google Photos uses (if no structured data on web page)

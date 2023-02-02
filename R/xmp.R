@@ -55,6 +55,10 @@
 #'                Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 #' @param title The document's title (XMP tag `dc:title`).
 #'                Related pdf documentation info key is `Title`.
+#' @param usage_terms A string describing legal terms of use for the document (XMP tag `xmpRights:UsageTerms`).
+#'                    Core IPTC photo metadata and recommended by Creative Commons.
+#'                    If `xmpRights:UsageTerms` in `auto_xmp` and `spdx_id` is not `NULL` then
+#'                    we can automatically set this with that license's name and URL.
 #' @param web_statement Web Statement of Rights (XMP tag `xmpRights:WebStatement`):
 #'                      a string of a full URL with license information about the page.
 #'                      If `xmpRights:WebStatement` in `auto_xmp` and `spdx_id` is not `NULL` then
@@ -94,6 +98,7 @@
 #'    \item{`producer`}{The name of the application that converted the document (to pdf).}
 #'    \item{`rights`}{The document's copy(right) information.}
 #'    \item{`title`}{The document's title.}
+#'    \item{`usage_terms`}{The document's rights usage terms.}
 #'    \item{`web_statement`}{A URL string for the web statement of rights for the document.}
 #'    \item{`spdx_id`}{The id of a license in the SPDX license list.  See [spdx_licenses].}
 #'    \item{`auto_xmp`}{Character vector of XMP metadata we should try to automatically determine
@@ -124,24 +129,34 @@
 #' @name xmp
 #' @export
 xmp <- function(...,
-                creator = NULL,  description = NULL, rights = NULL, title = NULL, # dc
-                create_date = NULL, creator_tool = NULL, modify_date = NULL, # xmp
-                marked = NULL, web_statement = NULL, # xmpRights
-                attribution_name = NULL, attribution_url = NULL, # cc
-                license = NULL, more_permissions = NULL,
-                keywords = NULL, producer = NULL, # pdf
-                credit = NULL, # photoshop
-                spdx_id = NULL,
+                attribution_name = NULL,
+                attribution_url = NULL,
+                create_date = NULL,
+                creator = NULL,
+                creator_tool = NULL,
+                credit = NULL,
+                description = NULL,
+                keywords = NULL,
+                license = NULL,
+                marked = NULL,
+                modify_date = NULL,
+                more_permissions = NULL,
+                producer = NULL,
+                rights = NULL,
+                title = NULL,
+                usage_terms = NULL,
+                web_statement = NULL,
                 auto_xmp = c("cc:attributionName", "cc:license", "photoshop:Credit",
-                             "xmpRights:Marked", "xmpRights:WebStatement")) {
+                             "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
+                spdx_id = NULL) {
     Xmp$new(...,
-            creator = creator,  description = description, rights = rights, title = title,
-            keywords = keywords, producer = producer,
-            attribution_name = attribution_name, attribution_url = attribution_url,
+            creator = creator,  description = description, rights = rights, title = title, # dc
+            keywords = keywords, producer = producer, # pdf
+            attribution_name = attribution_name, attribution_url = attribution_url, #cc
             license = license, more_permissions = more_permissions,
-            credit = credit,
-            create_date = create_date, creator_tool = creator_tool, modify_date = modify_date,
-            marked = marked, web_statement = web_statement,
+            credit = credit, # photoshop
+            create_date = create_date, creator_tool = creator_tool, modify_date = modify_date, # xmp
+            marked = marked, usage_terms = usage_terms, web_statement = web_statement, # xmpRights
             spdx_id = spdx_id, auto_xmp = auto_xmp)
 }
 
@@ -208,6 +223,8 @@ Xmp <- R6Class("xmp",
                 self$marked
             } else if (lkey %in% c("more_permissions", "morepermissions", "cc:morepermissions")) {
                 self$more_permissions
+            } else if (lkey %in% c("usage_terms", "usageterms", "xmprights:usageterms")) {
+                self$usage_terms
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
                 self$web_statement
             } else if (lkey %in% c("spdx_id")) {
@@ -250,6 +267,8 @@ Xmp <- R6Class("xmp",
                 self$modify_date <- value
             } else if (lkey %in% c("marked", "xmprights:marked")) {
                 self$marked <- value
+            } else if (lkey %in% c("usage_terms", "usageterms", "xmprights:usageterms")) {
+                self$usage_terms <- value
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
                 self$web_statement <- value
             } else if (lkey %in% c("spdx_id")) {
@@ -298,6 +317,8 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-dc:rights"]] <- self$rights
             if (!is.null(self$title))
                 tags[["XMP-dc:title"]] <- self$title
+            if (!is.null(self$usage_terms))
+                tags[["XMP-xmpRights:UsageTerms"]] <- self$usage_terms
             if (!is.null(self$web_statement))
                 tags[["XMP-xmpRights:WebStatement"]] <- self$web_statement
             for (key in names(private$tags$other)) {
@@ -337,6 +358,8 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "dc:rights")
             if (!is.null(private$tags$title))
                 keys <- append(keys, "dc:title")
+            if (!is.null(private$tags$usage_terms))
+                keys <- append(keys, "xmpRights:UsageTerms")
             if (!is.null(private$tags$web_statement))
                 keys <- append(keys, "xmpRights:WebStatement")
             keys <- append(keys, names(private$tags$other))
@@ -398,6 +421,14 @@ Xmp <- R6Class("xmp",
         producer = function(value) private$active_helper("producer", value),
         rights = function(value) private$active_helper("rights", value),
         title = function(value) private$active_helper("title", value),
+        usage_terms = function(value) {
+            if (missing(value)) {
+                value <- private$tags$usage_terms
+                private$fill_usage_terms(value)
+            } else {
+                private$tags$usage_terms <- as_character_value(value)
+            }
+        },
         web_statement = function(value) {
             if (missing(value)) {
                 value <- private$tags$web_statement
@@ -427,6 +458,8 @@ Xmp <- R6Class("xmp",
                 is.null(private$tags$license)
             } else if (lkey %in% c("marked", "xmprights:marked")) {
                 is.null(private$tags$marked)
+            } else if (lkey %in% c("usage_terms", "usageterms", "xmprights:usageterms")) {
+                is.null(private$tags$usage_terms)
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
                 is.null(private$tags$web_statement)
             } else {
@@ -454,6 +487,17 @@ Xmp <- R6Class("xmp",
             }
             value
         },
+        fill_usage_terms = function(value) {
+            if (is.null(value) && !is.null(private$tags$spdx_id)) {
+                name <- xmpdf::spdx_licenses[self$spdx_id, "name"]
+                url <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
+                if (is.na(url))
+                    url <- xmpdf::spdx_licenses[self$spdx_id, "url"]
+                value <- paste("This work is licensed to the public under the",
+                               name, "license", url)
+            }
+            value
+        },
         tags = list(other = list())
     )
 )
@@ -466,7 +510,7 @@ KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate",
-                    "xmpRights:Marked", "xmpRights:WebStatement")
+                    "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement")
 
 #' @export
 update.xmp <- function(object, ...) {
