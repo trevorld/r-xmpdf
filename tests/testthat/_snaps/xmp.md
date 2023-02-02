@@ -34,7 +34,6 @@
     Code
       print(x2)
     Output
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       cc:attributionName := A creator
       cc:attributionURL := https://example.com/attribution
       cc:license := https://creativecommons.org/licenses/by/4.0/

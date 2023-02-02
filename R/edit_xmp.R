@@ -61,7 +61,9 @@ get_xmp_exiftool_helper <- function(filename) {
     md <- get_exiftool_metadata(filename, tags="-XMP:all")
     md <- md[grep("^XMP-", names(md))]
     names(md) <- gsub("^XMP-", "", names(md))
-    as_xmp(md)
+    x <- as_xmp(md)
+    x$auto_xmp <- NULL
+    x
 }
 
 #' @rdname edit_xmp
