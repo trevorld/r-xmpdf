@@ -30,6 +30,7 @@
 #'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:creator` non-missing
 #'               then will automatically use `paste(creator, collapse = " and ")`.
 #' @param date_created The date the intellectual content was created (XMP tag `photoshop:DateCreated`).
+#'               Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'               Core IPTC photo metadata.
 #' @param description The document's subject (XMP tag `dc:description`).
 #'                Related pdf documentation info key is `Subject`.
@@ -83,13 +84,14 @@
 #' @section `xmp` R6 Class Methods:\describe{
 #'     \item{`get_item(key)`}{Get XMP metadata value for key `key`.
 #'           Can also use the relevant active bindings to get more common values.}
-#'     \item{`print(mode = c("null_omit", "google_images", "creative_commons", "all"))`}{
+#'     \item{`print(mode = c("null_omit", "google_images", "creative_commons", "all"), xmp_only = FALSE)`}{
 #'           Print out XMP metadata values.  If `mode` is "null_omit" print out
 #'           which metadata would be embedded.  If `mode` is "google images" print out
 #'           values for the five fields Google Images uses.  If `mode` is `creative_commons`
 #'           print out the values for the fields Creative Commons recommends be set when
 #'           using their licenses.  If mode is `all` print out values for all
-#'           XMP metadata that we provide active bindings for (even if `NULL`).}
+#'           XMP metadata that we provide active bindings for (even if `NULL`).
+#'           If `xmp_only` is `TRUE` then don't print out `spdx_id` and `auto_xmp` values.}
 #'     \item{`set_item(key, value)`}{Set XMP metadata key `key` with value `value`.
 #'           Can also use the relevant active bindings to set XMP metadata values.}
 #'     \item{`update(x)`}{Update XMP metadata entries
@@ -187,13 +189,13 @@ Xmp <- R6Class("xmp",
             }
             invisible(NULL)
         },
-        print = function(mode = c("null_omit", "google_images", "creative_commons", "all")) {
+        print = function(mode = c("null_omit", "google_images", "creative_commons", "all"), xmp_only = FALSE) {
             mode <- match.arg(mode)
             text <- character(0)
             tags <- switch(mode,
                            google_images = c("dc:creator",
-                                             "photoshop:Credit",
                                              "dc:rights",
+                                             "photoshop:Credit",
                                              "xmpRights:WebStatement"),
                            creative_commons = c("cc:attributionName",
                                                 "cc:attributionURL",
@@ -210,15 +212,18 @@ Xmp <- R6Class("xmp",
                 if (private$is_auto(key))
                     text <- append(text, paste("=>", key, "=", x_format(value)))
                 else
-                    text <- append(text, paste(key, ":=", x_format(value)))
+                    text <- append(text, paste("  ", key, ":=", x_format(value)))
             }
             if (length(text)) {
-                if (length(self$auto_xmp))
-                    text <- c(paste("auto_xmp (not XMP tag): ", x_format(self$auto_xmp)), text)
-                if (!is.null(self$spdx_id))
-                    text <- c(paste("spdx_id (not XMP tag) :=", x_format(self$spdx_id)), text)
-                if (mode == "google_images")
-                    text <- c(text, "(We don't currently support the 'plus:Licensor' tag's 'LicensorURL')")
+                if (mode == "google_images") {
+                    text <- c(text[1:3], "X  plus:Licensor (not currently supported by {xmpdf})", text[4])
+                }
+                if (!xmp_only) {
+                    if (length(self$auto_xmp))
+                        text <- c(paste("i  auto_xmp (not XMP tag) := ", x_format(self$auto_xmp)), text)
+                    if (!is.null(self$spdx_id))
+                        text <- c(paste("i  spdx_id (not XMP tag) :=", x_format(self$spdx_id)), text)
+                }
                 invisible(cat(text, sep="\n"))
             } else {
                 invisible(cat("No XMP metadata found\n"))
@@ -524,6 +529,8 @@ Xmp <- R6Class("xmp",
                 is.null(private$tags$license)
             } else if (lkey %in% c("marked", "xmprights:marked")) {
                 is.null(private$tags$marked)
+            } else if (lkey %in% c("rights", "dc:rights")) {
+                is.null(private$tags$rights)
             } else if (lkey %in% c("usage_terms", "usageterms", "xmprights:usageterms")) {
                 is.null(private$tags$usage_terms)
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
@@ -586,7 +593,10 @@ Xmp <- R6Class("xmp",
     )
 )
 
-x_format <- d_format
+x_format <- function(value) {
+    value <- d_format(value)
+    paste(strwrap(value, exdent = 8), collapse = "\n")
+}
 
 KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "cc:license", "cc:morePermissions",

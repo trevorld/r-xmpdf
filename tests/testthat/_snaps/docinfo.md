@@ -17,15 +17,16 @@
     Code
       print(x)
     Output
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, dc:rights, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
+              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       => cc:attributionName = John Doe
-      dc:creator := John Doe
-      dc:description := Generic Subject
-      dc:title := Generic Title
-      pdf:Keywords := Key, Word
-      pdf:Producer := Generic Producer
+         dc:creator := John Doe
+         dc:description := Generic Subject
+         dc:title := Generic Title
+         pdf:Keywords := Key, Word
+         pdf:Producer := Generic Producer
       => photoshop:Credit = John Doe
-      xmp:CreateDate := 2022-11-11T11:11:11
-      xmp:CreatorTool := Generic Creator
-      xmp:ModifyDate := 2022-11-11T11:11:11
+         xmp:CreateDate := 2022-11-11T11:11:11
+         xmp:CreatorTool := Generic Creator
+         xmp:ModifyDate := 2022-11-11T11:11:11
 
