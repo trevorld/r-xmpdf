@@ -12,6 +12,7 @@ xmp(
   creator = NULL,
   creator_tool = NULL,
   credit = NULL,
+  date_created = NULL,
   description = NULL,
   keywords = NULL,
   license = NULL,
@@ -40,9 +41,11 @@ then will automatically use \code{paste(creator, collapse = " and ")}.}
 \item{attribution_url}{The URL to be used when attributing the work (XMP tag \code{cc:attributionURL}).
 Recommended by Creative Commons.}
 
-\item{create_date}{The date the document was created (XMP tag \code{xmp:CreateDate}).
+\item{create_date}{The date the digital document was created (XMP tag \code{xmp:CreateDate}).
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Related pdf documentation info key is \code{CreationDate}.}
+Related pdf documentation info key is \code{CreationDate}.
+Not to be confused with \code{photoshop:DateCreated} which is the
+date the intellectual content was created.}
 
 \item{creator}{The document's author(s) (XMP tag \code{dc:creator}).
 Related pdf documentation info key is \code{Author}.
@@ -57,6 +60,9 @@ Related pdf documentation info key is \code{Creator}.}
 Core IPTC photo metadata used by Google Photos.
 If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
 then will automatically use \code{paste(creator, collapse = " and ")}.}
+
+\item{date_created}{The date the intellectual content was created (XMP tag \code{photoshop:DateCreated}).
+Core IPTC photo metadata.}
 
 \item{description}{The document's subject (XMP tag \code{dc:description}).
 Related pdf documentation info key is \code{Subject}.}
@@ -147,6 +153,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{create_date}}{The date the document was created.}
 \item{\code{creator_tool}}{The name of the application that originally created the document.}
 \item{\code{credit}}{Credit line.}
+\item{\code{date_created}}{The date the document's intellectual content was created}
 \item{\code{description}}{The document's description (subject).}
 \item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
 \item{\code{license}}{URL of (open-source) license terms the document is licensed under.}
