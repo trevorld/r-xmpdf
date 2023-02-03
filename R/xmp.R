@@ -13,9 +13,11 @@
 #'               then will automatically use `paste(creator, collapse = " and ")`.
 #' @param attribution_url The URL to be used when attributing the work (XMP tag `cc:attributionURL`).
 #'                Recommended by Creative Commons.
-#' @param create_date The date the document was created (XMP tag `xmp:CreateDate`).
+#' @param create_date The date the digital document was created (XMP tag `xmp:CreateDate`).
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                Related pdf documentation info key is `CreationDate`.
+#'                Not to be confused with `photoshop:DateCreated` which is the
+#'                date the intellectual content was created.
 #' @param creator The document's author(s) (XMP tag `dc:creator`).
 #'                Related pdf documentation info key is `Author`.
 #'                Core IPTC photo metadata used by Google Photos.
@@ -27,6 +29,8 @@
 #'               Core IPTC photo metadata used by Google Photos.
 #'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:creator` non-missing
 #'               then will automatically use `paste(creator, collapse = " and ")`.
+#' @param date_created The date the intellectual content was created (XMP tag `photoshop:DateCreated`).
+#'               Core IPTC photo metadata.
 #' @param description The document's subject (XMP tag `dc:description`).
 #'                Related pdf documentation info key is `Subject`.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
@@ -96,6 +100,7 @@
 #'    \item{`create_date`}{The date the document was created.}
 #'    \item{`creator_tool`}{The name of the application that originally created the document.}
 #'    \item{`credit`}{Credit line.}
+#'    \item{`date_created`}{The date the document's intellectual content was created}
 #'    \item{`description`}{The document's description (subject).}
 #'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
 #'    \item{`license`}{URL of (open-source) license terms the document is licensed under.}
@@ -142,6 +147,7 @@ xmp <- function(...,
                 creator = NULL,
                 creator_tool = NULL,
                 credit = NULL,
+                date_created = NULL,
                 description = NULL,
                 keywords = NULL,
                 license = NULL,
@@ -161,7 +167,7 @@ xmp <- function(...,
             keywords = keywords, producer = producer, # pdf
             attribution_name = attribution_name, attribution_url = attribution_url, #cc
             license = license, more_permissions = more_permissions,
-            credit = credit, # photoshop
+            credit = credit, date_created = date_created, # photoshop
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date, # xmp
             marked = marked, usage_terms = usage_terms, web_statement = web_statement, # xmpRights
             spdx_id = spdx_id, auto_xmp = auto_xmp)
@@ -235,6 +241,8 @@ Xmp <- R6Class("xmp",
                 self$producer
             } else if (lkey %in% c("keywords", "pdf:keywords")) {
                 self$keywords
+            } else if (lkey %in% c("date_created", "datecreated", "photoshop:datecreated")) {
+                self$date_created
             } else if (lkey %in% c("credit", "credit", "photoshop:credit")) {
                 self$credit
             } else if (lkey %in% c("create_date", "createdate", "xmp:createdate")) {
@@ -283,6 +291,8 @@ Xmp <- R6Class("xmp",
                 self$keywords <- value
             } else if (lkey %in% c("credit", "photoshop:credit")) {
                 self$credit <- value
+            } else if (lkey %in% c("date_created", "datecreated", "photoshop:datecreated")) {
+                self$date_created <- value
             } else if (lkey %in% c("create_date", "createdate", "xmp:createdate")) {
                 self$create_date <- value
             } else if (lkey %in% c("creator_tool", "creatortool", "xmp:creatortool")) {
@@ -323,6 +333,8 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-xmp:CreatorTool"]] <- self$creator_tool
             if (!is.null(self$credit))
                 tags[["XMP-photoshop:Credit"]] <- self$credit
+            if (!is.null(self$date_created))
+                tags[["XMP-photoshop:DateCreated"]] <- self$date_created
             if (!is.null(self$description))
                 tags[["XMP-dc:description"]] <- self$description
             if (!is.null(self$keywords))
@@ -360,14 +372,14 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "cc:attributionURL")
             if (!is.null(private$tags$creator))
                 keys <- append(keys, "dc:creator")
-            if (!is.null(private$tags$description))
-                keys <- append(keys, "dc:description")
             if (!is.null(private$tags$create_date))
                 keys <- append(keys, "xmp:CreateDate")
             if (!is.null(private$tags$creator_tool))
                 keys <- append(keys, "xmp:CreatorTool")
-            if (!is.null(private$tags$producer))
-                keys <- append(keys, "pdf:Producer")
+            if (!is.null(private$tags$date_created))
+                keys <- append(keys, "photoshop:DateCreated")
+            if (!is.null(private$tags$description))
+                keys <- append(keys, "dc:description")
             if (!is.null(private$tags$keywords))
                 keys <- append(keys, "pdf:Keywords")
             if (!is.null(private$tags$license))
@@ -378,6 +390,8 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "xmp:ModifyDate")
             if (!is.null(private$tags$more_permissions))
                 keys <- append(keys, "cc:morePermissions")
+            if (!is.null(private$tags$producer))
+                keys <- append(keys, "pdf:Producer")
             if (!is.null(private$tags$rights))
                 keys <- append(keys, "dc:rights")
             if (!is.null(private$tags$title))
@@ -417,6 +431,7 @@ Xmp <- R6Class("xmp",
                 private$tags$credit <- as_character_value(value)
             }
         },
+        date_created = function(value) private$active_helper("date_created", value, as_datetime_value),
         description = function(value) private$active_helper("description", value),
         keywords = function(value) {
             if (missing(value))
@@ -548,7 +563,7 @@ KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "cc:license", "cc:morePermissions",
                     "dc:creator", "dc:description", "dc:rights", "dc:title",
                     "pdf:Keywords", "pdf:Producer",
-                    "photoshop:Credit",
+                    "photoshop:Credit", "photoshop:DateCreated",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate",
                     "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement")
 

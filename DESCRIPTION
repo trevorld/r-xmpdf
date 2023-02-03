@@ -20,7 +20,7 @@ BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyData: true
 LazyLoad: yes
 Imports:
-    datetimeoffset (>= 0.1.2),
+    datetimeoffset (>= 0.1.3),
     grDevices,
     jsonlite,
     purrr,
@@ -34,6 +34,7 @@ Suggests:
     qpdf,
     pdftools,
     testthat (>= 3.0.0)
+Remotes: datetimeoffset=trevorld/r-datetimeoffset
 SystemRequirements: 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries.
  'exiftool' for editing pdf documentation info entries and/or xmp metadata.
 Roxygen: list(markdown = TRUE)

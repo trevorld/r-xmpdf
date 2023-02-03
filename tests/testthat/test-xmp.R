@@ -14,8 +14,9 @@ test_that("get_xmp() / set_xmp()", {
     expect_snapshot(print(xmp()))
     x <- xmp(attribution_url = "https://example.com/attribution",
              creator = "A creator", #### Vector
-             create_date = "2020-10-10",
+             create_date = "2020-10-10", # Digital document creation date
              creator_tool = "A creator tool",
+             date_created = "2020",
              keywords = "R, xmpdf",
              modify_date = "2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]",
              more_permissions = "https://example.com/more-permissions",

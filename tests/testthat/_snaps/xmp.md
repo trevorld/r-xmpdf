@@ -22,6 +22,7 @@
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
       => photoshop:Credit = A creator
+      photoshop:DateCreated := 2020
       xmp:CreateDate := 2020-10-10
       xmp:CreatorTool := A creator tool
       xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]
@@ -76,6 +77,7 @@
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
       => photoshop:Credit = A creator
+      photoshop:DateCreated := 2020
       xmp:CreateDate := 2020-10-10
       xmp:CreatorTool := A creator tool
       xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]
@@ -98,6 +100,7 @@
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
       photoshop:Credit := A creator
+      photoshop:DateCreated := 2020
       xmp:CreateDate := 2020-10-10
       xmp:CreatorTool := A creator tool
       xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00
