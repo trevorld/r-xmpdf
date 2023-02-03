@@ -125,13 +125,13 @@ and such objects are returned by \code{\link[=get_xmp]{get_xmp()}}.
 \describe{
 \item{\code{get_item(key)}}{Get XMP metadata value for key \code{key}.
 Can also use the relevant active bindings to get more common values.}
-\item{\code{print(mode = c("nonnull", "google_images", "creative_commons", "all"))}}{
-Print out XMP metadata values.  If \code{mode} is "nonnull" print out
+\item{\code{print(mode = c("null_omit", "google_images", "creative_commons", "all"))}}{
+Print out XMP metadata values.  If \code{mode} is "null_omit" print out
 which metadata would be embedded.  If \code{mode} is "google images" print out
 values for the five fields Google Images uses.  If \code{mode} is \code{creative_commons}
 print out the values for the fields Creative Commons recommends be set when
 using their licenses.  If mode is \code{all} print out values for all
-XMP metadata that we provide active bindings for.}
+XMP metadata that we provide active bindings for (even if \code{NULL}).}
 \item{\code{set_item(key, value)}}{Set XMP metadata key \code{key} with value \code{value}.
 Can also use the relevant active bindings to set XMP metadata values.}
 \item{\code{update(x)}}{Update XMP metadata entries

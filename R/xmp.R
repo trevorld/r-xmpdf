@@ -77,13 +77,13 @@
 #' @section `xmp` R6 Class Methods:\describe{
 #'     \item{`get_item(key)`}{Get XMP metadata value for key `key`.
 #'           Can also use the relevant active bindings to get more common values.}
-#'     \item{`print(mode = c("nonnull", "google_images", "creative_commons", "all"))`}{
-#'           Print out XMP metadata values.  If `mode` is "nonnull" print out
+#'     \item{`print(mode = c("null_omit", "google_images", "creative_commons", "all"))`}{
+#'           Print out XMP metadata values.  If `mode` is "null_omit" print out
 #'           which metadata would be embedded.  If `mode` is "google images" print out
 #'           values for the five fields Google Images uses.  If `mode` is `creative_commons`
 #'           print out the values for the fields Creative Commons recommends be set when
 #'           using their licenses.  If mode is `all` print out values for all
-#'           XMP metadata that we provide active bindings for.}
+#'           XMP metadata that we provide active bindings for (even if `NULL`).}
 #'     \item{`set_item(key, value)`}{Set XMP metadata key `key` with value `value`.
 #'           Can also use the relevant active bindings to set XMP metadata values.}
 #'     \item{`update(x)`}{Update XMP metadata entries
@@ -178,7 +178,7 @@ Xmp <- R6Class("xmp",
             }
             invisible(NULL)
         },
-        print = function(mode = c("nonnull", "google_images", "creative_commons", "all")) {
+        print = function(mode = c("null_omit", "google_images", "creative_commons", "all")) {
             mode <- match.arg(mode)
             text <- character(0)
             tags <- switch(mode,
@@ -197,7 +197,7 @@ Xmp <- R6Class("xmp",
                            KNOWN_XMP_TAGS)
             for (key in tags) {
                 value <- self$get_item(key)
-                if (is.null(value) && mode == "nonnull") next
+                if (is.null(value) && mode == "null_omit") next
                 if (private$is_auto(key))
                     text <- append(text, paste("=>", key, "=", x_format(value)))
                 else
