@@ -10,8 +10,15 @@
 * [Overview](#overview)
 * [Installation](#installation)
 * [Examples](#examples)
+
+  + [Add XMP/docinfo metadata and bookmarks to a pdf](#pdfcreate)
+  + [Add Google Images and Creative Commons license XMP metadata to an image](#pnglicense)
+
 * [Limitations by backend](#comparison)
-* [Related Software](#similar)
+* [External links](#links)
+
+  + [Metadata links](#standards)
+  + [Related software](#similar)
 
 ## <a name="overview">Overview</a>
 
@@ -59,6 +66,8 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
 ## <a name="examples">Examples</a>
 
+### <a name="pdfcreate">Add XMP/docinfo metadata and bookmarks to a pdf</a>
+
 A simple example where we create a two page pdf using `pdf()` and then add XMP metadata, PDF documentation info metadata, and PDF bookmarks to it:
 
 
@@ -79,13 +88,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2022-10-24T14:50:33
+## CreationDate: 2023-02-03T14:26:40
 ## Creator: R
-## Producer: R 4.2.1
+## Producer: R 4.2.2
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2022-10-24T14:50:33
+## ModDate: 2023-02-03T14:26:40
 ```
 
 ```r
@@ -93,7 +102,7 @@ get_xmp(f)[[1]] |> print()
 ```
 
 ```
-## no XMP metadata found
+## No XMP metadata found
 ```
 
 ```r
@@ -107,7 +116,7 @@ get_bookmarks(f)[[1]] |> print()
 
 ```r
 # Edit PDF documentation info
-d <- get_docinfo(f)[[1]] |> 
+d <- get_docinfo(f)[[1]] |>
        update(author = "John Doe",
               title = "Two Boring Pages",
               keywords = c("R", "xmpdf"))
@@ -117,32 +126,44 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2022-10-24T14:50:33
+## CreationDate: 2023-02-03T14:26:40
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: NULL
 ## Keywords: R, xmpdf
-## ModDate: 2022-10-24T14:50:33
+## ModDate: 2023-02-03T14:26:40
 ```
 
 ```r
 # Edit XMP metadata
-set_xmp(d, f)
+x <- as_xmp(d) |>
+       update(attribution_url = "https://example.com/attribution",
+              date_created = Sys.Date(),
+              spdx_id = "CC-BY-4.0")
+set_xmp(x, f)
 get_xmp(f)[[1]] |> print()
 ```
 
 ```
-## x:XMPToolkit : Image::ExifTool 12.40
-## dc:Creator : John Doe
-## dc:Format : application/pdf
-## dc:Title : Two Boring Pages
-## pdf:Keywords : R, xmpdf
-## pdf:Producer : R 4.2.1
-## xmp:CreateDate : 2022:10:24 14:50:33
-## xmp:CreatorTool : R
-## xmp:ModifyDate : 2022:10:24 14:50:33
-## xmpMM:DocumentID : uuid:6fdbc072-8c02-11f8-0000-2567e21c8552
+##    cc:attributionName := John Doe
+##    cc:attributionURL := https://example.com/attribution
+##    cc:license := https://creativecommons.org/licenses/by/4.0/
+##    dc:creator := John Doe
+##    dc:rights := © 2023 John Doe. Some rights reserved.
+##    dc:title := Two Boring Pages
+##    pdf:Keywords := R, xmpdf
+##    pdf:Producer := R 4.2.2
+##    photoshop:Credit := John Doe
+##    photoshop:DateCreated := 2023-02-03
+##    xmp:CreateDate := 2023-02-03T14:26:40
+##    xmp:CreatorTool := R
+##    xmp:ModifyDate := 2023-02-03T14:26:40
+##    xmpRights:Marked := TRUE
+##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
+##         Attribution 4.0 International license
+##         https://creativecommons.org/licenses/by/4.0/
+##    xmpRights:WebStatement := https://creativecommons.org/licenses/by/4.0/
 ```
 
 ```r
@@ -161,6 +182,86 @@ get_bookmarks(f)[[1]] |> print()
 ```r
 unlink(f)
 ```
+
+### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to an image</a>
+
+Besides pdf files with `exiftool` we can also edit the XMP metadata for [a large number of image formats](https://exiftool.org/#supported)
+including "gif", "png", "jpeg", "tiff", and "webp".  In particular we may be interested in setting the subset of [IPTC Photo XMP metadata displayed by Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) as well as embedding [Creative Commons license XMP metadata](https://wiki.creativecommons.org/wiki/XMP).
+
+
+```r
+library("xmpdf")
+f <- tempfile(fileext = ".png")
+png(f)
+grid::grid.text("This is an image!")
+dev.off() |> invisible()
+
+get_xmp(f)[[1]] |> print()
+```
+
+```
+## No XMP metadata found
+```
+
+```r
+x <- xmp(attribution_url = "https://example.com/attribution",
+         creator = "John Doe",
+         description = "An image caption",
+         date_created = Sys.Date(),
+         spdx_id = "CC-BY-4.0")
+print(x, mode = "google_images", xmp_only = TRUE)
+```
+
+```
+##    dc:creator := John Doe
+## => dc:rights = © 2023 John Doe. Some rights reserved.
+## => photoshop:Credit = John Doe
+## X  plus:Licensor (not currently supported by {xmpdf})
+## => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
+```
+
+```r
+print(x, mode = "creative_commons", xmp_only = TRUE)
+```
+
+```
+## => cc:attributionName = John Doe
+##    cc:attributionURL := https://example.com/attribution
+## => cc:license = https://creativecommons.org/licenses/by/4.0/
+##    cc:morePermissions := NULL
+## => dc:rights = © 2023 John Doe. Some rights reserved.
+## => xmpRights:Marked = TRUE
+## => xmpRights:UsageTerms = This work is licensed to the public under the Creative Commons
+##         Attribution 4.0 International license
+##         https://creativecommons.org/licenses/by/4.0/
+## => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
+```
+
+```r
+set_xmp(x, f)
+get_xmp(f)[[1]] |> print()
+```
+
+```
+##    cc:attributionName := John Doe
+##    cc:attributionURL := https://example.com/attribution
+##    cc:license := https://creativecommons.org/licenses/by/4.0/
+##    dc:creator := John Doe
+##    dc:description := An image caption
+##    dc:rights := © 2023 John Doe. Some rights reserved.
+##    photoshop:Credit := John Doe
+##    photoshop:DateCreated := 2023-02-03
+##    xmpRights:Marked := TRUE
+##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
+##         Attribution 4.0 International license
+##         https://creativecommons.org/licenses/by/4.0/
+##    xmpRights:WebStatement := https://creativecommons.org/licenses/by/4.0/
+```
+
+```r
+unlink(f)
+```
+
 
 ## <a name="comparison">Limitations by backend</a>
 
@@ -193,17 +294,28 @@ Known limitations:
   If deleting the old metadata is important one may want to consider calling
   `qpdf::pdf_compress(input, linearize = TRUE)` at the end.
 
-## <a name="similar">Related Software</a>
+## <a name="links">External links</a>
+
+### <a name="standards">Metadata links</a>
+
+* [basic pdfmark features](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#) (Adobe) documents "Documentation info dictionary" metadata and "Bookmarks"
+* [IPTC Photo Metadata Standard](https://iptc.org/standards/photo-metadata/iptc-standard/) (IPTC) is a popular XMP metadata standard for photos
+* [Quick guide to IPTC Photo Metadata on Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) (IPTC) describes the subset of the IPTC Photo Metadata Standard used by Google Photos to list photo credits and license information
+* [xmp-docs](https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces) (Adobe) describes some common XMP tags
+* [XMP](https://wiki.creativecommons.org/wiki/XMP) (Creative Commons) describes a standard for using XMP to embed Creative Commons license information
+* [XMP tags](https://exiftool.org/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags
+
+### <a name="similar">Related software</a>
 
 Note most of the R packages listed below are focused on **getting** metadata rather than **setting** metadata
 and/or only provide low-level wrappers around the relevant command-line tools.
 Please feel free to [open a pull request to add any missing relevant R packages](https://github.com/trevorld/r-xmpdf/edit/main/README.Rmd).
 
-### exempi
+#### exempi
 
 * [exempi](https://libopenraw.freedesktop.org/exempi/)
 
-### exiftool
+#### exiftool
 
 * [{exifr}](https://github.com/paleolimbot/exifr) 
   provides a high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
@@ -213,43 +325,43 @@ Please feel free to [open a pull request to add any missing relevant R packages]
   Can download `exiftool`.
 * [exiftool](https://exiftool.org/)
 
-### exiv2
+#### exiv2
 
 * [{exiv}](https://github.com/hrbrmstr/exiv) read and write ‘Exif’, ‘ID3v1’ and ‘ID3v2’ image/media tags
 * [exiv2](https://exiv2.org/)
 
-### other exif tools
+#### other exif tools
 
 * [{exif}](https://github.com/Ironholds/exif) reads EXIF from jpeg images
 * [{magick}](https://github.com/ropensci/magick) has `image_attributes()` which reads EXIF image tags.
 
-### ghostscript
+#### ghostscript
 
 * `{tools}` has `find_gs_cmd()` to find a GhostScript executable in a cross-platform way.
 * [ghostscript](https://www.ghostscript.com/)
 
-### poppler
+#### poppler
 
 * [{pdftools}](https://docs.ropensci.org/pdftools/)
 * [{Rpoppler}](https://cran.r-project.org/web/packages/Rpoppler/index.html)
 * [poppler](https://poppler.freedesktop.org/)
 
-### qpdf
+#### qpdf
 
 * [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)
 * [qpdf](https://qpdf.sourceforge.io/)
 
-### pdftk
+#### pdftk
 
 * [{animation}](https://yihui.org/animation/) has `pdftk()`, a low-level wrapper around the `pdftk` command-line tool.
 * [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
 * [pdftk-java](https://gitlab.com/pdftk-java/pdftk)
 
-### tabula
+#### tabula
 
 * [{tabulizer}](https://github.com/ropensci/tabulizer)
 * [tabula-java](https://github.com/tabulapdf/tabula-java/)
 
-### xpdf
+#### xpdf
 
 * [xpdf](http://www.xpdfreader.com/about.html)'s `pdfinfo` tool

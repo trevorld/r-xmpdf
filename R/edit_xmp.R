@@ -23,18 +23,27 @@
 #' @seealso [xmp()] for more information about xmp metadata objects.
 #'   [supports_get_xmp()], [supports_set_xmp()], and [supports_exiftool()] to detect support for these features.  For more info about xmp metadata see <https://www.exiftool.org/TagNames/XMP.html>.
 #' @examples
-#' if (supports_set_xmp() && supports_get_xmp() && require("grid", quietly = TRUE)) {
-#'   f <- tempfile(fileext = ".pdf")
-#'   pdf(f, onefile = TRUE)
-#'   grid.text("Page 1")
-#'   grid.newpage()
-#'   grid.text("Page 2")
-#'   invisible(dev.off())
+#'   x <- xmp(attribution_url = "https://example.com/attribution",
+#'            creator = "John Doe",
+#'            description = "An image caption",
+#'            date_created = Sys.Date(),
+#'            spdx_id = "CC-BY-4.0")
+#'   print(x)
+#'   print(x, mode = "google_images", xmp_only = TRUE)
+#'   print(x, mode = "creative_commons", xmp_only = TRUE)
 #'
-#'   x <- xmp(Title = "An XMP title", creator = "John Doe")
-#'   set_xmp(x, f)
-#'   print(get_xmp(f)[[1]])
-#' }
+#'   if (supports_set_xmp() &&
+#'       supports_get_xmp() &&
+#'       capabilities("png") &&
+#'       requireNamespace("grid", quietly = TRUE)) {
+#'
+#'     f <- tempfile(fileext = ".png")
+#'     png(f)
+#'     grid::grid.text("This is an image!")
+#'     invisible(dev.off())
+#'     set_xmp(x, f)
+#'     print(get_xmp(f)[[1]])
+#'   }
 #' @name edit_xmp
 NULL
 
