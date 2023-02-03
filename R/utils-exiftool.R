@@ -24,18 +24,9 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
 }
 
-# use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z] when writing datetimes
-as_exif_dt <- function(value) {
-    value <- datetimeoffset::as_datetimeoffset(value)
-    value <- datetimeoffset::format_iso8601(value)
-    value <- gsub("^([[:digit:]]{4})-", "\\1:", value)
-    value <- gsub("^([[:digit:]]{4}):([[:digit:]]{2})-", "\\1:\\2:", value)
-    gsub("T", " ", value)
-}
-
 as_exif_value <- function(x) {
     if (inherits(x, c("datetimeoffset", "POSIXt"))) {
-        as_exif_dt(x)
+        datetimeoffset::format_exiftool(datetimeoffset::as_datetimeoffset(x))
     } else if (is.logical(x)) {
         n <- length(x)
         ifelse(x, rep_len("True", n), rep_len("False", n))
