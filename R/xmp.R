@@ -57,6 +57,8 @@
 #'                Related pdf documentation info key is `Producer`.
 #' @param rights (copy)right information about the document (XMP tag `dc:rights`).
 #'                Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
+#'                If `dc:rights` in `auto_xmp` and `creator` and `date_created` are not `NULL` then
+#'                we can automatically generate a basic copyright statement with the help of `spdx_id`.
 #' @param title The document's title (XMP tag `dc:title`).
 #'                Related pdf documentation info key is `Title`.
 #' @param usage_terms A string describing legal terms of use for the document (XMP tag `xmpRights:UsageTerms`).
@@ -159,7 +161,8 @@ xmp <- function(...,
                 title = NULL,
                 usage_terms = NULL,
                 web_statement = NULL,
-                auto_xmp = c("cc:attributionName", "cc:license", "photoshop:Credit",
+                auto_xmp = c("cc:attributionName", "cc:license",
+                             "dc:rights", "photoshop:Credit",
                              "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
                 spdx_id = NULL) {
     Xmp$new(...,
@@ -468,7 +471,17 @@ Xmp <- R6Class("xmp",
         more_permissions = function(value) private$active_helper("more_permissions",
                                                                  value, as_url_value),
         producer = function(value) private$active_helper("producer", value),
-        rights = function(value) private$active_helper("rights", value),
+        rights = function(value) {
+            if (missing(value)) {
+                value <- private$tags$rights
+                if (is.null(value) && "dc:rights" %in% self$auto_xmp)
+                    value <- private$auto_rights()
+                value
+            } else {
+                private$tags$rights <- as_character_value(value)
+            }
+
+        },
         title = function(value) private$active_helper("title", value),
         usage_terms = function(value) {
             if (missing(value)) {
@@ -529,6 +542,22 @@ Xmp <- R6Class("xmp",
             value <- private$tags$credit
             if (is.null(value) && !is.null(private$tags$creator))
                 value <- paste(private$tags$creator, collapse = " and ")
+            value
+        },
+        auto_rights = function() {
+            #### Update if/when we support plus:CopyrightOwner
+            value <- NULL
+            if (!is.null(private$tags$creator) && !is.null(private$tags$date_created)) {
+                owner <- paste(private$tags$creator, collapse = " and ")
+                year <- datetimeoffset::format_iso8601(private$tags$date_created, precision = "year")
+                if (is.null(self$spdx_id)) {
+                    value <- paste0("\u00a9 ", year, " ", owner, ". All rights reserved.")
+                } else if (isTRUE(xmpdf::spdx_licenses[self$spdx_id, "pd"])) {
+                    value <- paste0("In the public domain. No rights reserved.")
+                } else {
+                    value <- paste0("\u00a9 ", year, " ", owner, ". Some rights reserved.")
+                }
+            }
             value
         },
         auto_spdx_url = function() {

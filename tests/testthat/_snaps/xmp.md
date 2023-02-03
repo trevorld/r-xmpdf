@@ -11,13 +11,14 @@
       print(x)
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, dc:rights, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       => cc:attributionName = A creator
       cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
       cc:morePermissions := https://example.com/more-permissions
       dc:creator := A creator
       dc:description := A description
+      dc:rights := © 2020 A creator. Some rights reserved.
       dc:title := An XMP title
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
@@ -36,12 +37,12 @@
       print(x, mode = "creative_commons")
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, dc:rights, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       => cc:attributionName = A creator
       cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
       cc:morePermissions := https://example.com/more-permissions
-      dc:rights := NULL
+      dc:rights := © 2020 A creator. Some rights reserved.
       => xmpRights:Marked = TRUE
       => xmpRights:UsageTerms = This work is licensed to the public under the Creative Commons Attribution 4.0 International license https://creativecommons.org/licenses/by/4.0/
       => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
@@ -52,10 +53,10 @@
       print(x, mode = "google_images")
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, dc:rights, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       dc:creator := A creator
       => photoshop:Credit = A creator
-      dc:rights := NULL
+      dc:rights := © 2020 A creator. Some rights reserved.
       => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
       (We don't currently support the 'plus:Licensor' tag's 'LicensorURL')
 
@@ -65,14 +66,14 @@
       print(x, mode = "all")
     Output
       spdx_id (not XMP tag) := CC-BY-4.0
-      auto_xmp (not XMP tag):  cc:attributionName, cc:license, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      auto_xmp (not XMP tag):  cc:attributionName, cc:license, dc:rights, photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
       => cc:attributionName = A creator
       cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
       cc:morePermissions := https://example.com/more-permissions
       dc:creator := A creator
       dc:description := A description
-      dc:rights := NULL
+      dc:rights := © 2020 A creator. Some rights reserved.
       dc:title := An XMP title
       pdf:Keywords := R, xmpdf
       pdf:Producer := R
@@ -96,6 +97,7 @@
       cc:morePermissions := https://example.com/more-permissions
       dc:creator := A creator
       dc:description := A description
+      dc:rights := © 2020 A creator. Some rights reserved.
       dc:title := An XMP title
       pdf:Keywords := R, xmpdf
       pdf:Producer := R

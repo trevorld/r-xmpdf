@@ -24,7 +24,7 @@ xmp(
   title = NULL,
   usage_terms = NULL,
   web_statement = NULL,
-  auto_xmp = c("cc:attributionName", "cc:license", "photoshop:Credit",
+  auto_xmp = c("cc:attributionName", "cc:license", "dc:rights", "photoshop:Credit",
     "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
   spdx_id = NULL
 )
@@ -96,7 +96,9 @@ Contrast with the \code{LicensorURL} property of \code{plus:Licensor} XMP tag.}
 Related pdf documentation info key is \code{Producer}.}
 
 \item{rights}{(copy)right information about the document (XMP tag \code{dc:rights}).
-Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.}
+Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
+If \code{dc:rights} in \code{auto_xmp} and \code{creator} and \code{date_created} are not \code{NULL} then
+we can automatically generate a basic copyright statement with the help of \code{spdx_id}.}
 
 \item{title}{The document's title (XMP tag \code{dc:title}).
 Related pdf documentation info key is \code{Title}.}

@@ -50,6 +50,13 @@ test_that("auto_xmp", {
     expect_true(x$marked)
     x$auto_xmp <- base::setdiff(x$auto_xmp, "xmpRights:Marked")
     expect_null(x$marked)
+
+    x <- update(x, creator = "A creator", date_created = "2020-10-04")
+    expect_equal(x$rights, "\u00a9 2020 A creator. Some rights reserved.")
+    x$spdx_id <- "CC0-1.0"
+    expect_equal(x$rights, "In the public domain. No rights reserved.")
+    x$spdx_id <- NULL
+    expect_equal(x$rights, "\u00a9 2020 A creator. All rights reserved.")
 })
 
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
