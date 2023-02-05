@@ -25,16 +25,16 @@ Initial features
 * `get_docinfo()` reads in pdf documentation info entries from pdf file(s).
   `get_docinfo()` will try to use the following helper functions in the following order:
 
-  1. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
-  2. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  1. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
   3. `get_docinfo_pdftools()` which wraps `pdftools::pdf_info()`
 
 * `set_docinfo()` sets pdf documentation info entries to a pdf file (#3).
   `set_docinfo()` will try to use the following helper functions in the following order:
 
   1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
-  2. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
-  3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+  3. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
 
 * `xmp()` provides an `{R6}` object to represent xmp metadata.
 * `as_xmp()` can coerce objects into `xmp()` objects.

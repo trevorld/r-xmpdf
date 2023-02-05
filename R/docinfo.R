@@ -185,7 +185,6 @@ DocInfo <- R6Class("docinfo",
             keys
         },
         exiftool_tags = function() {
-            # We're using a date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
             tags <- list()
             if (!is.null(self$author))
                 tags[["PDF:Author"]] <- self$author

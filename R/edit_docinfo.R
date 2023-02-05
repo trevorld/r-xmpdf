@@ -7,15 +7,15 @@
 #'
 #' `get_docinfo()` will try to use the following helper functions in the following order:
 #'
-#' 1. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
-#' 2. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 1. `get_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
 #' 3. `get_docinfo_pdftools()` which wraps [pdftools::pdf_info()]
 #'
 #' `set_docinfo()` will try to use the following helper functions in the following order:
 #'
 #' 1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
-#' 2. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
-#' 3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
+#' 3. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
 #'
 #' @param filename Filename(s) (pdf) to extract info dictionary entries from.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
@@ -71,10 +71,10 @@ NULL
 #' @rdname edit_docinfo
 #' @export
 get_docinfo <- function(filename, use_names = TRUE) {
-    if (supports_exiftool()) {
-        get_docinfo_exiftool(filename, use_names = use_names)
-    } else if (supports_pdftk()) {
+    if (supports_pdftk()) {
         get_docinfo_pdftk(filename, use_names = use_names)
+    } else if (supports_exiftool()) {
+        get_docinfo_exiftool(filename, use_names = use_names)
     } else if (supports_pdftools()) {
         get_docinfo_pdftools(filename, use_names = use_names)
     } else {
@@ -149,7 +149,7 @@ get_docinfo_exiftool_helper <- function(filename) {
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
     docinfo <- as_docinfo(docinfo)
     tags <- docinfo$exiftool_tags()
-    set_exiftool_metadata(tags, input, output)
+    set_exiftool_metadata(tags, input, output, mode = "pdf")
 }
 
 #' @rdname edit_docinfo
@@ -188,10 +188,10 @@ get_docinfo_pdftk_helper <- function(filename) {
 set_docinfo <- function(docinfo, input, output = input) {
     if (supports_gs()) {
         set_docinfo_gs(docinfo, input, output)
-    } else if (supports_exiftool()) {
-        set_docinfo_exiftool(docinfo, input, output)
     } else if (supports_pdftk()) {
         set_docinfo_pdftk(docinfo, input, output)
+    } else if (supports_exiftool()) {
+        set_docinfo_exiftool(docinfo, input, output)
     } else {
         msg <- c(need_to_install_str("set_docinfo()"),
                  install_gs_str(),

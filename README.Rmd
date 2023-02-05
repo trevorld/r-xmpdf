@@ -146,8 +146,8 @@ Get XMP metadata | **Yes** | **No** | **No**
 Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata is set then as a side effect it seems the documentation info metadata will also be set as XMP metadata
 Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
 Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but only action supported is to view a particular page
-Get PDF documentation info | **Yes** | **Yes** | **No**
-Set PDF documentation info | **Yes** | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Get PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **No**
+Set PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
 Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:

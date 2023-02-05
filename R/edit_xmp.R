@@ -92,5 +92,5 @@ set_xmp <- function(xmp, input, output = input) {
 #' @export
 set_xmp_exiftool <- function(xmp, input, output = input) {
     xmp <- as_xmp(xmp)
-    set_exiftool_metadata(xmp$exiftool_tags(), input, output)
+    set_exiftool_metadata(xmp$exiftool_tags(), input, output, mode = "xmp")
 }

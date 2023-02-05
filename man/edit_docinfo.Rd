@@ -51,16 +51,16 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \details{
 \code{get_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
-\item \code{get_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{get_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
+\item \code{get_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{get_docinfo_pdftools()} which wraps \code{\link[pdftools:pdftools]{pdftools::pdf_info()}}
 }
 
 \code{set_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{set_docinfo_gs()} which wraps \code{ghostscript} command-line tool
-\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{set_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
+\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 }
 }
 \section{Known limitations}{

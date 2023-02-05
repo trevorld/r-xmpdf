@@ -24,9 +24,9 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
 }
 
-as_exif_value <- function(x) {
+as_exif_value <- function(x, mode = "xmp") {
     if (inherits(x, c("datetimeoffset", "POSIXt"))) {
-        datetimeoffset::format_exiftool(datetimeoffset::as_datetimeoffset(x))
+        datetimeoffset::format_exiftool(datetimeoffset::as_datetimeoffset(x), mode = mode)
     } else if (is.logical(x)) {
         n <- length(x)
         ifelse(x, rep_len("True", n), rep_len("False", n))
@@ -39,12 +39,12 @@ as_exif_value <- function(x) {
 
 #' @param tags Named list of metadata tags to set
 #' @noRd
-set_exiftool_metadata <- function(tags, input, output = input) {
+set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     stopifnot(supports_exiftool())
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)
     if (input == output) {
-        target <- tempfile(fileext = tools::file_ext(input))
+        target <- tempfile(fileext = paste0(".", tools::file_ext(input)))
         on.exit(unlink(target))
     } else {
         target <- output
@@ -53,7 +53,7 @@ set_exiftool_metadata <- function(tags, input, output = input) {
     values <- character(0)
     ops <- character(0)
     for (name in names(tags)) {
-        value <- as_exif_value(tags[[name]])
+        value <- as_exif_value(tags[[name]], mode = mode)
         #### lang-alt?
         values <- append(values, value)
         if (length(value) > 1) {
