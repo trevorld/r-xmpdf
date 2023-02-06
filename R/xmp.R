@@ -35,10 +35,15 @@
 #' @param date_created The date the intellectual content was created (XMP tag `photoshop:DateCreated`).
 #'               Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'               Core IPTC photo metadata.
+#'               Not to be confused with `xmp:CreateDate` for when the digital document was created.
 #' @param description The document's subject (XMP tag `dc:description`).
 #'                Will be coerced by [as_lang_alt()].
 #'                Core IPTC photo metadata.
 #'                Related pdf documentation info key is `Subject`.
+#' @param ext_description An extended description (for accessibility)
+#'                if the "alt text" is insufficient (XMP tag `Iptc4xmpCore:ExtDescrAccessibility`).
+#'                Will be coerced by [as_lang_alt()].
+#'                Core IPTC photo metadata.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
 #'                Recommended by Creative Commons.
 #'                Note `xmpRights:WebStatement` set in `web_statement` is a more popular XMP tag (e.g. used by Google Images)
@@ -115,6 +120,7 @@
 #'    \item{`credit`}{Credit line.}
 #'    \item{`date_created`}{The date the document's intellectual content was created}
 #'    \item{`description`}{The document's description (subject).}
+#'    \item{`ext_description`}{An extended description for accessibility.}
 #'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
 #'    \item{`license`}{URL of (open-source) license terms the document is licensed under.}
 #'    \item{`marked`}{Boolean of whether this is a rights-managed document.}
@@ -172,6 +178,7 @@ xmp <- function(...,
                 credit = NULL,
                 date_created = NULL,
                 description = NULL,
+                ext_description = NULL,
                 keywords = NULL,
                 license = NULL,
                 marked = NULL,
@@ -191,7 +198,7 @@ xmp <- function(...,
             keywords = keywords, producer = producer, # pdf
             attribution_name = attribution_name, attribution_url = attribution_url, #cc
             license = license, more_permissions = more_permissions,
-            alt_text = alt_text, # Iptc4xmpCore
+            alt_text = alt_text, ext_description = ext_description, # Iptc4xmpCore
             credit = credit, date_created = date_created, # photoshop
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date, # xmp
             marked = marked, usage_terms = usage_terms, web_statement = web_statement, # xmpRights
@@ -264,6 +271,10 @@ Xmp <- R6Class("xmp",
                 self$creator
             } else if (lkey %in% c("description", "dc:description")) {
                 self$description
+            } else if (lkey %in% c("ext_description", "extdescraccessibility",
+                                   "iptccore:extdescraccessibility",
+                                   "iptc4xmpcore:extdescraccessibility")) {
+                self$ext_description
             } else if (lkey %in% c("rights", "dc:rights")) {
                 self$rights
             } else if (lkey %in% c("title", "dc:title")) {
@@ -300,9 +311,7 @@ Xmp <- R6Class("xmp",
         },
         set_item = function(key, value) {
             lkey <- tolower(key)
-            if (lkey %in% c("alt_text", "alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
-                self$alt_text <- value
-            } else if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
+            if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
                 self$attribution_name <- value
             } else if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
                 self$attribution_url <- value
@@ -318,6 +327,12 @@ Xmp <- R6Class("xmp",
                 self$rights <- value
             } else if (lkey %in% c("title", "dc:title")) {
                 self$title <- value
+            } else if (lkey %in% c("alt_text", "alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
+                self$alt_text <- value
+            } else if (lkey %in% c("ext_description", "extdescraccessibility",
+                                   "iptccore:extdescraccessibility",
+                                   "iptc4xmpcore:extdescraccessibility")) {
+                self$ext_description <- value
             } else if (lkey %in% c("producer", "pdf:producer")) {
                 self$producer <- value
             } else if (lkey %in% c("keywords", "pdf:keywords")) {
@@ -372,6 +387,8 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-photoshop:DateCreated"]] <- self$date_created
             if (!is.null(self$description))
                 tags[["XMP-dc:description"]] <- self$description
+            if (!is.null(self$ext_description))
+                tags[["XMP-iptcCore:ExtDescrAccessibility"]] <- self$ext_description
             if (!is.null(self$keywords))
                 tags[["XMP-pdf:Keywords"]] <- self$keywords
             if (!is.null(self$license))
@@ -417,6 +434,8 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "photoshop:DateCreated")
             if (!is.null(private$tags$description))
                 keys <- append(keys, "dc:description")
+            if (!is.null(private$tags$ext_description))
+                keys <- append(keys, "Iptc4xmpCore:ExtDescrAccessibility")
             if (!is.null(private$tags$keywords))
                 keys <- append(keys, "pdf:Keywords")
             if (!is.null(private$tags$license))
@@ -471,6 +490,7 @@ Xmp <- R6Class("xmp",
         },
         date_created = function(value) private$active_helper("date_created", value, as_datetime_value),
         description = function(value) private$active_helper("description", value, as_la_value),
+        ext_description = function(value) private$active_helper("ext_description", value, as_la_value),
         keywords = function(value) {
             if (missing(value))
                 private$tags$keywords
@@ -631,7 +651,7 @@ x_format <- function(value) {
 KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "cc:license", "cc:morePermissions",
                     "dc:creator", "dc:description", "dc:rights", "dc:title",
-                    "Iptc4xmpCore:AltTextAccessibility",
+                    "Iptc4xmpCore:AltTextAccessibility", "Iptc4xmpCore:ExtDescrAccessibility",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit", "photoshop:DateCreated",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate",
