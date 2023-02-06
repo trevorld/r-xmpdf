@@ -38,6 +38,7 @@ test_that("get_xmp() / set_xmp()", {
                  "An updated contributor")
     expect_equal(x$get_item("Iptc4xmpCore:Location"),
                  "A sublocation (legacy)")
+    expect_equal(x$subject, c("R", "xmpdf"))
 
     xc <- x$clone()
     x$update(xc)
@@ -47,6 +48,7 @@ test_that("get_xmp() / set_xmp()", {
     expect_equal(x2$alt_text[["x-default"]], "An alternative image text")
     expect_equal(x2$ext_description[["x-default"]],
                  "An extended description (for accessibility)")
+    expect_equal(x2$subject, c("R", "xmpdf"))
     expect_equal(x2$title[["x-default"]], "An XMP title")
     expect_equal(x2$get_item("dc:contributor"),
                  "An updated contributor")

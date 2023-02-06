@@ -17,11 +17,13 @@
     Code
       print(x)
     Output
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
-              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+              photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
+              xmpRights:WebStatement
       => cc:attributionName = John Doe
          dc:creator := John Doe
          dc:description := Generic Subject
+      => dc:subject = Key, Word
          dc:title := Generic Title
          pdf:Keywords := Key, Word
          pdf:Producer := Generic Producer

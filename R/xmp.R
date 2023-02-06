@@ -71,6 +71,12 @@
 #'                Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 #'                If `dc:rights` in `auto_xmp` and `creator` and `date_created` are not `NULL` then
 #'                we can automatically generate a basic copyright statement with the help of `spdx_id`.
+#' @param subject List of description phrases, keywords, classification codes (XMP tag `dc:subject`).
+#'                Core IPTC photo metadata.
+#'                A character vector.
+#'                Similar but less popular to the XMP tag `pdf:Keywords` which is a string.
+#'                If `dc:subject` in `auto_xmp` and `keywords` is not NULL then we can
+#'                automatically extract the keywords from it using `strsplit(keywords, ", ")[[1]]`.
 #' @param title The document's title (XMP tag `dc:title`).
 #'              Will be coerced by [as_lang_alt()].
 #'              Related pdf documentation info key is `Title`.
@@ -119,15 +125,16 @@
 #'    \item{`creator_tool`}{The name of the application that originally created the document.}
 #'    \item{`credit`}{Credit line.}
 #'    \item{`date_created`}{The date the document's intellectual content was created}
-#'    \item{`description`}{The document's description (subject).}
+#'    \item{`description`}{The document's description.}
 #'    \item{`ext_description`}{An extended description for accessibility.}
-#'    \item{`keywords`}{Character vector of keywords for this document (for cross-document searching).}
+#'    \item{`keywords`}{String of keywords for this document (less popular than `subject`)).}
 #'    \item{`license`}{URL of (open-source) license terms the document is licensed under.}
 #'    \item{`marked`}{Boolean of whether this is a rights-managed document.}
 #'    \item{`modify_date`}{The date the document was last modified.}
 #'    \item{`more_permissions`}{URL for acquiring additional permissions beyond `license`.}
 #'    \item{`producer`}{The name of the application that converted the document (to pdf).}
 #'    \item{`rights`}{The document's copy(right) information.}
+#'    \item{`subject`}{Vector of key phrases/words/codes for this document (more popular than `keywords`)).}
 #'    \item{`title`}{The document's title.}
 #'    \item{`usage_terms`}{The document's rights usage terms.}
 #'    \item{`web_statement`}{A URL string for the web statement of rights for the document.}
@@ -186,15 +193,18 @@ xmp <- function(...,
                 more_permissions = NULL,
                 producer = NULL,
                 rights = NULL,
+                subject = NULL,
                 title = NULL,
                 usage_terms = NULL,
                 web_statement = NULL,
                 auto_xmp = c("cc:attributionName", "cc:license",
-                             "dc:rights", "photoshop:Credit",
+                             "dc:rights", "dc:subject",
+                             "photoshop:Credit",
                              "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
                 spdx_id = NULL) {
     Xmp$new(...,
-            creator = creator,  description = description, rights = rights, title = title, # dc
+            creator = creator,  description = description, rights = rights,
+            subject = subject, title = title, # dc
             keywords = keywords, producer = producer, # pdf
             attribution_name = attribution_name, attribution_url = attribution_url, #cc
             license = license, more_permissions = more_permissions,
@@ -258,10 +268,7 @@ Xmp <- R6Class("xmp",
         },
         get_item = function(key) {
             lkey <- tolower(key)
-            if (lkey %in% c("alt_text", "alttextaccessibility",
-                            "iptccore:alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
-                self$alt_text
-            } else if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
+            if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
                 self$attribution_name
             } else if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
                 self$attribution_url
@@ -271,14 +278,19 @@ Xmp <- R6Class("xmp",
                 self$creator
             } else if (lkey %in% c("description", "dc:description")) {
                 self$description
-            } else if (lkey %in% c("ext_description", "extdescraccessibility",
-                                   "iptccore:extdescraccessibility",
-                                   "iptc4xmpcore:extdescraccessibility")) {
-                self$ext_description
+            } else if (lkey %in% c("subject", "dc:subject")) {
+                self$subject
             } else if (lkey %in% c("rights", "dc:rights")) {
                 self$rights
             } else if (lkey %in% c("title", "dc:title")) {
                 self$title
+            } else if (lkey %in% c("alt_text", "alttextaccessibility",
+                            "iptccore:alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
+                self$alt_text
+            } else if (lkey %in% c("ext_description", "extdescraccessibility",
+                                   "iptccore:extdescraccessibility",
+                                   "iptc4xmpcore:extdescraccessibility")) {
+                self$ext_description
             } else if (lkey %in% c("producer", "pdf:producer")) {
                 self$producer
             } else if (lkey %in% c("keywords", "pdf:keywords")) {
@@ -325,6 +337,8 @@ Xmp <- R6Class("xmp",
                 self$description <- value
             } else if (lkey %in% c("rights", "dc:rights")) {
                 self$rights <- value
+            } else if (lkey %in% c("subject", "dc:subject")) {
+                self$subject <- value
             } else if (lkey %in% c("title", "dc:title")) {
                 self$title <- value
             } else if (lkey %in% c("alt_text", "alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
@@ -403,6 +417,8 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-pdf:Producer"]] <- self$producer
             if (!is.null(self$rights))
                 tags[["XMP-dc:rights"]] <- self$rights
+            if (!is.null(self$subject))
+                tags[["XMP-dc:subject"]] <- self$subject
             if (!is.null(self$title))
                 tags[["XMP-dc:title"]] <- self$title
             if (!is.null(self$usage_terms))
@@ -450,6 +466,8 @@ Xmp <- R6Class("xmp",
                 keys <- append(keys, "pdf:Producer")
             if (!is.null(private$tags$rights))
                 keys <- append(keys, "dc:rights")
+            if (!is.null(private$tags$subject))
+                keys <- append(keys, "dc:subject")
             if (!is.null(private$tags$title))
                 keys <- append(keys, "dc:title")
             if (!is.null(private$tags$usage_terms))
@@ -537,6 +555,19 @@ Xmp <- R6Class("xmp",
             }
 
         },
+        subject = function(value) {
+            if (missing(value)) {
+                value <- private$tags$subject
+                if (is.null(value) && "dc:subject" %in% self$auto_xmp) {
+                    if (!is.null(private$tags$keywords))
+                        value <- strsplit(private$tags$keywords, ", ")[[1]]
+                }
+                value
+            } else {
+                private$tags$subject <- as_character_value(value)
+            }
+
+        },
         title = function(value) private$active_helper("title", value, as_la_value),
         usage_terms = function(value) {
             if (missing(value)) {
@@ -581,6 +612,8 @@ Xmp <- R6Class("xmp",
                 is.null(private$tags$marked)
             } else if (lkey %in% c("rights", "dc:rights")) {
                 is.null(private$tags$rights)
+            } else if (lkey %in% c("subject", "dc:subject")) {
+                is.null(private$tags$subject)
             } else if (lkey %in% c("usage_terms", "usageterms", "xmprights:usageterms")) {
                 is.null(private$tags$usage_terms)
             } else if (lkey %in% c("web_statement", "webstatement", "xmprights:webstatement")) {
@@ -650,7 +683,7 @@ x_format <- function(value) {
 
 KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "cc:license", "cc:morePermissions",
-                    "dc:creator", "dc:description", "dc:rights", "dc:title",
+                    "dc:creator", "dc:description", "dc:rights", "dc:subject", "dc:title",
                     "Iptc4xmpCore:AltTextAccessibility", "Iptc4xmpCore:ExtDescrAccessibility",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit", "photoshop:DateCreated",

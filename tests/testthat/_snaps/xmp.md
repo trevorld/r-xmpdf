@@ -11,8 +11,9 @@
       print(x)
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
-              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+              photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
+              xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
          Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility)
          Iptc4xmpCore:Location := A sublocation (legacy)
@@ -24,6 +25,7 @@
          dc:creator := A creator
          dc:description := A description
       => dc:rights = © 2020 A creator. Some rights reserved.
+      => dc:subject = R, xmpdf
          dc:title := An XMP title
          pdf:Keywords := R, xmpdf
          pdf:Producer := R
@@ -44,8 +46,9 @@
       print(x, mode = "creative_commons")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
-              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+              photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
+              xmpRights:WebStatement
       => cc:attributionName = A creator
          cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
@@ -63,8 +66,9 @@
       print(x, mode = "google_images")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
-              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+              photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
+              xmpRights:WebStatement
          dc:creator := A creator
       => dc:rights = © 2020 A creator. Some rights reserved.
       => photoshop:Credit = A creator
@@ -77,8 +81,9 @@
       print(x, mode = "all")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
-              xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+              photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
+              xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
          Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility)
          Iptc4xmpCore:Location := A sublocation (legacy)
@@ -90,6 +95,7 @@
          dc:creator := A creator
          dc:description := A description
       => dc:rights = © 2020 A creator. Some rights reserved.
+      => dc:subject = R, xmpdf
          dc:title := An XMP title
          pdf:Keywords := R, xmpdf
          pdf:Producer := R
@@ -120,6 +126,7 @@
          dc:creator := A creator
          dc:description := A description
          dc:rights := © 2020 A creator. Some rights reserved.
+         dc:subject := R, xmpdf
          dc:title := An XMP title
          pdf:Keywords := R, xmpdf
          pdf:Producer := R

@@ -6,6 +6,7 @@
 \usage{
 xmp(
   ...,
+  alt_text = NULL,
   attribution_name = NULL,
   attribution_url = NULL,
   create_date = NULL,
@@ -14,6 +15,7 @@ xmp(
   credit = NULL,
   date_created = NULL,
   description = NULL,
+  ext_description = NULL,
   keywords = NULL,
   license = NULL,
   marked = NULL,
@@ -21,16 +23,22 @@ xmp(
   more_permissions = NULL,
   producer = NULL,
   rights = NULL,
+  subject = NULL,
   title = NULL,
   usage_terms = NULL,
   web_statement = NULL,
-  auto_xmp = c("cc:attributionName", "cc:license", "dc:rights", "photoshop:Credit",
-    "xmpRights:Marked", "xmpRights:UsageTerms", "xmpRights:WebStatement"),
+  auto_xmp = c("cc:attributionName", "cc:license", "dc:rights", "dc:subject",
+    "photoshop:Credit", "xmpRights:Marked", "xmpRights:UsageTerms",
+    "xmpRights:WebStatement"),
   spdx_id = NULL
 )
 }
 \arguments{
 \item{...}{Entries of xmp metadata.  The names are either the xmp tag names or alternatively the xmp namespace and tag names separated by ":".  The values are the xmp values.}
+
+\item{alt_text}{Brief textual description that can be used as its "alt text" (XMP tag \code{Iptc4xmpCore:AltTextAccessibility}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
+Core IPTC photo metadata.}
 
 \item{attribution_name}{The name to be used when attributing the work (XMP tag \code{cc:attributionName}).
 Recommended by Creative Commons.
@@ -63,12 +71,18 @@ then will automatically use \code{paste(creator, collapse = " and ")}.}
 
 \item{date_created}{The date the intellectual content was created (XMP tag \code{photoshop:DateCreated}).
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
-Core IPTC photo metadata.}
+Core IPTC photo metadata.
+Not to be confused with \code{xmp:CreateDate} for when the digital document was created.}
 
 \item{description}{The document's subject (XMP tag \code{dc:description}).
 Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
 Core IPTC photo metadata.
 Related pdf documentation info key is \code{Subject}.}
+
+\item{ext_description}{An extended description (for accessibility)
+if the "alt text" is insufficient (XMP tag \code{Iptc4xmpCore:ExtDescrAccessibility}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
+Core IPTC photo metadata.}
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
 Related pdf documentation info key is \code{pdf:Keywords}.
@@ -103,6 +117,13 @@ Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
 Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 If \code{dc:rights} in \code{auto_xmp} and \code{creator} and \code{date_created} are not \code{NULL} then
 we can automatically generate a basic copyright statement with the help of \code{spdx_id}.}
+
+\item{subject}{List of description phrases, keywords, classification codes (XMP tag \code{dc:subject}).
+Core IPTC photo metadata.
+A character vector.
+Similar but less popular to the XMP tag \code{pdf:Keywords} which is a string.
+If \code{dc:subject} in \code{auto_xmp} and \code{keywords} is not NULL then we can
+automatically extract the keywords from it using \code{strsplit(keywords, ", ")[[1]]}.}
 
 \item{title}{The document's title (XMP tag \code{dc:title}).
 Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
@@ -156,6 +177,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 
 \section{\code{xmp} R6 Active Bindings}{
 \describe{
+\item{\code{alt_text}}{The image's alt text (accessibility).}
 \item{\code{attribution_name}}{The name to attribute the document.}
 \item{\code{attribution_url}}{The URL to attribute the document.}
 \item{\code{creator}}{The document's author.}
@@ -163,14 +185,16 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{creator_tool}}{The name of the application that originally created the document.}
 \item{\code{credit}}{Credit line.}
 \item{\code{date_created}}{The date the document's intellectual content was created}
-\item{\code{description}}{The document's description (subject).}
-\item{\code{keywords}}{Character vector of keywords for this document (for cross-document searching).}
+\item{\code{description}}{The document's description.}
+\item{\code{ext_description}}{An extended description for accessibility.}
+\item{\code{keywords}}{String of keywords for this document (less popular than \code{subject})).}
 \item{\code{license}}{URL of (open-source) license terms the document is licensed under.}
 \item{\code{marked}}{Boolean of whether this is a rights-managed document.}
 \item{\code{modify_date}}{The date the document was last modified.}
 \item{\code{more_permissions}}{URL for acquiring additional permissions beyond \code{license}.}
 \item{\code{producer}}{The name of the application that converted the document (to pdf).}
 \item{\code{rights}}{The document's copy(right) information.}
+\item{\code{subject}}{Vector of key phrases/words/codes for this document (more popular than \code{keywords})).}
 \item{\code{title}}{The document's title.}
 \item{\code{usage_terms}}{The document's rights usage terms.}
 \item{\code{web_statement}}{A URL string for the web statement of rights for the document.}
