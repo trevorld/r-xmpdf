@@ -59,13 +59,10 @@ test_that("set_docinfo_gs", {
     on.exit(unlink(f3))
 
     di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
-    print("Before")
-    print(get_pdftk_metadata(f1))
     set_docinfo_gs(di_set, f1, f3)
-    print("After")
-    print(get_pdftk_metadata(f3))
 
     skip_if_not(supports_get_docinfo())
+
     di_get <- get_docinfo(f3)[[1]]
     expect_equal(di_get$title, "Two Boring Pages")
     expect_equal(di_get$author, "John Doe")

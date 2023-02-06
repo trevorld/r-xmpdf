@@ -20,7 +20,7 @@ BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyData: true
 LazyLoad: yes
 Imports:
-    datetimeoffset (>= 0.2.0-2),
+    datetimeoffset (>= 0.2.0-4),
     grDevices,
     jsonlite,
     purrr,
