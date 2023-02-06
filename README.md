@@ -33,7 +33,7 @@ remotes::install_github("trevorld/r-xmpdf")
 
 Depending on what you'd like to do you'll need to install some additional R packages and/or command-line tools:
 
-* **[{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)** can be used to concatenate pdf files together as well as get the number of pages in a pdf.
+* **[{qpdf}](https://cran.r-project.org/package=qpdf)** can be used to concatenate pdf files together as well as get the number of pages in a pdf.
   Note currently a dependency of [{pdftools}](https://docs.ropensci.org/pdftools/).
 
   + `install.packages("qpdf")`
@@ -343,12 +343,12 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 #### poppler
 
 * [{pdftools}](https://docs.ropensci.org/pdftools/)
-* [{Rpoppler}](https://cran.r-project.org/web/packages/Rpoppler/index.html)
+* [{Rpoppler}](https://cran.r-project.org/package=Rpoppler)
 * [poppler](https://poppler.freedesktop.org/)
 
 #### qpdf
 
-* [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html)
+* [{qpdf}](https://cran.r-project.org/package=qpdf)
 * [qpdf](https://qpdf.sourceforge.io/)
 
 #### pdftk

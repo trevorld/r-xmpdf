@@ -1,7 +1,7 @@
 Encoding: UTF-8
 Package: xmpdf
 Type: Package
-Title: Edit XMP metadata and PDF bookmarks and documentation info
+Title: Edit XMP Metadata and PDF Bookmarks and Documentation Info
 Version: 0.1.0-22
 Description: Edit 'xmp' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
     in a variety of media file formats as well as 

@@ -9,6 +9,8 @@ grid.newpage()
 grid.text("Page 2")
 invisible(dev.off())
 
+print(get_docinfo(f1)[[1]])
+
 test_that("get_docinfo", {
     skip_if_not(supports_get_docinfo())
     expect_equal(get_docinfo(f1)[[1]]$title, "R Graphics Output")
