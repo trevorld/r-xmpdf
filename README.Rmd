@@ -154,10 +154,11 @@ Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
+* `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
+* `set_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
-* Datetimes are often converted to UTC time (any original "UTF offsets" may not be preserved).
 * As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.
