@@ -70,6 +70,10 @@ get_xmp_exiftool_helper <- function(filename) {
     md <- get_exiftool_metadata(filename, tags="-XMP:all")
     md <- md[grep("^XMP-", names(md))]
     names(md) <- gsub("^XMP-", "", names(md))
+    names(md) <- gsub("^iptc", "Iptc4xmp", names(md))
+    names(md) <- ifelse(grepl("^dc:", names(md)),
+                        tolower(names(md)),
+                        names(md))
     if (any(grepl("-", names(md)))) {
         md <- extract_lang_alt(md)
     }

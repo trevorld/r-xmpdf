@@ -6,6 +6,9 @@
 #' Such objects can be used with [set_xmp()] to edit XMP medata for a variety of media formats
 #' and such objects are returned by [get_xmp()].
 #'
+#' @param alt_text Brief textual description that can be used as its "alt text" (XMP tag `Iptc4xmpCore:AltTextAccessibility`).
+#'                Will be coerced by [as_lang_alt()].
+#'                Core IPTC photo metadata.
 #' @param attribution_name The name to be used when attributing the work (XMP tag `cc:attributionName`).
 #'                Recommended by Creative Commons.
 #'               If missing and `"cc:attributionName"` in `auto_xmp` and
@@ -103,6 +106,7 @@
 #'                        using non-`NULL` entries in `x` coerced by [as_xmp()].}
 #' }
 #' @section `xmp` R6 Active Bindings:\describe{
+#'    \item{`alt_text`}{The image's alt text (accessibility).}
 #'    \item{`attribution_name`}{The name to attribute the document.}
 #'    \item{`attribution_url`}{The URL to attribute the document.}
 #'    \item{`creator`}{The document's author.}
@@ -159,6 +163,7 @@
 #' @name xmp
 #' @export
 xmp <- function(...,
+                alt_text = NULL,
                 attribution_name = NULL,
                 attribution_url = NULL,
                 create_date = NULL,
@@ -186,6 +191,7 @@ xmp <- function(...,
             keywords = keywords, producer = producer, # pdf
             attribution_name = attribution_name, attribution_url = attribution_url, #cc
             license = license, more_permissions = more_permissions,
+            alt_text = alt_text, # Iptc4xmpCore
             credit = credit, date_created = date_created, # photoshop
             create_date = create_date, creator_tool = creator_tool, modify_date = modify_date, # xmp
             marked = marked, usage_terms = usage_terms, web_statement = web_statement, # xmpRights
@@ -219,7 +225,7 @@ Xmp <- R6Class("xmp",
                                                 "xmpRights:Marked",
                                                 "xmpRights:UsageTerms",
                                                 "xmpRights:WebStatement"),
-                           KNOWN_XMP_TAGS)
+                           sort(c(KNOWN_XMP_TAGS, names(private$tags$other))))
             for (key in tags) {
                 value <- self$get_item(key)
                 if (is.null(value) && mode == "null_omit") next
@@ -245,7 +251,10 @@ Xmp <- R6Class("xmp",
         },
         get_item = function(key) {
             lkey <- tolower(key)
-            if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
+            if (lkey %in% c("alt_text", "alttextaccessibility",
+                            "iptccore:alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
+                self$alt_text
+            } else if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
                 self$attribution_name
             } else if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
                 self$attribution_url
@@ -291,7 +300,9 @@ Xmp <- R6Class("xmp",
         },
         set_item = function(key, value) {
             lkey <- tolower(key)
-            if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
+            if (lkey %in% c("alt_text", "alttextaccessibility", "iptc4xmpcore:alttextaccessibility")) {
+                self$alt_text <- value
+            } else if (lkey %in% c("attribution_name", "attributionname", "cc:attributionname")) {
                 self$attribution_name <- value
             } else if (lkey %in% c("attribution_url", "attributionurl", "cc:attributionurl")) {
                 self$attribution_url <- value
@@ -343,6 +354,8 @@ Xmp <- R6Class("xmp",
         },
         exiftool_tags = function() {
             tags <- list()
+            if (!is.null(self$alt_text))
+                tags[["XMP-iptcCore:AltTextAccessibility"]] <- self$alt_text
             if (!is.null(self$attribution_name))
                 tags[["XMP-cc:attributionName"]] <- self$attribution_name
             if (!is.null(self$attribution_url))
@@ -380,14 +393,16 @@ Xmp <- R6Class("xmp",
             if (!is.null(self$web_statement))
                 tags[["XMP-xmpRights:WebStatement"]] <- self$web_statement
             for (key in names(private$tags$other)) {
-                key <- gsub("Iptc4xmp", "iptc", key)
-                ekey <- paste0("XMP-", key)
+                ekey <- gsub("Iptc4xmp", "iptc", key)
+                ekey <- paste0("XMP-", ekey)
                 tags[[ekey]] <- private$tags$other[[key]] #### more formatting needed?
             }
             tags
         },
         get_nonnull_keys = function() {
             keys <- character(0)
+            if (!is.null(private$tags$alt_text))
+                keys <- append(keys, "Iptc4xmpCore:AltTextAccessibility")
             if (!is.null(private$tags$attribution_name))
                 keys <- append(keys, "cc:attributionName")
             if (!is.null(private$tags$attribution_url))
@@ -429,6 +444,7 @@ Xmp <- R6Class("xmp",
         }
     ),
     active = list(
+        alt_text = function(value) private$active_helper("alt_text", value, as_la_value),
         attribution_name = function(value) {
             if (missing(value)) {
                 value <- private$tags$attribution_name
@@ -615,6 +631,7 @@ x_format <- function(value) {
 KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",
                     "cc:license", "cc:morePermissions",
                     "dc:creator", "dc:description", "dc:rights", "dc:title",
+                    "Iptc4xmpCore:AltTextAccessibility",
                     "pdf:Keywords", "pdf:Producer",
                     "photoshop:Credit", "photoshop:DateCreated",
                     "xmp:CreateDate", "xmp:CreatorTool", "xmp:ModifyDate",

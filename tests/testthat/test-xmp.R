@@ -10,7 +10,8 @@ test_that("get_xmp() / set_xmp()", {
     invisible(dev.off())
 
     expect_snapshot(print(xmp()))
-    x <- xmp(attribution_url = "https://example.com/attribution",
+    x <- xmp(alt_text = "An alternative image text",
+             attribution_url = "https://example.com/attribution",
              creator = "A creator", #### Vector
              create_date = "2020-10-10", # Digital document creation date
              creator_tool = "A creator tool",
@@ -22,20 +23,32 @@ test_that("get_xmp() / set_xmp()", {
              description = "A description",
              title = "An XMP title", #### alt-lang
              spdx_id = "CC-BY-4.0",
-             `dc:Contributor` = "A contributor"
+             `Iptc4xmpCore:Location` = "A sublocation (legacy)",
+             `dc:contributor` = "A contributor"
     )
-    expect_true(x$marked)
-    x <- update(x, `dc:Contributor` = "An updated contributor")
+    x <- update(x, `dc:contributor` = "An updated contributor")
     expect_snapshot(print(x))
     expect_snapshot(print(x, mode = "creative_commons"))
     expect_snapshot(print(x, mode = "google_images"))
     expect_snapshot(print(x, mode = "all"))
+
+    expect_true(x$marked)
+    expect_equal(x$get_item("dc:contributor"),
+                 "An updated contributor")
+    expect_equal(x$get_item("Iptc4xmpCore:Location"),
+                 "A sublocation (legacy)")
+
     xc <- x$clone()
     x$update(xc)
     set_xmp(x, f)
     x2 <- get_xmp(f)[[1]]
     expect_snapshot(print(x2))
-    expect_equal(x$title[["x-default"]], "An XMP title")
+    expect_equal(x2$alt_text[["x-default"]], "An alternative image text")
+    expect_equal(x2$title[["x-default"]], "An XMP title")
+    expect_equal(x2$get_item("dc:contributor"),
+                 "An updated contributor")
+    expect_equal(x2$get_item("Iptc4xmpCore:Location"),
+                 "A sublocation (legacy)")
 
     x <- xmp(creator = c("Creator 1", "Creator 2"))
     set_xmp(x, f)

@@ -13,10 +13,13 @@
       i  spdx_id (not XMP tag) := CC-BY-4.0
       i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
               xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+         Iptc4xmpCore:AltTextAccessibility := An alternative image text
+         Iptc4xmpCore:Location := A sublocation (legacy)
       => cc:attributionName = A creator
          cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
          cc:morePermissions := https://example.com/more-permissions
+         dc:contributor := An updated contributor
          dc:creator := A creator
          dc:description := A description
       => dc:rights = © 2020 A creator. Some rights reserved.
@@ -75,10 +78,13 @@
       i  spdx_id (not XMP tag) := CC-BY-4.0
       i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, photoshop:Credit,
               xmpRights:Marked, xmpRights:UsageTerms, xmpRights:WebStatement
+         Iptc4xmpCore:AltTextAccessibility := An alternative image text
+         Iptc4xmpCore:Location := A sublocation (legacy)
       => cc:attributionName = A creator
          cc:attributionURL := https://example.com/attribution
       => cc:license = https://creativecommons.org/licenses/by/4.0/
          cc:morePermissions := https://example.com/more-permissions
+         dc:contributor := An updated contributor
          dc:creator := A creator
          dc:description := A description
       => dc:rights = © 2020 A creator. Some rights reserved.
@@ -101,10 +107,13 @@
     Code
       print(x2)
     Output
+         Iptc4xmpCore:AltTextAccessibility := An alternative image text
+         Iptc4xmpCore:Location := A sublocation (legacy)
          cc:attributionName := A creator
          cc:attributionURL := https://example.com/attribution
          cc:license := https://creativecommons.org/licenses/by/4.0/
          cc:morePermissions := https://example.com/more-permissions
+         dc:contributor := An updated contributor
          dc:creator := A creator
          dc:description := A description
          dc:rights := © 2020 A creator. Some rights reserved.
@@ -113,6 +122,7 @@
          pdf:Producer := R
          photoshop:Credit := A creator
          photoshop:DateCreated := 2020
+         x:XMPToolkit := Image::ExifTool 12.40
          xmp:CreateDate := 2020-10-10
          xmp:CreatorTool := A creator tool
          xmp:ModifyDate := 2023-01-27T13:37:27.909812682-08:00
