@@ -70,8 +70,27 @@ get_xmp_exiftool_helper <- function(filename) {
     md <- get_exiftool_metadata(filename, tags="-XMP:all")
     md <- md[grep("^XMP-", names(md))]
     names(md) <- gsub("^XMP-", "", names(md))
+    if (any(grepl("-", names(md)))) {
+        md <- extract_lang_alt(md)
+    }
     x <- as_xmp(md)
     x$auto_xmp <- NULL
+    x
+}
+
+#### lang_alt
+extract_lang_alt <- function(x) {
+    tags <- unique(gsub("^([[:alnum:]:]+)-(.*)$", "\\1",
+                        grep("-", names(x), value = TRUE)))
+    for (tag in tags) {
+        names(x) <- ifelse(names(x) == tag, paste0(tag, "-x-default"), names(x))
+        i <- grep(paste0("^", tag), names(x))
+        x_tag <- x[i]
+        names(x_tag) <- substr(names(x_tag), nchar(tag) + 2L, nchar(names(x_tag)))
+        x_la <- list(as_lang_alt(x_tag))
+        names(x_la) <- tag
+        x <- c(x[-i], x_la)
+    }
     x
 }
 

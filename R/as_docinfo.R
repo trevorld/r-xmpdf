@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Coerce to docinfo objects
 #'
 #' `as_docinfo()` coerces objects into a [docinfo()] object.
@@ -32,9 +34,9 @@ as_docinfo.default <- function(x, ...) {
 #' @export
 as_docinfo.xmp <- function(x, ...) {
     d <- docinfo()
-    d$title <- x$title
+    d$title <- x$title[["x-default"]]
     d$author <- paste(x$creator, collapse = " and ")
-    d$subject <- x$description
+    d$subject <- x$description[["x-default"]]
     d$producer <- x$producer
     d$keywords <- x$keywords
     d$creation_date <- x$create_date

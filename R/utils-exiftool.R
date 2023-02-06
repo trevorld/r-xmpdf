@@ -37,6 +37,14 @@ as_exif_value <- function(x, mode = "xmp") {
     }
 }
 
+as_exif_name <- function(x, name) {
+    if (inherits(x, "lang_alt")) {
+        paste0(name, "-", names(x))
+    } else {
+        rep_len(name, length(x))
+    }
+}
+
 #' @param tags Named list of metadata tags to set
 #' @noRd
 set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
@@ -54,16 +62,12 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     ops <- character(0)
     for (name in names(tags)) {
         value <- as_exif_value(tags[[name]], mode = mode)
-        #### lang-alt?
+        nm <- as_exif_name(tags[[name]], name)
+        n <- length(value)
+
         values <- append(values, value)
-        if (length(value) > 1) {
-            n <- length(value)
-            nms <- append(nms, rep_len(name, n))
-            ops <- c(ops, rep_len("=", n))
-        } else {
-            nms <- append(nms, name)
-            ops <- append(ops, "=")
-        }
+        nms <- append(nms, nm)
+        ops <- c(ops, rep_len("=", n))
     }
     args <- paste0("-", nms, ops, values)
     if (requireNamespace("exiftoolr", quietly = TRUE)) {

@@ -37,6 +37,9 @@ Initial features
   3. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
 
 * `xmp()` provides an `{R6}` object to represent xmp metadata.
+
+  + `as_lang_alt()` supports "language alternative" XMP tags.
+
 * `as_xmp()` can coerce objects into `xmp()` objects.
   In particular there is an `as_xmp.docinfo()` method to coerce `docinfo()` objects.
 * `get_xmp()` reads in xmp metadata from media file(s).

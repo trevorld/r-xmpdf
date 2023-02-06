@@ -9,6 +9,7 @@ reference:
       - set_xmp
       - xmp
       - as_xmp
+      - as_lang_alt
   - title: "Get/set PDF bookmarks"
     desc: "Functions for getting/setting PDF bookmarks (aka table of contents)"
     contents:
@@ -36,3 +37,7 @@ reference:
     desc: "SPDX license list dataset"
     contents:
       - spdx_licenses
+  - title: "Overall package description"
+    desc: "Overall package description including supported package options"
+    contents:
+      - xmpdf-package

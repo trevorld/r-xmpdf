@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' SPDX License List data
 #'
 #' `spdx_licenses` is a data frame of SPDX License List data.

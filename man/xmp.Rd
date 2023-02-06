@@ -66,6 +66,8 @@ Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset:
 Core IPTC photo metadata.}
 
 \item{description}{The document's subject (XMP tag \code{dc:description}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
+Core IPTC photo metadata.
 Related pdf documentation info key is \code{Subject}.}
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
@@ -97,14 +99,17 @@ Contrast with the \code{LicensorURL} property of \code{plus:Licensor} XMP tag.}
 Related pdf documentation info key is \code{Producer}.}
 
 \item{rights}{(copy)right information about the document (XMP tag \code{dc:rights}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
 Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 If \code{dc:rights} in \code{auto_xmp} and \code{creator} and \code{date_created} are not \code{NULL} then
 we can automatically generate a basic copyright statement with the help of \code{spdx_id}.}
 
 \item{title}{The document's title (XMP tag \code{dc:title}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
 Related pdf documentation info key is \code{Title}.}
 
 \item{usage_terms}{A string describing legal terms of use for the document (XMP tag \code{xmpRights:UsageTerms}).
+Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
 Core IPTC photo metadata and recommended by Creative Commons.
 If \code{xmpRights:UsageTerms} in \code{auto_xmp} and \code{spdx_id} is not \code{NULL} then
 we can automatically set this with that license's name and URL.}

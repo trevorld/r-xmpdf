@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #' Coerce to xmp objects
 #'
 #' `as_xmp()` coerces objects into an [xmp()] object.

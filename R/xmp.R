@@ -33,6 +33,8 @@
 #'               Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'               Core IPTC photo metadata.
 #' @param description The document's subject (XMP tag `dc:description`).
+#'                Will be coerced by [as_lang_alt()].
+#'                Core IPTC photo metadata.
 #'                Related pdf documentation info key is `Subject`.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
 #'                Recommended by Creative Commons.
@@ -57,12 +59,15 @@
 #' @param producer The name of the application that converted the document to pdf (XMP tag `pdf:Producer`).
 #'                Related pdf documentation info key is `Producer`.
 #' @param rights (copy)right information about the document (XMP tag `dc:rights`).
+#'                Will be coerced by [as_lang_alt()].
 #'                Core IPTC photo metadata used by Google Photos that Creative Commons also recommends setting.
 #'                If `dc:rights` in `auto_xmp` and `creator` and `date_created` are not `NULL` then
 #'                we can automatically generate a basic copyright statement with the help of `spdx_id`.
 #' @param title The document's title (XMP tag `dc:title`).
-#'                Related pdf documentation info key is `Title`.
+#'              Will be coerced by [as_lang_alt()].
+#'              Related pdf documentation info key is `Title`.
 #' @param usage_terms A string describing legal terms of use for the document (XMP tag `xmpRights:UsageTerms`).
+#'                    Will be coerced by [as_lang_alt()].
 #'                    Core IPTC photo metadata and recommended by Creative Commons.
 #'                    If `xmpRights:UsageTerms` in `auto_xmp` and `spdx_id` is not `NULL` then
 #'                    we can automatically set this with that license's name and URL.
@@ -449,7 +454,7 @@ Xmp <- R6Class("xmp",
             }
         },
         date_created = function(value) private$active_helper("date_created", value, as_datetime_value),
-        description = function(value) private$active_helper("description", value),
+        description = function(value) private$active_helper("description", value, as_la_value),
         keywords = function(value) {
             if (missing(value))
                 private$tags$keywords
@@ -492,11 +497,11 @@ Xmp <- R6Class("xmp",
                     value <- private$auto_rights()
                 value
             } else {
-                private$tags$rights <- as_character_value(value)
+                private$tags$rights <- as_la_value(value)
             }
 
         },
-        title = function(value) private$active_helper("title", value),
+        title = function(value) private$active_helper("title", value, as_la_value),
         usage_terms = function(value) {
             if (missing(value)) {
                 value <- private$tags$usage_terms
@@ -504,7 +509,7 @@ Xmp <- R6Class("xmp",
                     value <- private$auto_usage_terms()
                 value
             } else {
-                private$tags$usage_terms <- as_character_value(value)
+                private$tags$usage_terms <- as_la_value(value)
             }
         },
         web_statement = function(value) {
@@ -620,6 +625,13 @@ update.xmp <- function(object, ...) {
     x <- object$clone()
     x$update(as_xmp(list(...)))
     x
+}
+
+as_la_value <- function(value) {
+    if (is.null(value))
+        NULL
+    else
+        as_lang_alt(value)
 }
 
 as_logical_value <- function(value) {
