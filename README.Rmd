@@ -12,7 +12,8 @@
 * [Examples](#examples)
 
   + [Add XMP/docinfo metadata and bookmarks to a pdf](#pdfcreate)
-  + [Add Google Images and Creative Commons license XMP metadata to an image](#pnglicense)
+  + [Add Google Images and Creative Commons license XMP metadata to a png image](#pnglicense)
+  + [Concatenate pdf files and embed concatenated bookmarks](#pdfcat)
 
 * [Limitations by backend](#comparison)
 * [External links](#links)
@@ -88,6 +89,7 @@ get_bookmarks(f)[[1]] |> print()
 # Edit PDF documentation info
 d <- get_docinfo(f)[[1]] |>
        update(author = "John Doe",
+              subject = "A minimal document to demonstrate {xmpdf} features on",
               title = "Two Boring Pages",
               keywords = c("R", "xmpdf"))
 set_docinfo(d, f)
@@ -105,11 +107,12 @@ get_xmp(f)[[1]] |> print()
 bm <- data.frame(title = c("Page 1", "Page 2"), page = c(1, 2))
 set_bookmarks(bm, f)
 get_bookmarks(f)[[1]] |> print()
-
+```
+```{r echo=FALSE}
 unlink(f)
 ```
 
-### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to an image</a>
+### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to a png image</a>
 
 Besides pdf files with `exiftool` we can also edit the XMP metadata for [a large number of image formats](https://exiftool.org/#supported)
 including "gif", "png", "jpeg", "tiff", and "webp".  In particular we may be interested in setting the subset of [IPTC Photo XMP metadata displayed by Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) as well as embedding [Creative Commons license XMP metadata](https://wiki.creativecommons.org/wiki/XMP).
@@ -133,10 +136,47 @@ print(x, mode = "creative_commons", xmp_only = TRUE)
 
 set_xmp(x, f)
 get_xmp(f)[[1]] |> print()
-
+```
+```{r echo=FALSE}
 unlink(f)
 ```
 
+### <a name="pdfcat">Concatenate pdf files and embed concatenated bookmarks</a>
+
+```{r pdfcat}
+# Create two multi-page pdfs and add bookmarks to them
+f_a <- tempfile(fileext = ".pdf")
+pdf(f_a, title = "Document A", onefile = TRUE)
+grid::grid.text("Document A: First Page")
+grid::grid.newpage()
+grid::grid.text("Document A: Second Page")
+dev.off() |> invisible()
+
+f_b <- tempfile(fileext = ".pdf")
+pdf(f_b, title = "Document B", onefile = TRUE)
+grid::grid.text("Document B: First Page")
+grid::grid.newpage()
+grid::grid.text("Document B: Second Page")
+dev.off() |> invisible()
+
+bm <- data.frame(title = c("First Page", "Second Page"), page = c(1, 2))
+set_bookmarks(bm, f_a)
+set_bookmarks(bm, f_b)
+
+# Concatenate pdfs to a single pdf and add their concatenated bookmarks to it
+files <- c(f_a, f_b)
+f_cat <- tempfile(fileext = ".pdf")
+cat_pages(files, f_cat)
+
+cat_bookmarks(get_bookmarks(files), method = "title") |>
+    set_bookmarks(f_cat)
+
+print(get_bookmarks(f_cat)[[1]])
+```
+```{r echo=FALSE}
+unlink(f_a)
+unlink(f_b)
+```
 
 ## <a name="comparison">Limitations by backend</a>
 

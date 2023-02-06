@@ -12,7 +12,8 @@
 * [Examples](#examples)
 
   + [Add XMP/docinfo metadata and bookmarks to a pdf](#pdfcreate)
-  + [Add Google Images and Creative Commons license XMP metadata to an image](#pnglicense)
+  + [Add Google Images and Creative Commons license XMP metadata to a png image](#pnglicense)
+  + [Concatenate pdf files and embed concatenated bookmarks](#pdfcat)
 
 * [Limitations by backend](#comparison)
 * [External links](#links)
@@ -88,13 +89,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2023-02-03T14:26:40
+## CreationDate: 2023-02-06T14:20:58
 ## Creator: R
 ## Producer: R 4.2.2
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2023-02-03T14:26:40
+## ModDate: 2023-02-06T14:20:58
 ```
 
 ```r
@@ -118,6 +119,7 @@ get_bookmarks(f)[[1]] |> print()
 # Edit PDF documentation info
 d <- get_docinfo(f)[[1]] |>
        update(author = "John Doe",
+              subject = "A minimal document to demonstrate {xmpdf} features on",
               title = "Two Boring Pages",
               keywords = c("R", "xmpdf"))
 set_docinfo(d, f)
@@ -126,13 +128,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2023-02-03T14:26:40
+## CreationDate: 2023-02-06T14:20:58
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
-## Subject: NULL
+## Subject: A minimal document to demonstrate {xmpdf} features on
 ## Keywords: R, xmpdf
-## ModDate: 2023-02-03T14:26:40
+## ModDate: 2023-02-06T14:20:58
 ```
 
 ```r
@@ -150,15 +152,20 @@ get_xmp(f)[[1]] |> print()
 ##    cc:attributionURL := https://example.com/attribution
 ##    cc:license := https://creativecommons.org/licenses/by/4.0/
 ##    dc:creator := John Doe
+##    dc:description := A minimal document to demonstrate {xmpdf} features on
+##    dc:format := application/pdf
 ##    dc:rights := © 2023 John Doe. Some rights reserved.
+##    dc:subject := R, xmpdf
 ##    dc:title := Two Boring Pages
 ##    pdf:Keywords := R, xmpdf
 ##    pdf:Producer := R 4.2.2
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-03
-##    xmp:CreateDate := 2023-02-03T14:26:40
+##    photoshop:DateCreated := 2023-02-06
+##    x:XMPToolkit := Image::ExifTool 12.40
+##    xmp:CreateDate := 2023-02-06T14:20:58
 ##    xmp:CreatorTool := R
-##    xmp:ModifyDate := 2023-02-03T14:26:40
+##    xmp:ModifyDate := 2023-02-06T14:20:58
+##    xmpMM:DocumentID := uuid:159e5fe4-de89-11f8-0000-2567e21c8552
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
 ##         Attribution 4.0 International license
@@ -179,11 +186,8 @@ get_bookmarks(f)[[1]] |> print()
 ## 2 Page 2    2     1    NA   NA  <NA>     <NA>
 ```
 
-```r
-unlink(f)
-```
 
-### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to an image</a>
+### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to a png image</a>
 
 Besides pdf files with `exiftool` we can also edit the XMP metadata for [a large number of image formats](https://exiftool.org/#supported)
 including "gif", "png", "jpeg", "tiff", and "webp".  In particular we may be interested in setting the subset of [IPTC Photo XMP metadata displayed by Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) as well as embedding [Creative Commons license XMP metadata](https://wiki.creativecommons.org/wiki/XMP).
@@ -250,7 +254,8 @@ get_xmp(f)[[1]] |> print()
 ##    dc:description := An image caption
 ##    dc:rights := © 2023 John Doe. Some rights reserved.
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-03
+##    photoshop:DateCreated := 2023-02-06
+##    x:XMPToolkit := Image::ExifTool 12.40
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
 ##         Attribution 4.0 International license
@@ -258,8 +263,49 @@ get_xmp(f)[[1]] |> print()
 ##    xmpRights:WebStatement := https://creativecommons.org/licenses/by/4.0/
 ```
 
+
+### <a name="pdfcat">Concatenate pdf files and embed concatenated bookmarks</a>
+
+
 ```r
-unlink(f)
+# Create two multi-page pdfs and add bookmarks to them
+f_a <- tempfile(fileext = ".pdf")
+pdf(f_a, title = "Document A", onefile = TRUE)
+grid::grid.text("Document A: First Page")
+grid::grid.newpage()
+grid::grid.text("Document A: Second Page")
+dev.off() |> invisible()
+
+f_b <- tempfile(fileext = ".pdf")
+pdf(f_b, title = "Document B", onefile = TRUE)
+grid::grid.text("Document B: First Page")
+grid::grid.newpage()
+grid::grid.text("Document B: Second Page")
+dev.off() |> invisible()
+
+bm <- data.frame(title = c("First Page", "Second Page"), page = c(1, 2))
+set_bookmarks(bm, f_a)
+set_bookmarks(bm, f_b)
+
+# Concatenate pdfs to a single pdf and add their concatenated bookmarks to it
+files <- c(f_a, f_b)
+f_cat <- tempfile(fileext = ".pdf")
+cat_pages(files, f_cat)
+
+cat_bookmarks(get_bookmarks(files), method = "title") |>
+    set_bookmarks(f_cat)
+
+print(get_bookmarks(f_cat)[[1]])
+```
+
+```
+##         title page level count open color fontface
+## 1  Document A    1     1    NA   NA  <NA>     <NA>
+## 2  First Page    1     2    NA   NA  <NA>     <NA>
+## 3 Second Page    2     2    NA   NA  <NA>     <NA>
+## 4  Document B    3     1    NA   NA  <NA>     <NA>
+## 5  First Page    3     2    NA   NA  <NA>     <NA>
+## 6 Second Page    4     2    NA   NA  <NA>     <NA>
 ```
 
 
