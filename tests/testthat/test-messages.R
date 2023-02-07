@@ -24,6 +24,7 @@ test_that("messages", {
             fn <- function() assert_suggested("foobar")
             fn()
         }, class = "xmpdf_suggested_package")
+
     },
     xmpdf_disable_pdftk = TRUE,
     xmpdf_disable_gs = TRUE,
@@ -31,4 +32,15 @@ test_that("messages", {
     xmpdf_disable_qpdf = TRUE,
     xmpdf_disable_pdftools = TRUE
     )
+})
+
+test_that("enable_feature_message()", {
+        expect_snapshot(rlang::inform(enable_feature_message("cat_pages")))
+        expect_snapshot(rlang::inform(enable_feature_message("get_bookmarks")))
+        expect_snapshot(rlang::inform(enable_feature_message("get_docinfo")))
+        expect_snapshot(rlang::inform(enable_feature_message("get_xmp")))
+        expect_snapshot(rlang::inform(enable_feature_message("n_pages")))
+        expect_snapshot(rlang::inform(enable_feature_message("set_bookmarks")))
+        expect_snapshot(rlang::inform(enable_feature_message("set_docinfo")))
+        expect_snapshot(rlang::inform(enable_feature_message("set_xmp")))
 })

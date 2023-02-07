@@ -33,6 +33,7 @@ reference:
     desc: "Functions for detecting various feature support"
     contents:
       - supports_gs
+      - enable_feature_message
   - title: "SPDX License data"
     desc: "SPDX license list dataset"
     contents:

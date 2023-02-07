@@ -78,12 +78,7 @@ get_docinfo <- function(filename, use_names = TRUE) {
     } else if (supports_pdftools()) {
         get_docinfo_pdftools(filename, use_names = use_names)
     } else {
-        msg <- c(need_to_install_str("get_docinfo()"),
-                 install_exiftool_str(),
-                 install_pdftk_str(),
-                 install_package_str("pdftools")
-        )
-        abort(msg, class = "xmpdf_suggested_package")
+        abort(msg_get_docinfo(), class = "xmpdf_suggested_package")
     }
 }
 
@@ -193,12 +188,7 @@ set_docinfo <- function(docinfo, input, output = input) {
     } else if (supports_exiftool()) {
         set_docinfo_exiftool(docinfo, input, output)
     } else {
-        msg <- c(need_to_install_str("set_docinfo()"),
-                 install_gs_str(),
-                 install_exiftool_str(),
-                 install_pdftk_str()
-        )
-        abort(msg, class = "xmpdf_suggested_package")
+        abort(msg_set_docinfo(), class = "xmpdf_suggested_package")
     }
 }
 

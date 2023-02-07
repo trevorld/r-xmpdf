@@ -39,13 +39,7 @@ n_pages <- function(filename, use_names = TRUE) {
     } else if (supports_gs()) {
         n_pages_gs(filename, use_names = use_names)
     } else {
-        msg <- c(need_to_install_str("n_pages()"),
-                 install_package_str("qpdf"),
-                 install_exiftool_str(),
-                 install_pdftk_str(),
-                 install_gs_str()
-        )
-        abort(msg, class = "xmpdf_suggested_package")
+        abort(msg_n_pages(), class = "xmpdf_suggested_package")
     }
 }
 

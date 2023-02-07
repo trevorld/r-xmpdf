@@ -29,7 +29,7 @@ Initial features
   2. `get_docinfo_exiftool()` which wraps `exiftool` command-line tool
   3. `get_docinfo_pdftools()` which wraps `pdftools::pdf_info()`
 
-* `set_docinfo()` sets pdf documentation info entries to a pdf file (#3).
+* `set_docinfo()` sets pdf documentation info entries to a pdf file.
   `set_docinfo()` will try to use the following helper functions in the following order:
 
   1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
@@ -83,5 +83,9 @@ Initial features
   * `supports_exiftool()` detects support for `exiftool`
   * `supports_gs()` detects support for `ghostscript`
   * `supports_pdftk()` detects support for `pdftk`
+
+* `enable_feature_message()` returns a character vector with the
+  information needed to install the requested feature.
+  Formatted for use with `rlang::abort()`, `rlang::warn()`, or `rlang::inform()`.
 
 * The `spdx_licenses` data set contains the [SPDX License List](https://spdx.org/licenses/).

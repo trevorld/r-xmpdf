@@ -57,12 +57,7 @@ cat_pages <- function(input, output) {
     } else if (supports_gs()) {
         cat_pages_gs(input, output)
     } else {
-        msg <- c(need_to_install_str("cat_pages()"),
-                 install_package_str("qpdf"),
-                 install_pdftk_str(),
-                 install_gs_str()
-        )
-        abort(msg, class = "xmpdf_suggested_package")
+        abort(msg_cat_pages(), class = "xmpdf_suggested_package")
     }
 }
 
