@@ -17,6 +17,7 @@ test_that("get_xmp() / set_xmp()", {
              creator_tool = "A creator tool",
              date_created = "2020",
              ext_description = "An extended description (for accessibility)",
+             headline = "A headline",
              keywords = "R, xmpdf",
              modify_date = "2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]",
              more_permissions = "https://example.com/more-permissions",

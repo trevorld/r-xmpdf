@@ -16,6 +16,7 @@ xmp(
   date_created = NULL,
   description = NULL,
   ext_description = NULL,
+  headline = NULL,
   keywords = NULL,
   license = NULL,
   marked = NULL,
@@ -82,6 +83,9 @@ Related pdf documentation info key is \code{Subject}.}
 \item{ext_description}{An extended description (for accessibility)
 if the "alt text" is insufficient (XMP tag \code{Iptc4xmpCore:ExtDescrAccessibility}).
 Will be coerced by \code{\link[=as_lang_alt]{as_lang_alt()}}.
+Core IPTC photo metadata.}
+
+\item{headline}{A short synopsis of the document (XMP tag \code{photoshop:Headline}).
 Core IPTC photo metadata.}
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
@@ -187,6 +191,7 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{date_created}}{The date the document's intellectual content was created}
 \item{\code{description}}{The document's description.}
 \item{\code{ext_description}}{An extended description for accessibility.}
+\item{\code{headline}}{A short synopsis of document.}
 \item{\code{keywords}}{String of keywords for this document (less popular than \code{subject})).}
 \item{\code{license}}{URL of (open-source) license terms the document is licensed under.}
 \item{\code{marked}}{Boolean of whether this is a rights-managed document.}
