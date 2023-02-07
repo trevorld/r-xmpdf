@@ -630,8 +630,8 @@ Xmp <- R6Class("xmp",
         },
         auto_credit = function() {
             value <- private$tags$credit
-            if (is.null(value) && !is.null(private$tags$creator))
-                value <- paste(private$tags$creator, collapse = " and ")
+            if (is.null(value) && !is.null(private$tags[["creator"]]))
+                value <- paste(private$tags[["creator"]], collapse = " and ")
             value
         },
         auto_rights = function() {
