@@ -89,13 +89,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2023-02-06T14:20:58
+## CreationDate: 2023-02-08T14:42:02
 ## Creator: R
 ## Producer: R 4.2.2
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2023-02-06T14:20:58
+## ModDate: 2023-02-08T14:42:02
 ```
 
 ```r
@@ -128,13 +128,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2023-02-06T14:20:58
+## CreationDate: 2023-02-08T14:42:02
 ## Creator: R
 ## Producer: GPL Ghostscript 9.55.0
 ## Title: Two Boring Pages
 ## Subject: A minimal document to demonstrate {xmpdf} features on
 ## Keywords: R, xmpdf
-## ModDate: 2023-02-06T14:20:58
+## ModDate: 2023-02-08T14:42:02
 ```
 
 ```r
@@ -160,12 +160,12 @@ get_xmp(f)[[1]] |> print()
 ##    pdf:Keywords := R, xmpdf
 ##    pdf:Producer := R 4.2.2
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-06
+##    photoshop:DateCreated := 2023-02-08
 ##    x:XMPToolkit := Image::ExifTool 12.40
-##    xmp:CreateDate := 2023-02-06T14:20:58
+##    xmp:CreateDate := 2023-02-08T14:42:02
 ##    xmp:CreatorTool := R
-##    xmp:ModifyDate := 2023-02-06T14:20:58
-##    xmpMM:DocumentID := uuid:159e5fe4-de89-11f8-0000-2567e21c8552
+##    xmp:ModifyDate := 2023-02-08T14:42:02
+##    xmpMM:DocumentID := uuid:5b406831-e01e-11f8-0000-2567e21c8552
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
 ##         Attribution 4.0 International license
@@ -254,7 +254,7 @@ get_xmp(f)[[1]] |> print()
 ##    dc:description := An image caption
 ##    dc:rights := © 2023 John Doe. Some rights reserved.
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-06
+##    photoshop:DateCreated := 2023-02-08
 ##    x:XMPToolkit := Image::ExifTool 12.40
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
@@ -317,8 +317,8 @@ Get XMP metadata | **Yes** | **No** | **No**
 Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata is set then as a side effect it seems the documentation info metadata will also be set as XMP metadata
 Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
 Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but only action supported is to view a particular page
-Get PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **No**
-Set PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Get PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Good**: may not handle entries with newlines in them | **No**
+Set PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Good**: may not handle entries with newlines in them | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
 Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:
@@ -326,9 +326,12 @@ Known limitations:
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
 * `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
+* `get_docinfo_pdftk()` may not handle entries with newlines in them.
+* `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * `set_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
+* `set_docinfo_pdftk()` may not handle entries with newlines in them.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
