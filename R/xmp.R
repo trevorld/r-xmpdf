@@ -103,6 +103,11 @@
 #'          [as_xmp()] for coercing to this object.
 #'    [as_docinfo()] can be used to coerce `xmp()` objects into [docinfo()] objects.
 #' @section `xmp` R6 Class Methods:\describe{
+#'     \item{`fig_process(..., auto = c("fig.alt", "fig.cap", "fig.scap"))`}{
+#'           Returns a function to embed XMP metadata suitable for use with
+#'           `{knitr}`'s `fig.process` chunk option.
+#'           `...` are local XMP metadata changes for this function.
+#'           `auto` are which chunk options should be used to further update metadata values.}
 #'     \item{`get_item(key)`}{Get XMP metadata value for key `key`.
 #'           Can also use the relevant active bindings to get more common values.}
 #'     \item{`print(mode = c("null_omit", "google_images", "creative_commons", "all"), xmp_only = FALSE)`}{
@@ -268,6 +273,19 @@ Xmp <- R6Class("xmp",
                 invisible(cat(text, sep="\n"))
             } else {
                 invisible(cat("No XMP metadata found\n"))
+            }
+        },
+        fig_process = function(..., auto = c("fig.alt", "fig.cap", "fig.scap")) {
+            x <- update(self, ...)
+            function(path, options) {
+                if ("fig.alt" %in% auto && !is.null(options[["fig.alt"]]))
+                    x$alt_text <- options[["fig.alt"]]
+                if ("fig.cap" %in% auto && !is.null(options[["fig.cap"]]))
+                    x$description <- options[["fig.cap"]]
+                if ("fig.scap" %in% auto && !is.null(options[["fig.scap"]]))
+                    x$headline <- options[["fig.scap"]]
+                xmpdf::set_xmp(x, path)
+                invisible(path)
             }
         },
         get_item = function(key) {

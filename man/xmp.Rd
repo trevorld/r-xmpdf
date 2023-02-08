@@ -162,6 +162,11 @@ and such objects are returned by \code{\link[=get_xmp]{get_xmp()}}.
 }
 \section{\code{xmp} R6 Class Methods}{
 \describe{
+\item{\code{fig_process(..., auto = c("fig.alt", "fig.cap", "fig.scap"))}}{
+Returns a function to embed XMP metadata suitable for use with
+\code{{knitr}}'s \code{fig.process} chunk option.
+\code{...} are local XMP metadata changes for this function.
+\code{auto} are which chunk options should be used to further update metadata values.}
 \item{\code{get_item(key)}}{Get XMP metadata value for key \code{key}.
 Can also use the relevant active bindings to get more common values.}
 \item{\code{print(mode = c("null_omit", "google_images", "creative_commons", "all"), xmp_only = FALSE)}}{
