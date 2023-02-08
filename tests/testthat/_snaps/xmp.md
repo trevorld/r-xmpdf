@@ -22,7 +22,7 @@
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
-         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility)
+         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility) With newline
          Iptc4xmpCore:Location := A sublocation (legacy)
       => cc:attributionName = A creator
          cc:attributionURL := https://example.com/attribution
@@ -93,7 +93,7 @@
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
-         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility)
+         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility) With newline
          Iptc4xmpCore:Location := A sublocation (legacy)
       => cc:attributionName = A creator
          cc:attributionURL := https://example.com/attribution
@@ -125,7 +125,7 @@
       print(x2)
     Output
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
-         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility)
+         Iptc4xmpCore:ExtDescrAccessibility := An extended description (for accessibility) With newline
          Iptc4xmpCore:Location := A sublocation (legacy)
          cc:attributionName := A creator
          cc:attributionURL := https://example.com/attribution

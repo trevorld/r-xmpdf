@@ -20,7 +20,7 @@ test_that("get_xmp() / set_xmp()", {
              create_date = "2020-10-10", # Digital document creation date
              creator_tool = "A creator tool",
              date_created = "2020",
-             ext_description = "An extended description (for accessibility)",
+             ext_description = "An extended description (for accessibility)\nWith newline",
              headline = "A headline",
              keywords = "R, xmpdf",
              modify_date = "2023-01-27T13:37:27.909812682-08:00[America/Los_Angeles]",
@@ -52,7 +52,7 @@ test_that("get_xmp() / set_xmp()", {
     expect_snapshot(print(x2))
     expect_equal(x2$alt_text[["x-default"]], "An alternative image text")
     expect_equal(x2$ext_description[["x-default"]],
-                 "An extended description (for accessibility)")
+                 "An extended description (for accessibility)\nWith newline")
     expect_equal(x2$subject, c("R", "xmpdf"))
     expect_equal(x2$title[["x-default"]], "An XMP title")
     expect_equal(x2$get_item("dc:contributor"),
