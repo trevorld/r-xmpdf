@@ -8,6 +8,13 @@
 ---
 
     Code
+      print(get_xmp(f)[[1]])
+    Output
+      No XMP metadata found
+
+---
+
+    Code
       print(x)
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0

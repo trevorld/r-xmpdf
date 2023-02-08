@@ -69,7 +69,10 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
         nms <- append(nms, nm)
         ops <- c(ops, rep_len("=", n))
     }
-    args <- paste0("-", nms, ops, values)
+    if (length(tags))
+        args <- paste0("-", nms, ops, values)
+    else
+        args <- character(0)
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
         args <- c(args, "-n", "-o", target, input)
         results <- exiftoolr::exif_call(args, quiet = TRUE)

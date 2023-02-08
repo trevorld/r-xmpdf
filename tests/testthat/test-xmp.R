@@ -10,6 +10,10 @@ test_that("get_xmp() / set_xmp()", {
     invisible(dev.off())
 
     expect_snapshot(print(xmp()))
+
+    set_xmp(xmp(), f)
+    expect_snapshot(print(get_xmp(f)[[1]]))
+
     x <- xmp(alt_text = "An alternative image text",
              attribution_url = "https://example.com/attribution",
              creator = "A creator", #### Vector
