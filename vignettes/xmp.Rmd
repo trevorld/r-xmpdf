@@ -1,0 +1,222 @@
+---
+title: "XMP FAQ"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{XMP FAQ}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+### Table of Contents
+
+* [How do I adjust the automatic guessing of missing XMP tags?](#auto)
+* [Which XMP tags have an active binding?](#active)
+* [How do I get or set XMP tags without an active binding?](#nonactive)
+* [What XMP tags are used to display informaton on Google Images?](#google)
+* [Which tags should I use for Creative Commons license information?](#cc)
+* [How do I embed XMP metadata in multiple languages?](#language)
+* [How do I enter in a "structured" tag?](#structure)
+* [Is there an easy way to embed XMP metadata when using {knitr}?](#knitr)
+* [What are some helpful XMP external links?](#links)
+
+## <a name="auto">How do I adjust the automatic guessing of missing XMP tags?</a>
+
+The `auto_xmp` active binding for `xmp()` objects is a character vector of XMP tags that if missing
+`{xmpdf}` will try to automatically guess based on values of other XMP tags and the `spdx_id` active binding ([SPDX License List Identifer](https://spdx.org/licenses/)).
+When printing `xmp()` objects one can observe which XMP tags are guessed because they'll have a `=>` on their left.
+
+```{r}
+library("xmpdf")
+x <- xmp(creator = "John Doe", date_created = "2023-02-10", spdx_id = "CC-BY-4.0")
+print(x)
+```
+
+If you remove an XMP tag from `auto_xmp` then `{xmpdf}` will no longer try to guess it:
+
+```{r}
+library("xmpdf")
+x <- xmp(creator = "John Doe", date_created = "2023-02-10", spdx_id = "CC-BY-4.0")
+x$auto_xmp <- base::setdiff(x$auto_xmp,
+                            c("dc:rights", "photoshop:Credit"))
+print(x)
+```
+
+Alternatively you could explicitly set a missing XMP tag (which then would no longer need to be guessed):
+
+```{r}
+library("xmpdf")
+x <- xmp(creator = "John Doe", date_created = "2023-02-10")
+x$rights <- "© 2023 A Corporation. Some rights reserved."
+print(x)
+```
+
+## <a name="active">Which XMP tags have an active binding?</a>
+
+XMP tags with an active binding in `xmp()` objects will automatically be coerced into the right data type and are a little easier to get/set than XMP tags without an active binding.  Here is a list of current active bindings provided by `xmp()` objects:
+
+| Active Binding | XMP tag |
+|---|---|
+| `alt_text` | `Iptc4xmpCore:AltTextAccessibility` |
+| `attribution_name` | `cc:attributionName` |
+| `attribution_url` | `cc:attributionURL` |
+| `create_date` | `xmp:CreateDate` |
+| `creator` | `dc:creator` |
+| `creator_tool` | `xmp:CreatorTool` |
+| `credit` | `photoshop:Credit` |
+| `date_created` | `photoshop:DateCreated` |
+| `description` | `dc:description` |
+| `ext_description` | `Iptc4xmpCore:ExtDescrAccessibility` |
+| `headline` | `photoshop:Headline` |
+| `keywords` | `pdf:Keywords` |
+| `license` | `cc:license` |
+| `marked` | `xmpRights:Marked` |
+| `modify_date` | `xmp:ModifyDate` |
+| `more_permissions` | `cc:morePermissions` |
+| `producer` | `pdf:Producer` |
+| `rights` | `dc:rights` |
+| `subject` | `dc:subject` |
+| `title` | `dc:title` |
+| `usage_terms` | `xmpRights:UsageTerms` |
+| `web_statement` | `xmpRights:WebStatement` |
+
+## <a name="nonactive">How do I get or set XMP tags without an active binding?</a>
+
+If you want to set an XMP tag without an active binding you must use the `xmp()` objects `set_item()` method.  To get an XMP without an active binding you must use the `xmp()` objects `get_item()` method.  You may also use `get_item()` and `set_item()` for XMP tags with an active binding as well.
+
+```{r}
+library("xmpdf")
+x <- xmp()
+x$set_item("dc:contributor", c("John Doe", "Jane Doe"))
+x$get_item("dc:contributor")
+```
+
+Depending on the value type of the XMP tag you may need to manually coerce it to a special R class:
+
+| XMP value type | R function to coerce |
+|---|---|
+| date | `datetimeoffset::as_datetimeoffset()` |
+| lang-alt | `xmpdf::as_lang_alt()` |
+
+```{r}
+library("datetimeoffset")
+library("xmpdf")
+transcript <- c(en = "An English Transcript", 
+                fr = "Une transcription française") |>
+                  as_lang_alt(default_lang = "en")
+last_edited <- "2020-02-04T10:10:10" |>
+                   as_datetimeoffset()
+x <- xmp()
+x$set_item("Iptc4xmpExt:Transcript", transcript)
+x$set_item("Iptc4xmpExt:IPTCLastEdited", last_edited)
+```
+
+## <a name="google">What XMP tags are used to display informaton on Google Images?</a>
+
+Google Images can show more details about an image when [certain metadata is specified](https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata):
+
+1) Structured data on the web page the image appears (takes priority over XMP tags if defined)
+2) XMP tags embedded in the image
+
+   * `dc:creator`
+   * `photoshop:Credit`
+   * `dc:rights`
+   * `xmpRights:WebStatement`
+   * the `Licensor URL` subfield of `plus:Licensor` structured XMP tag
+
+`xmp()` object's `print(mode = "google_images")` will tell what the Google Images XMP tags metadata would be:
+
+```{r}
+library("xmpdf")
+x <- xmp(attribution_url = "https://example.com/attribution",
+         creator = "John Doe",
+         description = "An image caption",
+         date_created = Sys.Date(),
+         spdx_id = "CC-BY-4.0")
+print(x, mode = "google_images", xmp_only = TRUE)
+```
+
+## <a name="cc">Which tags should I use for Creative Commons license information?</a>
+
+[Creative Commons recommends](https://wiki.creativecommons.org/wiki/XMP) you specify the following XMP tags to indicate your license information:
+
+* `dc:rights`
+* `xmpRight:Marked`
+* `xmpRights:WebStatement`
+* `xmpRights:UsageTerms`
+* `cc:license`
+* `cc:morePermissions`
+* `cc:attributionURL`
+* `cc:attributionName`
+
+`xmp()` object's `print(mode = "creative_commons")` will tell what this XMP tags metadata would be:
+
+```{r}
+library("xmpdf")
+x <- xmp(attribution_url = "https://example.com/attribution",
+         creator = "John Doe",
+         description = "An image caption",
+         date_created = Sys.Date(),
+         spdx_id = "CC-BY-4.0")
+print(x, mode = "creative_commons", xmp_only = TRUE)
+```
+
+## <a name="language">How do I embed XMP metadata in multiple languages?</a>
+
+Although some XMP metadata tags must be a string in a single language but some XMP metadata tags support ["language alternative aka "lang-alt"](https://github.com/adobe/xmp-docs/blob/master/XMPNamespaces/XMPDataTypes/CoreProperties.md#language-alternative) values which allow values for multiple languages to be specified:
+
+* `Iptc4xmpCore:AltTextAccessibility`
+* `dc:description`
+* `Iptc4xmpCore:ExtDescrAccessibility`
+* `dc:rights`
+* `dc:title`
+* `xmpRights:UsageTerms`
+* Plus [other XMP tags](https://exiftool.org/TagNames/XMP.html) which will need to be manually coerced by `as_lang_alt()` and set with the `xmp()` object's `set_item()` method
+
+See `?as_lang_alt` for more details but essentially create a character vector or list and name the entries with an RFC 3066 name tag.
+
+```{r}
+library("xmpdf")
+x <- xmp()
+x$description <- "Description in only one default language"
+x$title <- c(en = "An English Title",
+             fr = "Une titre française")
+# XMP tags without an active binding must be manually coerced by `as_lang_alt`
+transcript <- c(en = "An English Transcript",
+                fr = "Une transcription française") |>
+                  as_lang_alt(default_lang = "en")
+x$set_item("Iptc4xmpExt:Transcript", transcript)
+```
+
+## <a name="structure">How do I enter in a "structured" tag?</a>
+
+Currently `{xmpdf}` does not officially support entering in "struct" XMP tags (although it does support "lang-alt" tags and simple lists of basic XMP value types).
+
+Unofficially if you read the `exiftool` [XMP Tags](https://exiftool.org/TagNames/XMP.html) and [Structured Information](https://exiftool.org/struct.html) documentation you may be able to set a "flattened" tag to set or manually construct a serialized struct string for a non-"flattened" tag that you could then set via an `xmp()` objects `set_item()` method and it may work (for now) when using `set_xmp_exiftool()`.
+
+## <a name="knitr">Is there an easy way to embed XMP metadata when using {knitr}?</a>
+
+`{knitr}` supports the [chunk option](https://yihui.org/knitr/options/#plots) `fig.process` which accepts a function to post-process figure files.  The first argument should be a path to the figure file and may optionally accept an `options` argument which will receive a list of chunk options. It should return a (possibly new) path to be inserted in the output.
+
+`xmp()` objects have a `fig_process()` method which return a **function** that can be used for this `fig.process` option to embed XMP metadat into images.  Depending on the strings in its `auto` argument this function will also automatically map the following `{knitr}` chunk options to XMP tags:
+
+* `fig.cap` to `dc:description`
+* `fig.scap` to `photoshop:Headline`
+* `fig.alt` to `Iptc4xmpCore:AltTextAccessibility`
+
+```Rmd
+.. {r setup, echo=FALSE}
+x <- xmpdf::xmp(creator = "John Doe", 
+                date_created = "2023", 
+                spdx_id = "CC-BY-4.0",
+                attribution_url = "https://example.com/attribution")
+knitr::opts_chunk$set(fig.process = x$fig_process())
+.. ..
+```
+
+## <a name="links">What are some helpful XMP external links?</a>
+
+* [IPTC Photo Metadata Standard](https://iptc.org/standards/photo-metadata/iptc-standard/) (IPTC) is a popular XMP metadata standard for photos
+* [Quick guide to IPTC Photo Metadata on Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) (IPTC) describes the subset of the IPTC Photo Metadata Standard used by Google Photos to list photo credits and license information
+* [xmp-docs](https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces) (Adobe) describes some common XMP tags
+* [XMP](https://wiki.creativecommons.org/wiki/XMP) (Creative Commons) describes a standard for using XMP to embed Creative Commons license information
+* [XMP tags](https://exiftool.org/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags

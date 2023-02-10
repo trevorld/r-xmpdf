@@ -6,7 +6,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
 
     # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
     if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-G1", "-a", "-n", "-j", filename)
+        args <- c(tags, "-G1", "-a", "-n", "-struct", "-j", filename)
         output <- exiftoolr::exif_call(args, quiet = TRUE)
     } else {
         cmd <- exiftool()

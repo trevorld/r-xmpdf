@@ -62,7 +62,7 @@ Core IPTC photo metadata used by Google Photos.
 If \code{credit} is missing and \code{"photoshop:Credit"} in \code{auto_xmp} then
 we'll also use this for the \code{photoshop:Credit} XMP tag.}
 
-\item{creator_tool}{The name of the application that originally created the document.
+\item{creator_tool}{The name of the application that originally created the document (XMP tag \code{xmp:CreatorTool}).
 Related pdf documentation info key is \code{Creator}.}
 
 \item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
@@ -109,7 +109,7 @@ we can automatically set this for a subset of SPDX licenses (including all Creat
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Related pdf documentation info key is \code{ModDate}.}
 
-\item{more_permissions}{A URL for additional permissions beyond the \code{license} (XMP tag \code{cc:license}).
+\item{more_permissions}{A URL for additional permissions beyond the \code{license} (XMP tag \code{cc:morePermissions}).
 Recommended by Creative Commons.
 Contrast with the \code{LicensorURL} property of \code{plus:Licensor} XMP tag.}
 
@@ -189,8 +189,8 @@ using non-\code{NULL} entries in \code{x} coerced by \code{\link[=as_xmp]{as_xmp
 \item{\code{alt_text}}{The image's alt text (accessibility).}
 \item{\code{attribution_name}}{The name to attribute the document.}
 \item{\code{attribution_url}}{The URL to attribute the document.}
-\item{\code{creator}}{The document's author.}
 \item{\code{create_date}}{The date the document was created.}
+\item{\code{creator}}{The document's author.}
 \item{\code{creator_tool}}{The name of the application that originally created the document.}
 \item{\code{credit}}{Credit line.}
 \item{\code{date_created}}{The date the document's intellectual content was created}

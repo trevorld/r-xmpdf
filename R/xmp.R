@@ -26,7 +26,7 @@
 #'                Core IPTC photo metadata used by Google Photos.
 #'                If `credit` is missing and `"photoshop:Credit"` in `auto_xmp` then
 #'                we'll also use this for the `photoshop:Credit` XMP tag.
-#' @param creator_tool The name of the application that originally created the document.
+#' @param creator_tool The name of the application that originally created the document (XMP tag `xmp:CreatorTool`).
 #'                Related pdf documentation info key is `Creator`.
 #' @param credit Credit line field (XMP tag `photoshop:Credit`).
 #'               Core IPTC photo metadata used by Google Photos.
@@ -46,6 +46,9 @@
 #'                Core IPTC photo metadata.
 #' @param headline A short synopsis of the document (XMP tag `photoshop:Headline`).
 #'                Core IPTC photo metadata.
+#' @param keywords Character vector of keywords for this document (for cross-document searching).
+#'                 Related pdf documentation info key is `pdf:Keywords`.
+#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
 #'                Recommended by Creative Commons.
 #'                Note `xmpRights:WebStatement` set in `web_statement` is a more popular XMP tag (e.g. used by Google Images)
@@ -60,12 +63,9 @@
 #' @param modify_date The date the document was last modified (XMP tag `xmp:ModifyDate`).
 #'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                 Related pdf documentation info key is `ModDate`.
-#' @param more_permissions A URL for additional permissions beyond the `license` (XMP tag `cc:license`).
+#' @param more_permissions A URL for additional permissions beyond the `license` (XMP tag `cc:morePermissions`).
 #'                 Recommended by Creative Commons.
 #'                 Contrast with the `LicensorURL` property of `plus:Licensor` XMP tag.
-#' @param keywords Character vector of keywords for this document (for cross-document searching).
-#'                 Related pdf documentation info key is `pdf:Keywords`.
-#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
 #' @param producer The name of the application that converted the document to pdf (XMP tag `pdf:Producer`).
 #'                Related pdf documentation info key is `Producer`.
 #' @param rights (copy)right information about the document (XMP tag `dc:rights`).
@@ -127,8 +127,8 @@
 #'    \item{`alt_text`}{The image's alt text (accessibility).}
 #'    \item{`attribution_name`}{The name to attribute the document.}
 #'    \item{`attribution_url`}{The URL to attribute the document.}
-#'    \item{`creator`}{The document's author.}
 #'    \item{`create_date`}{The date the document was created.}
+#'    \item{`creator`}{The document's author.}
 #'    \item{`creator_tool`}{The name of the application that originally created the document.}
 #'    \item{`credit`}{Credit line.}
 #'    \item{`date_created`}{The date the document's intellectual content was created}
