@@ -19,7 +19,7 @@ jobs:
       matrix:
         config:
 #         - {os: macOS-latest,   r: 'release'}
-#         - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
@@ -39,12 +39,20 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install ghostscript/pdftk
-        if: always()
+      - name: Install ghostscript/pdftk on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
         run: |
             sudo apt-get install -y ghostscript
             sudo apt-get install -y libimage-exiftool-perl
             sudo apt-get install -y pdftk
+        shell: bash
+
+      - name: Install ghostscript/pdftk on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+            choco install -y ghostscript
+            choco install -y exiftool
+            choco install -y pdftk
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
