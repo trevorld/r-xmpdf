@@ -51,7 +51,8 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     stopifnot(supports_exiftool())
     input <- normalizePath(input, mustWork = TRUE)
     output <- normalizePath(output, mustWork = FALSE)
-    if (input == output) {
+    output_exists <- file.exists(output)
+    if (output_exists) {
         target <- tempfile(fileext = paste0(".", tools::file_ext(input)))
         on.exit(unlink(target))
     } else {
@@ -96,7 +97,7 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
         }
         results <- xmpdf_system2(cmd, args)
     }
-    if (input == output)
+    if (output_exists)
         file.copy(target, output, overwrite = TRUE)
     invisible(output)
 }

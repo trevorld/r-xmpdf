@@ -318,18 +318,18 @@ Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata
 Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
 Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but only action supported is to view a particular page
 Get PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **No**
-Set PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Good**: may not handle entries with newlines in them | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Set PDF documentation info | **Good**: An hour-only UTC offset in dates will be "widened" to minute precision | **Good**: may not handle entries with newlines in them | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
 Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
-* `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
+* `get_docinfo_exiftool()` an hour-only UTC offset will be "widened" to minute precision.
 * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
-* `set_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
+* `set_docinfo_exiftool()` will "widen" an hour-only UTC offset to minute precision.
 * `set_docinfo_pdftk()` may not handle entries with newlines in them.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata

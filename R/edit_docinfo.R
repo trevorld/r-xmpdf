@@ -37,11 +37,10 @@
 #'   * Old metadata information is usually not deleted from the pdf file by these operations.
 #'     If deleting the old metadata is important one may want to try
 #'     `qpdf::pdf_compress(input, linearize = TRUE)`.
-#'   * `get_docinfo_exiftool()` and `set_docinfo_exiftool()` "widen" datetimes to second precision.
-#'     An hour-only UTC offset will be "widened" to minute precision.
+#'   * `get_docinfo_exiftool()` will "widen" datetimes to second precision.
+#'   * `set_docinfo_exiftool()` will "widen" an hour-only UTC offset to minute precision.
 #'   * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
-#'   * `set_docinfo_pdftk()` may not correctly handle
-#'     documentation info entries with newlines in them.
+#'   * `set_docinfo_pdftk()` may not correctly handle documentation info entries with newlines in them.
 #'
 #' @examples
 #' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {

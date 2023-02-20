@@ -189,7 +189,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$author))
                 tags[["PDF:Author"]] <- self$author
             if (!is.null(self$creation_date))
-                tags[["PDF:CreateDate"]] <- self$creation_date
+                tags[["PDF:CreateDate"]] <- to_date_pdfmark_exiftool(self$creation_date)
             if (!is.null(self$creator))
                 tags[["PDF:Creator"]] <- self$creator
             if (!is.null(self$producer))
@@ -201,7 +201,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$keywords))
                 tags[["PDF:Keywords"]] <- self$keywords
             if (!is.null(self$mod_date))
-                tags[["PDF:ModifyDate"]] <-  self$mod_date
+                tags[["PDF:ModifyDate"]] <-  to_date_pdfmark_exiftool(self$mod_date)
             tags
         },
         pdfmark = function(raw = FALSE) {
@@ -409,6 +409,14 @@ to_date_pdfmark <- function(date) {
     } else {
         datetimeoffset::format_pdfmark(date)
     }
+}
+
+to_date_pdfmark_exiftool <- function(date) {
+    s <- datetimeoffset::format_pdfmark(date)
+    s <- substr(s, 3L, nchar(s))
+    if (grepl("'", s))
+        s <- datetimeoffset::format_exiftool(date, mode = "pdf")
+    s
 }
 
 raw_pdfmark_entry <- function(open, value, close) {

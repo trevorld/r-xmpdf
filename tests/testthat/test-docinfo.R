@@ -60,6 +60,31 @@ test_that("docinfo_pdftk", {
     expect_equal(get_docinfo_exiftool(f5)[[1]]$subject, "A subject\nwith a newline")
     expect_equal(get_docinfo_pdftk(f5)[[1]]$subject, "A subject\nwith a newline")
 
+    di_set$creation_date <- "2010"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010")
+    di_set$creation_date <- "2010-01"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01")
+    di_set$creation_date <- "2010-01-02"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02")
+    di_set$creation_date <- "2010-01-02T03"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03")
+    di_set$creation_date <- "2010-01-02T03:04"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04")
+    di_set$creation_date <- "2010-01-02T03:04:05"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05")
+    # di_set$creation_date <- "2010-01-02T03:04:05-03"
+    # set_docinfo_exiftool(di_set, f1, f5)
+    # expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03")
+    di_set$creation_date <- "2010-01-02T03:04:05-03:00"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03:00")
+
 })
 
 test_that("set_docinfo_gs", {

@@ -76,11 +76,10 @@ Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set
 \item Old metadata information is usually not deleted from the pdf file by these operations.
 If deleting the old metadata is important one may want to try
 \code{qpdf::pdf_compress(input, linearize = TRUE)}.
-\item \code{get_docinfo_exiftool()} and \code{set_docinfo_exiftool()} "widen" datetimes to second precision.
-An hour-only UTC offset will be "widened" to minute precision.
+\item \code{get_docinfo_exiftool()} will "widen" datetimes to second precision.
+\item \code{set_docinfo_exiftool()} will "widen" an hour-only UTC offset to minute precision.
 \item \code{get_docinfo_pdftools()}'s datetimes may not accurately reflect the embedded datetimes.
-\item \code{set_docinfo_pdftk()} may not correctly handle
-documentation info entries with newlines in them.
+\item \code{set_docinfo_pdftk()} may not correctly handle documentation info entries with newlines in them.
 }
 }
 
