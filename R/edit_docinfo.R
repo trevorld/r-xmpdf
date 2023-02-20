@@ -40,7 +40,7 @@
 #'   * `get_docinfo_exiftool()` and `set_docinfo_exiftool()` "widen" datetimes to second precision.
 #'     An hour-only UTC offset will be "widened" to minute precision.
 #'   * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
-#'   * `get_docinfo_pdftk()` and `set_docinfo_pdftk()` may not correctly handle
+#'   * `set_docinfo_pdftk()` may not correctly handle
 #'     documentation info entries with newlines in them.
 #'
 #' @examples
@@ -161,25 +161,49 @@ get_docinfo_pdftk <- function(filename, use_names = TRUE) {
 get_docinfo_pdftk_helper <- function(filename) {
     info <- get_pdftk_metadata(filename)
     dinfo <- docinfo()
-    if (length(id <- grep("^InfoKey: Author", info)))
-        dinfo$author <- gsub("^InfoValue: ", "", info[id + 1])
+    if (length(id <- grep("^InfoKey: Author", info))) {
+        dinfo$author <- pdftk_string_value(info, id)
+    }
     if (length(id <- grep("^InfoKey: CreationDate", info))) {
         dinfo$creation_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
     }
-    if (length(id <- grep("^InfoKey: Creator", info)))
-        dinfo$creator <- gsub("^InfoValue: ", "", info[id + 1])
-    if (length(id <- grep("^InfoKey: Producer", info)))
-        dinfo$producer <- gsub("^InfoValue: ", "", info[id + 1])
-    if (length(id <- grep("^InfoKey: Title", info)))
-        dinfo$title <- gsub("^InfoValue: ", "", info[id + 1])
-    if (length(id <- grep("^InfoKey: Subject", info)))
-        dinfo$subject <- gsub("^InfoValue: ", "", info[id + 1])
-    if (length(id <- grep("^InfoKey: Keywords", info)))
-        dinfo$keywords <- gsub("^InfoValue: ", "", info[id + 1])
+    if (length(id <- grep("^InfoKey: Creator", info))) {
+        dinfo$creator <- pdftk_string_value(info, id)
+    }
+    if (length(id <- grep("^InfoKey: Producer", info))) {
+        dinfo$producer <- pdftk_string_value(info, id)
+    }
+    if (length(id <- grep("^InfoKey: Title", info))) {
+        dinfo$title <- pdftk_string_value(info, id)
+    }
+    if (length(id <- grep("^InfoKey: Subject", info))) {
+        dinfo$subject <- pdftk_string_value(info, id)
+    }
+    if (length(id <- grep("^InfoKey: Keywords", info))) {
+        dinfo$keywords <- pdftk_string_value(info, id)
+    }
     if (length(id <- grep("^InfoKey: ModDate", info))) {
         dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
     }
     dinfo
+}
+
+pdftk_string_value <- function(info, id) {
+    v <- gsub("^InfoValue: ", "", info[id + 1])
+    i_x <- id + 2
+    while ((i_x) < length(info) && is_pdftk_newline(info[i_x])) {
+        v <- paste(v, info[i_x], sep = "\n")
+        i_x <- i_x + 1
+    }
+    v
+}
+
+is_pdftk_newline <- function(line) {
+    if (grepl("^[[:alnum:]]+:", line) ||
+        grepl("^[[:alpha:]]+Begin$", line))
+        FALSE
+    else
+        TRUE
 }
 
 #' @rdname edit_docinfo

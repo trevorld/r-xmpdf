@@ -50,6 +50,16 @@ test_that("docinfo_pdftk", {
     # Unicode works?
     set_docinfo_pdftk(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
+
+    skip_if_not(supports_exiftool())
+    f5 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f5))
+    di_set <- docinfo(subject = "A subject\nwith a newline")
+    set_docinfo_exiftool(di_set, f1, f5)
+
+    expect_equal(get_docinfo_exiftool(f5)[[1]]$subject, "A subject\nwith a newline")
+    expect_equal(get_docinfo_pdftk(f5)[[1]]$subject, "A subject\nwith a newline")
+
 })
 
 test_that("set_docinfo_gs", {
