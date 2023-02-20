@@ -191,7 +191,7 @@ x$set_item("Iptc4xmpExt:Transcript", transcript)
 
 Currently `{xmpdf}` does not officially support entering in "struct" XMP tags (although it does support "lang-alt" tags and simple lists of basic XMP value types).
 
-Unofficially if you read the `exiftool` [XMP Tags](https://exiftool.org/TagNames/XMP.html) and [Structured Information](https://exiftool.org/struct.html) documentation you may be able to set a "flattened" tag to set or manually construct a serialized struct string for a non-"flattened" tag that you could then set via an `xmp()` objects `set_item()` method and it may work (for now) when using `set_xmp_exiftool()`.
+If necessary you'll need to use an external program such as [exiftool](https://exiftool.org/) (perhaps via [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)) to [embed structured](https://exiftool.org/struct.html) XMP tags.
 
 ## <a name="knitr">Is there an easy way to embed XMP metadata when using {knitr}?</a>
 
