@@ -2,7 +2,7 @@ Encoding: UTF-8
 Package: xmpdf
 Type: Package
 Title: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info
-Version: 0.1.0-36
+Version: 0.1.1
 Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
     in a variety of media file formats as well as 
     edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files.
@@ -20,7 +20,7 @@ BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyData: true
 LazyLoad: yes
 Imports:
-    datetimeoffset (>= 0.2.0-4),
+    datetimeoffset (>= 0.2.1),
     grDevices,
     jsonlite,
     purrr,
@@ -36,7 +36,6 @@ Suggests:
     pdftools,
     rmarkdown,
     testthat (>= 3.0.0)
-Remotes: datetimeoffset=trevorld/r-datetimeoffset
 VignetteBuilder: knitr, rmarkdown
 SystemRequirements: 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries.
  'exiftool' for editing pdf documentation info entries and/or xmp metadata.
