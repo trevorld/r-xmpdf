@@ -37,7 +37,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
   + `install.packages("qpdf")`
 
 * **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries in pdf files.
-  Note currently depends on [{qpdf}](https://cran.r-project.org/web/packages/qpdf/index.html).
+  Note currently depends on [{qpdf}](https://cran.r-project.org/package=qpdf).
 
   + `install.packages("pdftools")` will probably install `{qpdf}` as well
 

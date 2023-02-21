@@ -133,10 +133,14 @@ find_gs_cmd <- function() {
 }
 
 find_pdftk_cmd <- function() {
-    if (getOption("xmpdf_disable_pdftk", FALSE))
+    if (getOption("xmpdf_disable_pdftk", FALSE)) {
         ""
-    else
-        Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
+    } else {
+        cmd <- Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
+        if (cmd == "")
+            cmd <- Sys.which("pdftk-java")
+        cmd
+    }
 }
 
 # supports_jsonlite <- function() {

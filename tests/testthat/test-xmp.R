@@ -49,7 +49,6 @@ test_that("get_xmp() / set_xmp()", {
     x$update(xc)
     set_xmp(x, f)
     x2 <- get_xmp(f)[[1]]
-    expect_snapshot(print(x2))
     expect_equal(x2$alt_text[["x-default"]], "An alternative image text")
     expect_equal(x2$ext_description[["x-default"]],
                  "An extended description (for accessibility)\nWith newline")
@@ -59,11 +58,14 @@ test_that("get_xmp() / set_xmp()", {
                  "An updated contributor")
     expect_equal(x2$get_item("Iptc4xmpCore:Location"),
                  "A sublocation (legacy)")
+    x2$set_item("x:XMPToolkit", NULL) # make reproducible
+    expect_snapshot(print(x2))
 
     x <- xmp(creator = c("Creator 1", "Creator 2"))
     set_xmp(x, f)
     x3 <- get_xmp(f)[[1]]
     expect_equal(x3$creator, c("Creator 1", "Creator 2"))
+
 })
 
 test_that("auto_xmp", {
