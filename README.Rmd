@@ -3,7 +3,6 @@
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
 [![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
 [![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg?token=K12GJIBIL7)](https://codecov.io/github/trevorld/r-xmpdf)
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 ### Table of Contents
 
