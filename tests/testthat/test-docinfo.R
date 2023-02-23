@@ -78,9 +78,9 @@ test_that("docinfo_pdftk", {
     di_set$creation_date <- "2010-01-02T03:04:05"
     set_docinfo_exiftool(di_set, f1, f5)
     expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05")
-    # di_set$creation_date <- "2010-01-02T03:04:05-03"
-    # set_docinfo_exiftool(di_set, f1, f5)
-    # expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03")
+    di_set$creation_date <- "2010-01-02T03:04:05-03"
+    set_docinfo_exiftool(di_set, f1, f5)
+    expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03")
     di_set$creation_date <- "2010-01-02T03:04:05-03:00"
     set_docinfo_exiftool(di_set, f1, f5)
     expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03:00")

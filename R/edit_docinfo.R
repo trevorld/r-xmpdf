@@ -13,9 +13,9 @@
 #'
 #' `set_docinfo()` will try to use the following helper functions in the following order:
 #'
-#' 1. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
-#' 2. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
-#' 3. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
+#' 1. `set_docinfo_exiftool()` which wraps `exiftool` command-line tool
+#' 2. `set_docinfo_gs()` which wraps `ghostscript` command-line tool
+#' 3. `set_docinfo_pdftk()` which wraps `pdftk` command-line tool
 #'
 #' @param filename Filename(s) (pdf) to extract info dictionary entries from.
 #' @param use_names If `TRUE` (default) use `filename` as the names of the result.
@@ -38,7 +38,6 @@
 #'     If deleting the old metadata is important one may want to try
 #'     `qpdf::pdf_compress(input, linearize = TRUE)`.
 #'   * `get_docinfo_exiftool()` will "widen" datetimes to second precision.
-#'   * `set_docinfo_exiftool()` will "widen" an hour-only UTC offset to minute precision.
 #'   * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 #'   * `set_docinfo_pdftk()` may not correctly handle documentation info entries with newlines in them.
 #'
@@ -208,12 +207,12 @@ is_pdftk_newline <- function(line) {
 #' @rdname edit_docinfo
 #' @export
 set_docinfo <- function(docinfo, input, output = input) {
-    if (supports_gs()) {
+    if (supports_exiftool()) {
+        set_docinfo_exiftool(docinfo, input, output)
+    } else if (supports_gs()) {
         set_docinfo_gs(docinfo, input, output)
     } else if (supports_pdftk()) {
         set_docinfo_pdftk(docinfo, input, output)
-    } else if (supports_exiftool()) {
-        set_docinfo_exiftool(docinfo, input, output)
     } else {
         abort(msg_set_docinfo(), class = "xmpdf_suggested_package")
     }

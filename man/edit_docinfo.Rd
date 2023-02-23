@@ -58,9 +58,9 @@ set_docinfo_pdftk(docinfo, input, output = input)
 
 \code{set_docinfo()} will try to use the following helper functions in the following order:
 \enumerate{
+\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 \item \code{set_docinfo_gs()} which wraps \code{ghostscript} command-line tool
 \item \code{set_docinfo_pdftk()} which wraps \code{pdftk} command-line tool
-\item \code{set_docinfo_exiftool()} which wraps \code{exiftool} command-line tool
 }
 }
 \section{Known limitations}{
@@ -77,7 +77,6 @@ Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set
 If deleting the old metadata is important one may want to try
 \code{qpdf::pdf_compress(input, linearize = TRUE)}.
 \item \code{get_docinfo_exiftool()} will "widen" datetimes to second precision.
-\item \code{set_docinfo_exiftool()} will "widen" an hour-only UTC offset to minute precision.
 \item \code{get_docinfo_pdftools()}'s datetimes may not accurately reflect the embedded datetimes.
 \item \code{set_docinfo_pdftk()} may not correctly handle documentation info entries with newlines in them.
 }

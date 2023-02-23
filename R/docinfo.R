@@ -412,11 +412,8 @@ to_date_pdfmark <- function(date) {
 }
 
 to_date_pdfmark_exiftool <- function(date) {
-    s <- datetimeoffset::format_pdfmark(date)
-    s <- substr(s, 3L, nchar(s))
-    if (grepl("'", s))
-        s <- datetimeoffset::format_exiftool(date, mode = "pdf")
-    s
+    s <- datetimeoffset::format_pdfmark(date) #### Update when {datetimeoffset} allows suppressing prefix
+    substr(s, 3L, nchar(s))
 }
 
 raw_pdfmark_entry <- function(open, value, close) {

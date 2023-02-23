@@ -1,3 +1,16 @@
+xmpdf 0.1.2 (development)
+=========================
+
+Bug fixes and minor improvements
+--------------------------------
+
+* `set_docinfo_exiftool()` should now losslessly write all legal datetimes (#55).
+  `set_docinfo()`'s priority order has been updated to the following:
+
+  1. `set_docinfo_exiftool()`
+  2. `set_docinfo_gs()`
+  3. `set_docinfo_pdftk()`
+
 xmpdf 0.1.1
 ===========
 
