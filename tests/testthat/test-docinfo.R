@@ -48,6 +48,7 @@ test_that("docinfo_pdftk", {
     expect_equal(get_docinfo_pdftk(f4)[[1]]$author, "John Doe")
 
     # Unicode works?
+    skip_on_cran()
     set_docinfo_pdftk(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 
@@ -84,11 +85,10 @@ test_that("docinfo_pdftk", {
     di_set$creation_date <- "2010-01-02T03:04:05-03:00"
     set_docinfo_exiftool(di_set, f1, f5)
     expect_equal(format(get_docinfo_pdftk(f5)[[1]]$creation_date), "2010-01-02T03:04:05-03:00")
-
 })
 
 test_that("set_docinfo_gs", {
-    skip_if_not(supports_gs() && supports_set_docinfo())
+    skip_if_not(supports_gs())
 
     f3 <- tempfile(fileext = ".pdf")
     on.exit(unlink(f3))
@@ -118,6 +118,7 @@ test_that("set_docinfo_gs", {
     expect_equal(get_docinfo(f4)[[1]]$author, "John Doe")
 
     # Unicode works?
+    skip_on_cran()
     set_docinfo_gs(docinfo(title = "Test title", subject = "R\u5f88\u68d2\uff01"), f4)
     d <- get_docinfo(f4)[[1]]
     expect_equal(d$subject, "R\u5f88\u68d2\uff01")
@@ -150,6 +151,7 @@ test_that("docinfo_exiftool", {
     expect_equal(get_docinfo_exiftool(f4)[[1]]$author, "John Doe")
 
     # Unicode works?
+    skip_on_cran()
     set_docinfo_exiftool(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })

@@ -73,6 +73,7 @@ test_that("set_bookmarks_gs", {
     expect_equal(attr(bm, "total_pages"), 2L)
 
     # Does Unicode work
+    skip_on_cran()
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
@@ -118,6 +119,7 @@ test_that("bookmarks_pdftk", {
     expect_equal(nrow(get_bookmarks(f2)[[1]]), 3L)
 
     # Does Unicode work
+    skip_on_cran()
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
@@ -132,7 +134,6 @@ test_that("bookmarks_pdftk", {
                             fontface = c("italic", "bold", "plain"),
                             color = c("black", "blue", "red"))
     expect_snapshot(set_bookmarks_pdftk(bookmarks, f1, f2))
-
 })
 
 test_that("`get_count()` and `get_level()`", {

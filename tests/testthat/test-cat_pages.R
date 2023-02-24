@@ -27,7 +27,7 @@ test_that("cat_pages()", {
 })
 
 test_that("cat_pages_gs()", {
-    skip_if_not(supports_qpdf())
+    skip_if_not(supports_gs())
     fc <- tempfile(fileext = "_cat.pdf")
     on.exit(unlink(fc))
     cat_pages_gs(c(f1, f2), fc)
