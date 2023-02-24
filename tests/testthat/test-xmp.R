@@ -3,6 +3,7 @@ library("grid")
 
 test_that("get_xmp() / set_xmp()", {
     skip_if_not(supports_get_xmp() && supports_set_xmp())
+    skip_if_not(l10n_info()[["UTF-8"]])
     f <- tempfile(fileext = ".pdf")
     on.exit(unlink(f))
     pdf(f)
