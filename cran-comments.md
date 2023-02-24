@@ -1,5 +1,5 @@
 * Unit tests have been adjusted to prevent CRAN R CMD check ERRORs on certain CRAN platforms
-  that don't have `ghostscript` installed or are ran in a non-Unicode locale (#56).
+  that don't have `ghostscript` installed or are ran in a non-Unicode locale.
 * System requirements of 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries 
   and 'exiftool' for editing pdf documentation info entries and/or xmp metadata.
   The examples and tests shouldn't not throw an ERROR if one (or all)

@@ -143,9 +143,6 @@ find_pdftk_cmd <- function() {
     }
 }
 
-# supports_jsonlite <- function() {
-#     requireNamespace("jsonlite", quietly = TRUE)
-# }
 supports_qpdf <- function() {
     requireNamespace("qpdf", quietly = TRUE) &&
         !getOption("xmpdf_disable_qpdf", FALSE)
@@ -167,8 +164,6 @@ exiftool <- function() {
     get_cmd("exiftool", find_exiftool_cmd, install_exiftool_str)
 }
 
-#### Use more enhance error message with
-# 'install_exiftool_str()', 'install_gs_str()', 'install_pdftk_str()'
 get_cmd <- function(name,
                     cmd_fn = function() Sys.which(name),
                     msg_fn = function() install_cmd_str(name)) {

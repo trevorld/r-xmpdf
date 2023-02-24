@@ -52,7 +52,7 @@ jobs:
         run: |
             choco install -y ghostscript
             choco install -y exiftool
-            choco install -y pdftk
+            choco install -y pdftk-java
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
