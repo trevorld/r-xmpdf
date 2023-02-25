@@ -1,5 +1,5 @@
-xmpdf 0.1.2 (development)
-=========================
+xmpdf 0.1.3
+===========
 
 Bug fixes and minor improvements
 --------------------------------
