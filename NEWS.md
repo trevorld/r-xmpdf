@@ -1,3 +1,9 @@
+xmpdf 0.1.4
+===========
+
+* Unit tests have been adjusted to prevent an CRAN R CMD check ERROR on
+  an M1 Mac machine running macOS 14 (#58).
+
 xmpdf 0.1.3
 ===========
 

@@ -2,7 +2,7 @@
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
 [![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
-[![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg?token=K12GJIBIL7)](https://codecov.io/github/trevorld/r-xmpdf)
+[![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg)](https://app.codecov.io/github/trevorld/r-xmpdf)
 
 ### Table of Contents
 

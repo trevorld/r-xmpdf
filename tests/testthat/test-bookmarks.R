@@ -74,6 +74,7 @@ test_that("set_bookmarks_gs", {
 
     # Does Unicode work
     skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
@@ -120,6 +121,7 @@ test_that("bookmarks_pdftk", {
 
     # Does Unicode work
     skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))

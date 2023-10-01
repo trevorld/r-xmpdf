@@ -49,6 +49,7 @@ test_that("docinfo_pdftk", {
 
     # Unicode works?
     skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
     set_docinfo_pdftk(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_pdftk(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 
@@ -119,6 +120,7 @@ test_that("set_docinfo_gs", {
 
     # Unicode works?
     skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
     set_docinfo_gs(docinfo(title = "Test title", subject = "R\u5f88\u68d2\uff01"), f4)
     d <- get_docinfo(f4)[[1]]
     expect_equal(d$subject, "R\u5f88\u68d2\uff01")
@@ -152,6 +154,7 @@ test_that("docinfo_exiftool", {
 
     # Unicode works?
     skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
     set_docinfo_exiftool(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
     expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
 })
