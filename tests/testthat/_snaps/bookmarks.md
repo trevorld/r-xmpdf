@@ -2,7 +2,7 @@
 
     Code
       set_bookmarks_pdftk(bookmarks, f1, f2)
-    Message <xmpdf_inform>
+    Message
       ! 'set_bookmarks_pdftk()' will ignore certain requested bookmarks features:
       * 'set_bookmarks_pdftk()' treats negative 'count' values as positive ones.
       * 'set_bookmarks_pdftk()' ignores non-missing 'color' values.
