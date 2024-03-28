@@ -49,7 +49,10 @@ Useful if wanting to concatenate multiple pdf files together and
 would like to preserve the bookmarks information.
 }
 \examples{
-if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quietly = TRUE)) {
+if (supports_get_bookmarks() &&
+    supports_set_bookmarks() &&
+    supports_pdftk() &&
+    require("grid", quietly = TRUE)) {
  # Create two different two-page pdf files
  make_pdf <- function(f, title) {
    pdf(f, onefile = TRUE, title = title)

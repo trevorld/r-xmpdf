@@ -186,7 +186,7 @@ test_that("`get_count()` and `get_level()`", {
 })
 
 test_that("`cat_bookmarks()` works", {
-    skip_if_not(supports_get_bookmarks() && supports_set_bookmarks())
+    skip_if_not(supports_get_bookmarks() && supports_set_bookmarks() && supports_pdftk())
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     f2 <- tempfile(fileext = ".pdf")

@@ -138,7 +138,10 @@ get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
 #'         A "total_pages" attribute will be set for the theoretical total pages of
 #'         the concatenated document represented by the concatenated bookmarks.
 #' @examples
-#' if (supports_get_bookmarks() && supports_set_bookmarks() && require("grid", quietly = TRUE)) {
+#' if (supports_get_bookmarks() &&
+#'     supports_set_bookmarks() &&
+#'     supports_pdftk() &&
+#'     require("grid", quietly = TRUE)) {
 #'  # Create two different two-page pdf files
 #'  make_pdf <- function(f, title) {
 #'    pdf(f, onefile = TRUE, title = title)
