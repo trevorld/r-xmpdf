@@ -78,17 +78,17 @@ test_that("set_bookmarks_gs", {
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
-    set_bookmarks_gs(bookmarks, f1, f2)
-    bm <- get_bookmarks(f2)[[1]]
-    expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
-
-    # input = output
-    bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
-                            level = c(1, 2, 2),
-                            page = c(1L, 1L, 2L))
     set_bookmarks_gs(bookmarks, f2, f2)
     bm <- get_bookmarks(f2)[[1]]
     expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
+
+    # Edit bookmarks of file with pre-existing bookmarks
+    f3 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f3))
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+                            page = c(1L, 2L))
+    set_bookmarks_gs(bookmarks, f2, f3)
+    expect_equal(nrow(get_bookmarks(f3)[[1]]), 2L)
 })
 
 test_that("bookmarks_pdftk", {
@@ -136,6 +136,14 @@ test_that("bookmarks_pdftk", {
                             fontface = c("italic", "bold", "plain"),
                             color = c("black", "blue", "red"))
     expect_snapshot(set_bookmarks_pdftk(bookmarks, f1, f2))
+
+    # Edit bookmarks of file with pre-existing bookmarks
+    f3 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f3))
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+                            page = c(1L, 2L))
+    set_bookmarks_pdftk(bookmarks, f2, f3)
+    expect_equal(nrow(get_bookmarks(f3)[[1]]), 2L)
 })
 
 test_that("bookmarks_pdftools", {
