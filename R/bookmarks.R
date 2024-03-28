@@ -436,7 +436,7 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
               shQuote(input),
               shQuote(system.file("gs/pdfmark_restore.txt", package = "xmpdf")),
               shQuote(metafile))
-    xmpdf_system2(cmd, args)
+    stdout <- xmpdf_system2(cmd, args)
     if (input == output) {
         file.copy(target, output, overwrite = TRUE)
     }

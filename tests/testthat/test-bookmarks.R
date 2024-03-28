@@ -72,6 +72,9 @@ test_that("set_bookmarks_gs", {
     expect_equal(nrow(bm), 3L)
     expect_equal(attr(bm, "total_pages"), 2L)
 
+    gs_version <- numeric_version(system2(find_gs_cmd(), "--version", stdout = TRUE))
+    skip_if_not(gs_version <= "9.55.0")
+
     # Does Unicode work
     skip_if_not(l10n_info()[["UTF-8"]])
     skip_on_os("mac") # CRAN checks on macOS 14
@@ -174,6 +177,10 @@ test_that("bookmarks_pdftools", {
     # Does Unicode work
     skip_if_not(l10n_info()[["UTF-8"]])
     skip_on_os("mac") # CRAN checks on macOS 14
+    if(supports_gs()) {
+        gs_version <- numeric_version(system2(find_gs_cmd(), "--version", stdout = TRUE))
+        skip_if_not(gs_version <= "9.55.0")
+    }
     bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
                             level = c(1, 2, 2),
                             page = c(1L, 1L, 2L))
