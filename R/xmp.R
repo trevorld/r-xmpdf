@@ -13,7 +13,7 @@
 #'                Recommended by Creative Commons.
 #'               If missing and `"cc:attributionName"` in `auto_xmp` and
 #'               and `photoshop:Credit` non-missing will use that else if `dc:creator` non-missing
-#'               then will automatically use `paste(creator, collapse = " and ")`.
+#'               then will automatically use `stringi::stri_join(creator, collapse = " and ")`.
 #' @param attribution_url The URL to be used when attributing the work (XMP tag `cc:attributionURL`).
 #'                Recommended by Creative Commons.
 #' @param create_date The date the digital document was created (XMP tag `xmp:CreateDate`).
@@ -31,7 +31,7 @@
 #' @param credit Credit line field (XMP tag `photoshop:Credit`).
 #'               Core IPTC photo metadata used by Google Photos.
 #'               If missing and `"photoshop:Credit"` in `auto_xmp` and `dc:creator` non-missing
-#'               then will automatically use `paste(creator, collapse = " and ")`.
+#'               then will automatically use `stringi::stri_join(creator, collapse = " and ")`.
 #' @param date_created The date the intellectual content was created (XMP tag `photoshop:DateCreated`).
 #'               Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'               Core IPTC photo metadata.
@@ -48,7 +48,7 @@
 #'                Core IPTC photo metadata.
 #' @param keywords Character vector of keywords for this document (for cross-document searching).
 #'                 Related pdf documentation info key is `pdf:Keywords`.
-#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
+#'                 Will be coerced into a string by `stringi::stri_join(keywords, collapse = ", ")`.
 #' @param license The URL of (open source) license terms (XMP tag `cc:license`).
 #'                Recommended by Creative Commons.
 #'                Note `xmpRights:WebStatement` set in `web_statement` is a more popular XMP tag (e.g. used by Google Images)
@@ -256,9 +256,9 @@ Xmp <- R6Class("xmp",
                 value <- self$get_item(key)
                 if (is.null(value) && mode == "null_omit") next
                 if (private$is_auto(key))
-                    text <- append(text, paste("=>", key, "=", x_format(value)))
+                    text <- append(text, stri_join("=> ", key, " = ", x_format(value)))
                 else
-                    text <- append(text, paste("  ", key, ":=", x_format(value)))
+                    text <- append(text, stri_join("   ", key, " := ", x_format(value)))
             }
             if (length(text)) {
                 if (mode == "google_images") {
@@ -266,9 +266,9 @@ Xmp <- R6Class("xmp",
                 }
                 if (!xmp_only) {
                     if (length(self$auto_xmp))
-                        text <- c(paste("i  auto_xmp (not XMP tag) := ", x_format(self$auto_xmp)), text)
+                        text <- c(stri_join("i  auto_xmp (not XMP tag) := ", x_format(self$auto_xmp)), text)
                     if (!is.null(self$spdx_id))
-                        text <- c(paste("i  spdx_id (not XMP tag) :=", x_format(self$spdx_id)), text)
+                        text <- c(stri_join("i  spdx_id (not XMP tag) := ", x_format(self$spdx_id)), text)
                 }
                 invisible(cat(text, sep="\n"))
             } else {
@@ -455,7 +455,7 @@ Xmp <- R6Class("xmp",
                 tags[["XMP-xmpRights:WebStatement"]] <- self$web_statement
             for (key in names(private$tags$other)) {
                 ekey <- gsub("Iptc4xmp", "iptc", key)
-                ekey <- paste0("XMP-", ekey)
+                ekey <- stri_join("XMP-", ekey)
                 tags[[ekey]] <- private$tags$other[[key]] #### more formatting needed?
             }
             tags
@@ -544,7 +544,7 @@ Xmp <- R6Class("xmp",
             if (missing(value))
                 private$tags$keywords
             else
-                private$tags$keywords <- paste(value, collapse = ", ")
+                private$tags$keywords <- stri_join(value, collapse = ", ")
         },
         license = function(value) {
             if (missing(value)) {
@@ -662,21 +662,21 @@ Xmp <- R6Class("xmp",
         auto_credit = function() {
             value <- private$tags$credit
             if (is.null(value) && !is.null(private$tags[["creator"]]))
-                value <- paste(private$tags[["creator"]], collapse = " and ")
+                value <- stri_join(private$tags[["creator"]], collapse = " and ")
             value
         },
         auto_rights = function() {
             #### Update if/when we support plus:CopyrightOwner
             value <- NULL
             if (!is.null(private$tags$creator) && !is.null(private$tags$date_created)) {
-                owner <- paste(private$tags$creator, collapse = " and ")
+                owner <- stri_join(private$tags$creator, collapse = " and ")
                 year <- datetimeoffset::format_iso8601(private$tags$date_created, precision = "year")
                 if (is.null(self$spdx_id)) {
-                    value <- paste0("\u00a9 ", year, " ", owner, ". All rights reserved.")
+                    value <- stri_join("\u00a9 ", year, " ", owner, ". All rights reserved.")
                 } else if (isTRUE(xmpdf::spdx_licenses[self$spdx_id, "pd"])) {
-                    value <- paste0("In the public domain. No rights reserved.")
+                    value <- "In the public domain. No rights reserved."
                 } else {
-                    value <- paste0("\u00a9 ", year, " ", owner, ". Some rights reserved.")
+                    value <- stri_join("\u00a9 ", year, " ", owner, ". Some rights reserved.")
                 }
             }
             value
@@ -698,8 +698,8 @@ Xmp <- R6Class("xmp",
                 url <- xmpdf::spdx_licenses[self$spdx_id, "url_alt"]
                 if (is.na(url))
                     url <- xmpdf::spdx_licenses[self$spdx_id, "url"]
-                value <- paste("This work is licensed to the public under the",
-                               name, "license", url)
+                value <- stri_join("This work is licensed to the public under the ",
+                               name, " license ", url)
             }
             value
         },
@@ -709,7 +709,7 @@ Xmp <- R6Class("xmp",
 
 x_format <- function(value) {
     value <- d_format(value)
-    paste(strwrap(value, exdent = 8), collapse = "\n")
+    stri_join(strwrap(value, exdent = 8L), collapse = "\n")
 }
 
 KNOWN_XMP_TAGS <- c("cc:attributionName", "cc:attributionURL",

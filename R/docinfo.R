@@ -17,7 +17,7 @@
 #' @param subject The document's subject.  Matching xmp metadata tag is `dc:description`.
 #' @param keywords Keywords for this document (for cross-document searching).
 #'                 Matching xmp metadata tag is `pdf:Keywords`.
-#'                 Will be coerced into a string by `paste(keywords, collapse = ", ")`.
+#'                 Will be coerced into a string by `stringi::stri_join(keywords, collapse = ", ")`.
 #' @param mod_date The date the document was last modified.
 #'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                 Matching xmp metadata tag is `xmp:ModifyDate`.
@@ -104,14 +104,14 @@ DocInfo <- R6Class("docinfo",
             invisible(NULL)
         },
         print = function() {
-            text <- c(paste("Author:", d_format(self$author)),
-                      paste("CreationDate:", d_format(self$creation_date)),
-                      paste("Creator:", d_format(self$creator)),
-                      paste("Producer:", d_format(self$producer)),
-                      paste("Title:", d_format(self$title)),
-                      paste("Subject:", d_format(self$subject)),
-                      paste("Keywords:",  d_format(self$keywords)),
-                      paste("ModDate:", d_format(self$mod_date)))
+            text <- c(stri_join("Author: ", d_format(self$author)),
+                      stri_join("CreationDate: ", d_format(self$creation_date)),
+                      stri_join("Creator: ", d_format(self$creator)),
+                      stri_join("Producer: ", d_format(self$producer)),
+                      stri_join("Title: ", d_format(self$title)),
+                      stri_join("Subject: ", d_format(self$subject)),
+                      stri_join("Keywords: ",  d_format(self$keywords)),
+                      stri_join("ModDate: ", d_format(self$mod_date)))
             invisible(cat(text, sep="\n"))
         },
         get_item = function(key) {
@@ -306,7 +306,7 @@ DocInfo <- R6Class("docinfo",
             if (missing(value)) {
                 private$val$keywords
             } else {
-                private$val$keywords <- paste(value, collapse = ", ")
+                private$val$keywords <- stri_join(value, collapse = ", ")
             }
         },
         mod_date = function(value) {
@@ -336,12 +336,12 @@ DocInfo <- R6Class("docinfo",
                 tags <- append(tags, sprintf(" /Subject (%s)\n", self$subject))
             if (!is.null(self$keywords))
                 tags <- append(tags, sprintf(" /Keywords (%s)\n",
-                                             paste(self$keywords, collapse = ", ")))
+                                             stri_join(self$keywords, collapse = ", ")))
             if (!is.null(self$mod_date))
                 tags <- append(tags, sprintf(" /ModDate (%s)\n",
                                              to_date_pdfmark(self$mod_date)))
             tags <- append(tags, " /DOCINFO pdfmark\n")
-            paste(tags, collapse="")
+            stri_join(tags, collapse="")
         },
         pdfmark_raw = function() {
             tags <- iconv("[", to = "latin1", toRaw = TRUE)[[1]]
@@ -360,7 +360,7 @@ DocInfo <- R6Class("docinfo",
             if (!is.null(self$subject))
                 tags <- append(tags, raw_pdfmark_entry(" /Subject (", self$subject, ")\n"))
             if (!is.null(self$keywords)) {
-                keywords <- paste(self$keywords, collapse = ", ")
+                keywords <- stri_join(self$keywords, collapse = ", ")
                 tags <- append(tags, raw_pdfmark_entry(" /Keywords (", keywords, ")\n"))
             }
             if (!is.null(self$mod_date)) {
@@ -419,7 +419,9 @@ to_date_pdfmark_exiftool <- function(date) {
 raw_pdfmark_entry <- function(open, value, close) {
     r <- iconv(open, to = "latin1", toRaw = TRUE)[[1]]
     l1 <- iconv(value, to = "latin1")
-    if (is.na(l1)) { # Unicode needs to be "UTF-16BE" while rest needs to be "latin1"
+    if (is.na(l1)) {
+        # Unicode needs to be "UTF-16BE" while rest needs to be "latin1"
+        # Replacing `paste0()` with `stringi::stri_join()` causes an error here
         r <- append(r, iconv(paste0("\ufeff", value), to = "UTF-16BE", toRaw = TRUE)[[1]])
     } else {
         r <- append(r, iconv(value, to = "latin1", toRaw = TRUE)[[1]])
@@ -431,7 +433,7 @@ d_format <- function(value) {
     if (is.null(value)) {
         "NULL"
     } else if (length(value) > 1) {
-        paste(value, collapse = ", ")
+        stri_join(value, collapse = ", ")
     } else if (is.character(value)) {
         value
     } else {
@@ -441,8 +443,8 @@ d_format <- function(value) {
 
 entry_pdftk <- function(key, value) {
     c("InfoBegin",
-      paste("InfoKey:", key),
-      paste("InfoValue:", value))
+      stri_join("InfoKey: ", key),
+      stri_join("InfoValue: ", value))
 }
 
 as_character_value <- function(value) {

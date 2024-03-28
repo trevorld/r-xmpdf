@@ -35,7 +35,7 @@ as_docinfo.default <- function(x, ...) {
 as_docinfo.xmp <- function(x, ...) {
     d <- docinfo()
     d$title <- x$title[["x-default"]]
-    d$author <- paste(x$creator, collapse = " and ")
+    d$author <- stri_join(x$creator, collapse = " and ")
     d$subject <- x$description[["x-default"]]
     d$producer <- x$producer
     d$keywords <- x$keywords

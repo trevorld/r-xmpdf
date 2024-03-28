@@ -2,7 +2,7 @@
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
 [![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
-[![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg?token=K12GJIBIL7)](https://app.codecov.io/github/trevorld/r-xmpdf)
+[![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg)](https://app.codecov.io/github/trevorld/r-xmpdf)
 
 ### Table of Contents
 
@@ -38,7 +38,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("qpdf")`
 
-* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries in pdf files.
+* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get bookmarks and documentation info entries in pdf files.
   Note currently depends on [{qpdf}](https://cran.r-project.org/package=qpdf).
 
   + `install.packages("pdftools")` will probably install `{qpdf}` as well
@@ -88,13 +88,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: NULL
-## CreationDate: 2023-02-08T14:42:02
+## CreationDate: 2024-03-27T23:19:05
 ## Creator: R
-## Producer: R 4.2.2
+## Producer: R 4.3.3
 ## Title: R Graphics Output
 ## Subject: NULL
 ## Keywords: NULL
-## ModDate: 2023-02-08T14:42:02
+## ModDate: 2024-03-27T23:19:05
 ```
 
 ```r
@@ -127,13 +127,13 @@ get_docinfo(f)[[1]] |> print()
 
 ```
 ## Author: John Doe
-## CreationDate: 2023-02-08T14:42:02
+## CreationDate: 2024-03-27T23:19:05
 ## Creator: R
-## Producer: GPL Ghostscript 9.55.0
+## Producer: R 4.3.3
 ## Title: Two Boring Pages
 ## Subject: A minimal document to demonstrate {xmpdf} features on
 ## Keywords: R, xmpdf
-## ModDate: 2023-02-08T14:42:02
+## ModDate: 2024-03-27T23:19:05
 ```
 
 ```r
@@ -152,19 +152,17 @@ get_xmp(f)[[1]] |> print()
 ##    cc:license := https://creativecommons.org/licenses/by/4.0/
 ##    dc:creator := John Doe
 ##    dc:description := A minimal document to demonstrate {xmpdf} features on
-##    dc:format := application/pdf
-##    dc:rights := © 2023 John Doe. Some rights reserved.
+##    dc:rights := © 2024 John Doe. Some rights reserved.
 ##    dc:subject := R, xmpdf
 ##    dc:title := Two Boring Pages
 ##    pdf:Keywords := R, xmpdf
-##    pdf:Producer := R 4.2.2
+##    pdf:Producer := R 4.3.3
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-08
+##    photoshop:DateCreated := 2024-03-27
 ##    x:XMPToolkit := Image::ExifTool 12.40
-##    xmp:CreateDate := 2023-02-08T14:42:02
+##    xmp:CreateDate := 2024-03-27T23:19:05
 ##    xmp:CreatorTool := R
-##    xmp:ModifyDate := 2023-02-08T14:42:02
-##    xmpMM:DocumentID := uuid:5b406831-e01e-11f8-0000-2567e21c8552
+##    xmp:ModifyDate := 2024-03-27T23:19:05
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
 ##         Attribution 4.0 International license
@@ -217,7 +215,7 @@ print(x, mode = "google_images", xmp_only = TRUE)
 
 ```
 ##    dc:creator := John Doe
-## => dc:rights = © 2023 John Doe. Some rights reserved.
+## => dc:rights = © 2024 John Doe. Some rights reserved.
 ## => photoshop:Credit = John Doe
 ## X  plus:Licensor (not currently supported by {xmpdf})
 ## => xmpRights:WebStatement = https://creativecommons.org/licenses/by/4.0/
@@ -232,7 +230,7 @@ print(x, mode = "creative_commons", xmp_only = TRUE)
 ##    cc:attributionURL := https://example.com/attribution
 ## => cc:license = https://creativecommons.org/licenses/by/4.0/
 ##    cc:morePermissions := NULL
-## => dc:rights = © 2023 John Doe. Some rights reserved.
+## => dc:rights = © 2024 John Doe. Some rights reserved.
 ## => xmpRights:Marked = TRUE
 ## => xmpRights:UsageTerms = This work is licensed to the public under the Creative Commons
 ##         Attribution 4.0 International license
@@ -251,9 +249,9 @@ get_xmp(f)[[1]] |> print()
 ##    cc:license := https://creativecommons.org/licenses/by/4.0/
 ##    dc:creator := John Doe
 ##    dc:description := An image caption
-##    dc:rights := © 2023 John Doe. Some rights reserved.
+##    dc:rights := © 2024 John Doe. Some rights reserved.
 ##    photoshop:Credit := John Doe
-##    photoshop:DateCreated := 2023-02-08
+##    photoshop:DateCreated := 2024-03-27
 ##    x:XMPToolkit := Image::ExifTool 12.40
 ##    xmpRights:Marked := TRUE
 ##    xmpRights:UsageTerms := This work is licensed to the public under the Creative Commons
@@ -324,7 +322,8 @@ Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
-* `get_docinfo_exiftool()` an hour-only UTC offset will be "widened" to minute precision.
+* `get_bookmarks_pdftools()`'s doesn't report information about bookmarks pages, color, font face, and whether the bookmarks
+* `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
 * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.

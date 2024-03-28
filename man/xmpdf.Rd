@@ -2,8 +2,8 @@
 % Please edit documentation in R/xmpdf-package.R
 \docType{package}
 \name{xmpdf}
-\alias{xmpdf}
 \alias{xmpdf-package}
+\alias{xmpdf}
 \title{xmpdf: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}

@@ -45,7 +45,7 @@ Core IPTC photo metadata.}
 Recommended by Creative Commons.
 If missing and \code{"cc:attributionName"} in \code{auto_xmp} and
 and \code{photoshop:Credit} non-missing will use that else if \code{dc:creator} non-missing
-then will automatically use \code{paste(creator, collapse = " and ")}.}
+then will automatically use \code{stringi::stri_join(creator, collapse = " and ")}.}
 
 \item{attribution_url}{The URL to be used when attributing the work (XMP tag \code{cc:attributionURL}).
 Recommended by Creative Commons.}
@@ -68,7 +68,7 @@ Related pdf documentation info key is \code{Creator}.}
 \item{credit}{Credit line field (XMP tag \code{photoshop:Credit}).
 Core IPTC photo metadata used by Google Photos.
 If missing and \code{"photoshop:Credit"} in \code{auto_xmp} and \code{dc:creator} non-missing
-then will automatically use \code{paste(creator, collapse = " and ")}.}
+then will automatically use \code{stringi::stri_join(creator, collapse = " and ")}.}
 
 \item{date_created}{The date the intellectual content was created (XMP tag \code{photoshop:DateCreated}).
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
@@ -90,7 +90,7 @@ Core IPTC photo metadata.}
 
 \item{keywords}{Character vector of keywords for this document (for cross-document searching).
 Related pdf documentation info key is \code{pdf:Keywords}.
-Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
+Will be coerced into a string by \code{stringi::stri_join(keywords, collapse = ", ")}.}
 
 \item{license}{The URL of (open source) license terms (XMP tag \code{cc:license}).
 Recommended by Creative Commons.

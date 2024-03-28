@@ -8,6 +8,7 @@
 #' `get_bookmarks()` will try to use the following helper functions in the following order:
 #'
 #' 1. `get_bookmarks_pdftk()` which wraps `pdftk` command-line tool
+#' 2. `get_bookmarks_pdftools()` which wraps [pdftools::pdf_toc()]
 #'
 #' `set_bookmarks()` will try to use the following helper functions in the following order:
 #'
@@ -52,6 +53,8 @@
 #'
 #'   * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, fontface, and whether the bookmarks
 #'     should start open or closed.
+#'   * `get_bookmarks_pdftools()` doesn't report information about bookmarks page number,
+#'     color, fontface, and whether the bookmarks should start open or closed.
 #'   * `set_bookmarks_gs()` supports most bookmarks features including color and font face but
 #'     only action supported is to view a particular page.
 #'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
@@ -84,6 +87,8 @@ NULL
 get_bookmarks <- function(filename, use_names = TRUE) {
     if (supports_pdftk()) {
         get_bookmarks_pdftk(filename, use_names = use_names)
+    } else if (supports_pdftools()) {
+        get_bookmarks_pdftools(filename, use_names = use_names)
     } else {
         abort(msg_get_bookmarks(), class = "xmpdf_suggested_package")
     }
@@ -93,7 +98,14 @@ get_bookmarks <- function(filename, use_names = TRUE) {
 #' @export
 get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
     l <- lapply(filename, get_bookmarks_pdftk_helper)
-    l <- use_filenames(l, use_names, filename)
+    use_filenames(l, use_names, filename)
+}
+
+#' @rdname bookmarks
+#' @export
+get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
+    l <- lapply(filename, get_bookmarks_pdftools_helper)
+    use_filenames(l, use_names, filename)
 }
 
 #' Concatenate pdf bookmarks
@@ -275,6 +287,45 @@ get_bookmarks_pdftk_helper <- function(filename) {
     df
 }
 
+gbph_helper <- function(l, level = 0L) {
+    if (level == 0L) {
+        df <- data.frame(title = character(0), level = integer(0))
+    } else {
+        df <- data.frame(title = l$title, level = level)
+    }
+    if (length(l[["children"]]) > 0L) {
+        df_children <- do.call(rbind, lapply(l[["children"]], gbph_helper, level = level + 1L))
+        df <- rbind(df, df_children)
+    }
+    df
+}
+
+get_bookmarks_pdftools_helper <- function(filename) {
+    toc <- pdftools::pdf_toc(filename)
+    df <- if (length(toc) > 0L) {
+        df <- gbph_helper(toc)
+        data.frame(title = df$title,
+                   page = NA,
+                   level = as.integer(df$level),
+                   count = NA_integer_,
+                   open = NA,
+                   color = NA_character_,
+                   fontface = NA_character_,
+                   stringsAsFactors = FALSE)
+    } else {
+        df_bookmarks_empty
+    }
+    info <- pdftools::pdf_info(filename)
+    if (!is.null(info$keys) && !is.null(info$keys$Title))
+        title <- info$keys$Title
+    else
+        title <- NULL
+    attr(df, "filename") <- filename
+    attr(df, "title") <- title
+    attr(df, "total_pages") <- as.integer(info$pages)
+    df
+}
+
 #' @rdname bookmarks
 #' @export
 set_bookmarks <- function(bookmarks, input, output = input) {
@@ -334,7 +385,7 @@ set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
     on.exit(unlink(metafile))
     f <- file(metafile, encoding = "UTF-8")
     open(f, "w")
-    writeLines(meta, metafile)
+    brio::write_lines(meta, metafile)
     close(f)
 
     args <- c(shQuote(input),
@@ -372,7 +423,7 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
         bookmarks_gs <- unlist(purrr::pmap(bookmarks, bookmark_gs))
         f <- file(metafile, encoding = "latin1")
         open(f, "w")
-        writeLines(bookmarks_gs %||% character(0), metafile)
+        brio::write_lines(bookmarks_gs %||% character(0), metafile)
         close(f)
     }
 
@@ -402,7 +453,10 @@ as_bookmarks <- function(bookmarks) {
         bookmarks$fontface <- character()
         return(bookmarks)
     }
-    stopifnot(hasName(bookmarks, "title"), hasName(bookmarks, "page"))
+    stopifnot(hasName(bookmarks, "title"),
+              !any(is.na(bookmarks$title)),
+              hasName(bookmarks, "page"),
+              !any(is.na(bookmarks$page)))
     bookmarks[["title"]] <- as.character(bookmarks[["title"]])
     bookmarks[["page"]] <- as.integer(bookmarks[["page"]])
 
@@ -522,14 +576,14 @@ get_level <- function(counts) {
 
 bookmark_pdftk <- function(title, level, page, ...) {
     c("BookmarkBegin",
-      paste("BookmarkTitle:", title),
-      paste("BookmarkLevel:", level),
-      paste("BookmarkPageNumber:", page))
+      stri_join("BookmarkTitle:", title),
+      stri_join("BookmarkLevel:", level),
+      stri_join("BookmarkPageNumber:", page))
 }
 
 bookmark_gs <- function(title, page, count, fontface, color, ...) {
     otc <- bookmark_gs_helper(title, page, count, fontface, color)
-    paste(unlist(otc), collapse="")
+    stri_join(unlist(otc), collapse = "")
 }
 bookmark_gs_raw <- function(title, page, count, fontface, color, ...) {
     otc <- bookmark_gs_helper(title, page, count, fontface, color)
@@ -539,7 +593,7 @@ bookmark_gs_helper <- function(title, page, count, fontface, color) {
     if (count == 0)
         count_str <- ""
     else
-        count_str <- paste(" /Count", count)
+        count_str <- stri_join(" /Count ", count)
     if (is.na(fontface)) {
         style_str <- ""
     } else {
@@ -549,7 +603,7 @@ bookmark_gs_helper <- function(title, page, count, fontface, color) {
                         "bold" = 2L,
                         "bold.italic" = 3L)
 
-        style_str <- paste0(" /F ", style, "\n")
+        style_str <- stri_join(" /F ", style, "\n")
     }
     if (is.na(color)) {
         color_str <- ""

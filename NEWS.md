@@ -1,3 +1,22 @@
+xmpdf 0.2.0
+===========
+
+New features
+------------
+
+* `get_bookmarks_pdftools()` gets pdf bookmark information using `pdftools::pdf_toc()` (#30).
+  Note though due to poppler library limitations it can't return page numbers that correspond to each bookmark.
+  Hence `get_bookmarks()` will try to use the following helper functions in the following order:
+
+  1. `get_bookmarks_pdftk()`
+  2. `get_bookmarks_pdftools()`
+
+Bug fixes and minor improvements
+--------------------------------
+
+* Improved support for reading/writing Unicode values in non-Unicode locales (#57).
+* `get_bookmarks()` and `get_bookmarks_pdftk()` no longer returns its data frame value invisibly.
+
 xmpdf 0.1.4
 ===========
 

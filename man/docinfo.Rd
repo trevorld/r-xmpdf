@@ -34,7 +34,7 @@ Matching xmp metadata tag is \code{pdf:Producer}.}
 
 \item{keywords}{Keywords for this document (for cross-document searching).
 Matching xmp metadata tag is \code{pdf:Keywords}.
-Will be coerced into a string by \code{paste(keywords, collapse = ", ")}.}
+Will be coerced into a string by \code{stringi::stri_join(keywords, collapse = ", ")}.}
 
 \item{mod_date}{The date the document was last modified.
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.

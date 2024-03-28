@@ -60,6 +60,8 @@ required for \code{\link[=set_docinfo_gs]{set_docinfo_gs()}}, \code{\link[=set_b
 \item \code{supports_pdftk()} detects support for the command-line tool \code{pdftk} which is
 required for \code{\link[=get_bookmarks_pdftk]{get_bookmarks_pdftk()}}, \code{\link[=set_bookmarks_pdftk]{set_bookmarks_pdftk()}},
 \code{\link[=get_docinfo_pdftk]{get_docinfo_pdftk()}}, \code{\link[=set_docinfo_pdftk]{set_docinfo_pdftk()}}, \code{\link[=cat_pages_pdftk]{cat_pages_pdftk()}}, and \code{\link[=n_pages_pdftk]{n_pages_pdftk()}}.
+\item \code{requireNamespace("pdftools", quietly = TRUE)} detects support for the R packages \code{pdftools}
+which is required for \code{\link[=get_bookmarks_pdftools]{get_bookmarks_pdftools()}} and \code{\link[=get_docinfo_pdftools]{get_docinfo_pdftools()}}.
 \item \code{requireNamespace("qpdf", quietly = TRUE)} detects support for the R packages \code{qpdf}
 which is required for \code{\link[=cat_pages_qpdf]{cat_pages_qpdf()}} and \code{\link[=n_pages_qpdf]{n_pages_qpdf()}}.
 }
@@ -79,6 +81,6 @@ which is required for \code{\link[=cat_pages_qpdf]{cat_pages_qpdf()}} and \code{
   supports_exiftool()
   supports_gs()
   supports_pdftk()
-  print(requireNamespace("qpdf", quietly = TRUE))
   print(requireNamespace("pdftools", quietly = TRUE))
+  print(requireNamespace("qpdf", quietly = TRUE))
 }

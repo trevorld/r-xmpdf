@@ -84,8 +84,8 @@ extract_lang_alt <- function(x) {
     tags <- unique(gsub("^([[:alnum:]:]+)-(.*)$", "\\1",
                         grep("-", names(x), value = TRUE)))
     for (tag in tags) {
-        names(x) <- ifelse(names(x) == tag, paste0(tag, "-x-default"), names(x))
-        i <- grep(paste0("^", tag), names(x))
+        names(x) <- ifelse(names(x) == tag, stri_join(tag, "-x-default"), names(x))
+        i <- grep(stri_join("^", tag), names(x))
         x_tag <- x[i]
         names(x_tag) <- substr(names(x_tag), nchar(tag) + 2L, nchar(names(x_tag)))
         x_la <- list(as_lang_alt(x_tag))

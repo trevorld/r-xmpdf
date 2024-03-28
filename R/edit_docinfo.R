@@ -190,7 +190,7 @@ pdftk_string_value <- function(info, id) {
     v <- gsub("^InfoValue: ", "", info[id + 1])
     i_x <- id + 2
     while ((i_x) < length(info) && is_pdftk_newline(info[i_x])) {
-        v <- paste(v, info[i_x], sep = "\n")
+        v <- stri_join(v, info[i_x], sep = "\n")
         i_x <- i_x + 1
     }
     v
@@ -274,7 +274,7 @@ set_docinfo_pdftk <- function(docinfo, input, output = input) {
     meta <- append(docinfo$pdftk(), meta)
     metafile <- tempfile(fileext = ".txt")
     on.exit(unlink(metafile))
-    writeLines(meta, metafile)
+    brio::write_lines(meta, metafile)
     metafile <- normalizePath(metafile, mustWork = TRUE)
     args <- c(shQuote(input),
               "update_info_utf8", shQuote(metafile),

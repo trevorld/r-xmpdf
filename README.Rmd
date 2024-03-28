@@ -37,7 +37,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("qpdf")`
 
-* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get documentation info entries in pdf files.
+* **[{pdftools}](https://docs.ropensci.org/pdftools/)** can be used to get bookmarks and documentation info entries in pdf files.
   Note currently depends on [{qpdf}](https://cran.r-project.org/package=qpdf).
 
   + `install.packages("pdftools")` will probably install `{qpdf}` as well
@@ -193,11 +193,13 @@ Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
+* `get_bookmarks_pdftools()`'s doesn't report information about bookmarks pages, color, font face, and whether the bookmarks
 * `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
 * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * `set_docinfo_pdftk()` may not handle entries with newlines in them.
+* `set_bookmarks_pdftk()` and `set_docinfo_pdftk()` may not successfully write Unicode metadata in a non-Unicode locale.
 * All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update

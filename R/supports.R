@@ -22,6 +22,8 @@
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
 #'   required for [get_bookmarks_pdftk()], [set_bookmarks_pdftk()],
 #'   [get_docinfo_pdftk()], [set_docinfo_pdftk()], [cat_pages_pdftk()], and [n_pages_pdftk()].
+#' * `requireNamespace("pdftools", quietly = TRUE)` detects support for the R packages `pdftools`
+#'   which is required for [get_bookmarks_pdftools()] and [get_docinfo_pdftools()].
 #' * `requireNamespace("qpdf", quietly = TRUE)` detects support for the R packages `qpdf`
 #'   which is required for [cat_pages_qpdf()] and [n_pages_qpdf()].
 #' @examples
@@ -39,15 +41,15 @@
 #'   supports_exiftool()
 #'   supports_gs()
 #'   supports_pdftk()
-#'   print(requireNamespace("qpdf", quietly = TRUE))
 #'   print(requireNamespace("pdftools", quietly = TRUE))
+#'   print(requireNamespace("qpdf", quietly = TRUE))
 #' @name supports
 NULL
 
 #' @rdname supports
 #' @export
 supports_get_bookmarks <- function() {
-    supports_pdftk()
+    supports_pdftk() || supports_pdftools()
 }
 
 #' @rdname supports

@@ -68,8 +68,8 @@ use_filenames <- function(l, use_names, filename) {
     l
 }
 
-xmpdf_system2 <- function(cmd, args) {
-    output <- system2(cmd, args, stdout = TRUE)
+xmpdf_system2 <- function(cmd, args, stdout = TRUE) {
+    output <- system2(cmd, args, stdout = stdout)
     if (!is.null(attr(output, "status"))) {
         msg <- c(paste(sQuote("system2()"), "command failed."))
         abort(msg)

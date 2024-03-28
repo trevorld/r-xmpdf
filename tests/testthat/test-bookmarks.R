@@ -138,6 +138,42 @@ test_that("bookmarks_pdftk", {
     expect_snapshot(set_bookmarks_pdftk(bookmarks, f1, f2))
 })
 
+test_that("bookmarks_pdftools", {
+    skip_if_not(supports_pdftools())
+
+    expect_equal(nrow(get_bookmarks(f1)[[1]]), 0L)
+
+    f2 <- tempfile(fileext = ".pdf")
+    on.exit(unlink(f2))
+
+    skip_if_not(supports_set_bookmarks())
+    bookmarks <- data.frame(title = c("Page 1", "Page 2"),
+                            page = c(1L, 2L))
+    set_bookmarks(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks_pdftools(f2)[[1]]), 2L)
+
+    bookmarks <- data.frame(title = "Page 2",
+                            page = c(2L))
+    set_bookmarks(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks_pdftools(f2)[[1]]), 1L)
+
+    bookmarks <- data.frame(title = c("Front", "Page 1", "Page 2"),
+                            level = c(1, 2, 2),
+                            page = c(1L, 1L, 2L))
+    set_bookmarks(bookmarks, f1, f2)
+    expect_equal(nrow(get_bookmarks_pdftools(f2)[[1]]), 3L)
+
+    # Does Unicode work
+    skip_if_not(l10n_info()[["UTF-8"]])
+    skip_on_os("mac") # CRAN checks on macOS 14
+    bookmarks <- data.frame(title = c("R\u5f88\u68d2\uff01", "Page 1", "Page 2"),
+                            level = c(1, 2, 2),
+                            page = c(1L, 1L, 2L))
+    set_bookmarks(bookmarks, f2, f2)
+    bm <- get_bookmarks_pdftools(f2)[[1]]
+    expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
+})
+
 test_that("`get_count()` and `get_level()`", {
     expect_equal(get_count(c(1, 2, 3, 2), c(TRUE, FALSE, NA, NA)),
                            c(2, -1, 0, 0))

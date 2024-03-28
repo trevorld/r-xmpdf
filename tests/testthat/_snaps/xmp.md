@@ -18,7 +18,7 @@
       print(x)
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+      i  auto_xmp (not XMP tag) := cc:attributionName, cc:license, dc:rights, dc:subject,
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text
@@ -54,7 +54,7 @@
       print(x, mode = "creative_commons")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+      i  auto_xmp (not XMP tag) := cc:attributionName, cc:license, dc:rights, dc:subject,
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
       => cc:attributionName = A creator
@@ -74,7 +74,7 @@
       print(x, mode = "google_images")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+      i  auto_xmp (not XMP tag) := cc:attributionName, cc:license, dc:rights, dc:subject,
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
          dc:creator := A creator
@@ -89,7 +89,7 @@
       print(x, mode = "all")
     Output
       i  spdx_id (not XMP tag) := CC-BY-4.0
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+      i  auto_xmp (not XMP tag) := cc:attributionName, cc:license, dc:rights, dc:subject,
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
          Iptc4xmpCore:AltTextAccessibility := An alternative image text

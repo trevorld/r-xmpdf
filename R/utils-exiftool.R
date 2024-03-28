@@ -4,24 +4,29 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     stopifnot(supports_exiftool())
     filename <- normalizePath(filename, mustWork = TRUE)
 
+    json_dir <- tempfile()
+    on.exit(unlink(json_dir))
+
     # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
-    if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(tags, "-G1", "-a", "-n", "-struct", "-j", filename)
-        output <- exiftoolr::exif_call(args, quiet = TRUE)
-    } else {
-        cmd <- exiftool()
-        f <- tempfile(fileext = ".txt")
-        on.exit(unlink(f))
-        args <- c(tags, "-G1", "-a", "-n", "-j", filename)
-        writeLines(args, f)
-        args <- c("-@", shQuote(f))
-        if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
-            args <- c(cmd[-1L], args)
-            cmd <- cmd[1L]
-        }
-        output <- xmpdf_system2(cmd, args)
+    args <- c(tags, "-G1", "-a", "-n", "-struct",
+              "-j", "-w", stri_join(json_dir, "/%f.json"),
+              filename)
+    cmd <- exiftool()
+    f_args <- tempfile(fileext = ".txt")
+    on.exit(unlink(f_args))
+    brio::write_lines(args, f_args)
+    args <- c("-@", shQuote(f_args))
+    if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
+        args <- c(cmd[-1L], args)
+        cmd <- cmd[1L]
     }
-    jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
+    output <- xmpdf_system2(cmd, args)
+    json_file <- list.files(json_dir, pattern = ".json", full.names = TRUE)
+    if (length(json_file) == 0L) { # `exiftool` doesn't create json file if no metadata matching tags
+        return(list())
+    }
+    stopifnot(length(json_file) == 1L)
+    jsonlite::fromJSON(brio::read_lines(json_file), simplifyDataFrame = FALSE)[[1]]
 }
 
 as_exif_value <- function(x, mode = "xmp") {
@@ -39,7 +44,7 @@ as_exif_value <- function(x, mode = "xmp") {
 
 as_exif_name <- function(x, name) {
     if (inherits(x, "lang_alt")) {
-        paste0(name, "-", names(x))
+        stri_join(name, "-", names(x))
     } else {
         rep_len(name, length(x))
     }
@@ -53,7 +58,7 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     output <- normalizePath(output, mustWork = FALSE)
     output_exists <- file.exists(output)
     if (output_exists) {
-        target <- tempfile(fileext = paste0(".", tools::file_ext(input)))
+        target <- tempfile(fileext = stri_join(".", tools::file_ext(input)))
         on.exit(unlink(target))
     } else {
         target <- output
@@ -71,43 +76,28 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
         ops <- c(ops, rep_len("=", n))
     }
     if (length(tags)) {
-        args <- paste0("-", nms, ops, values)
+        args <- stri_join("-", nms, ops, values)
         # correctly handle any newlines
         if (any(gl <- grepl("\n", args))) {
             args <- ifelse(gl,
-                           paste0("#[CSTR]", gsub("\n", "\\\\n", args)),
+                           stri_join("#[CSTR]", gsub("\n", "\\\\n", args)),
                            args)
         }
     } else {
         args <- character(0)
     }
-    if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        args <- c(args, "-n", "-o", target, input)
-        results <- exiftoolr::exif_call(args, quiet = TRUE)
-    } else {
-        cmd <- exiftool()
-        f <- tempfile(fileext = ".txt")
-        on.exit(unlink(f))
-        args <- c(args, "-n", "-o", target, input)
-        writeLines(args, f)
-        args <- c("-@", shQuote(f))
-        if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
-            args <- c(cmd[-1L], args)
-            cmd <- cmd[1L]
-        }
-        results <- xmpdf_system2(cmd, args)
+    args <- c(args, "-n", "-o", target, input)
+    cmd <- exiftool()
+    f <- tempfile(fileext = ".txt")
+    on.exit(unlink(f))
+    brio::write_lines(args, f)
+    args <- c("-@", shQuote(f))
+    if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
+        args <- c(cmd[-1L], args)
+        cmd <- cmd[1L]
     }
+    results <- xmpdf_system2(cmd, args)
     if (output_exists)
         file.copy(target, output, overwrite = TRUE)
     invisible(output)
 }
-
-# get_exiftool_metadata_json <- function(filename, tags=NULL) {
-#     assert_suggested("jsonlite")
-#     cmd <- exiftool()
-#     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
-#
-#     args <- c(tags, "-G1", "-a", "-j", filename)
-#     output <- xmpdf_system2(cmd, args)
-#     jsonlite::fromJSON(output, simplifyDataFrame = FALSE)[[1]]
-# }

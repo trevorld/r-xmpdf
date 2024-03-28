@@ -17,7 +17,7 @@
     Code
       print(x)
     Output
-      i  auto_xmp (not XMP tag) :=  cc:attributionName, cc:license, dc:rights, dc:subject,
+      i  auto_xmp (not XMP tag) := cc:attributionName, cc:license, dc:rights, dc:subject,
               photoshop:Credit, xmpRights:Marked, xmpRights:UsageTerms,
               xmpRights:WebStatement
       => cc:attributionName = John Doe

@@ -160,7 +160,6 @@ test_that("docinfo_exiftool", {
 })
 
 test_that("docinfo()", {
-
     d <- docinfo(author = "John Doe",
                  creation_date = "2022-11-11 11:11:11",
                  creator = "Generic Creator",

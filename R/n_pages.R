@@ -93,8 +93,8 @@ n_pages_gs <- function(filename, use_names = TRUE) {
     filename <- normalizePath(filename, winslash="/", mustWork = TRUE)
     sapply(filename, USE.NAMES = use_names, FUN = function(f) {
         args <- c("-q", "-dNODISPLAY", "-dNOSAFER", "-c",
-                  paste(paste0('"(', f, ")"),
-                        "(r)", "file", "runpdfbegin", "pdfpagecount", "=", 'quit"'))
+                  stri_join(stri_join('"(', f, ")"),
+                            ' (r) file runpdfbegin pdfpagecount = quit"'))
         as.integer(xmpdf_system2(cmd, args))
     })
 }

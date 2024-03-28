@@ -3,6 +3,7 @@ library("grid")
 
 test_that("get_xmp() / set_xmp()", {
     skip_if_not(supports_get_xmp() && supports_set_xmp())
+    # In non-Unicode locales "dc:rights" will have <U+00A9> instead of copyright sign in snapshots
     skip_if_not(l10n_info()[["UTF-8"]])
     skip_on_os("mac") # CRAN checks on macOS 14
     f <- tempfile(fileext = ".pdf")
@@ -54,6 +55,7 @@ test_that("get_xmp() / set_xmp()", {
     expect_equal(x2$alt_text[["x-default"]], "An alternative image text")
     expect_equal(x2$ext_description[["x-default"]],
                  "An extended description (for accessibility)\nWith newline")
+    expect_equal(x2$rights[["x-default"]], "\u00a9 2020 A creator. Some rights reserved.")
     expect_equal(x2$subject, c("R", "xmpdf"))
     expect_equal(x2$title[["x-default"]], "An XMP title")
     expect_equal(x2$get_item("dc:contributor"),
