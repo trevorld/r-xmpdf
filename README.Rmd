@@ -246,7 +246,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 #### exiv2
 
 * [{exiv}](https://github.com/hrbrmstr/exiv) read and write ‘Exif’, ‘ID3v1’ and ‘ID3v2’ image/media tags
-* [exiv2](https://exiv2.org/)
+* [exiv2](https://github.com/Exiv2/exiv2)
 
 #### other exif tools
 
