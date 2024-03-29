@@ -2,7 +2,7 @@ Encoding: UTF-8
 Package: xmpdf
 Type: Package
 Title: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info
-Version: 0.2.0-1
+Version: 0.2.0-2
 Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
     in a variety of media file formats as well as 
     edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files.
@@ -11,10 +11,9 @@ Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metad
     and/or 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
 Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
                     email="trevor.l.davis@gmail.com", comment = c(ORCID = "0000-0001-6341-4639")),
-             person("W. Trevor King", role = "ctb", "Some pdf code adapted from 'pdf-merge.py'"),
              person("Linux Foundation", role="dtc",
                     comment = 'Uses some data from the "SPDX License List" <https://github.com/spdx/license-list-XML>'))
-License: GPL (>=3)
+License: MIT + file LICENSE
 URL: https://trevorldavis.com/R/xmpdf/dev/
 BugReports: https://github.com/trevorld/r-xmpdf/issues
 LazyData: true

@@ -14,6 +14,9 @@ New features
 Bug fixes and minor improvements
 --------------------------------
 
+* We can again disable old bookmarks when setting new bookmarks
+  in `set_bookmarks_gs()` for the newest versions of `ghostscript` (#59).
+  The new approach means we could remove some GPLv3 code and have relicensed the package under the MIT license.
 * Improved support for reading/writing Unicode values in non-Unicode locales (#57).
 * `get_bookmarks()` and `get_bookmarks_pdftk()` no longer returns its data frame value invisibly.
 

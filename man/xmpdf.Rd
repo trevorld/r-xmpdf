@@ -31,7 +31,6 @@ Useful links:
 
 Other contributors:
 \itemize{
-  \item W. Trevor King Some pdf code adapted from 'pdf-merge.py' [contributor]
   \item Linux Foundation (Uses some data from the "SPDX License List" <https://github.com/spdx/license-list-XML>) [data contributor]
 }
 
