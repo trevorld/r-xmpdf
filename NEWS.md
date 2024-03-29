@@ -1,4 +1,4 @@
-xmpdf 0.2.0
+xmpdf 0.2.1
 ===========
 
 New features
