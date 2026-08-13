@@ -385,7 +385,7 @@ set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
 
     metafile <- tempfile(fileext = ".txt")
     metafile <- normalizePath(metafile, mustWork = FALSE)
-    on.exit(unlink(metafile))
+    on.exit(unlink(metafile), add = TRUE)
     f <- file(metafile, encoding = "UTF-8")
     open(f, "w")
     brio::write_lines(meta, metafile)
@@ -415,7 +415,7 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
     }
     metafile <- tempfile(fileext = ".bin")
     metafile <- normalizePath(metafile, mustWork = FALSE)
-    on.exit(unlink(metafile))
+    on.exit(unlink(metafile), add = TRUE)
 
     if (any(is.na(iconv(bookmarks$title, to = "latin1")))) { # Has non-Latin-1 characters
         bookmarks_raw <- unlist(purrr::pmap(bookmarks, bookmark_gs_raw))
