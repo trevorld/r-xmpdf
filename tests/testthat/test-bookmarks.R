@@ -2,7 +2,7 @@ skip_if_not_installed("grid")
 library("grid")
 
 f1 <- tempfile(fileext = ".pdf")
-on.exit(unlink(f1))
+on.exit(unlink(f1), add = TRUE)
 pdf(f1, onefile = TRUE)
 grid.text("Page 1")
 grid.newpage()
@@ -18,7 +18,7 @@ test_that("set_bookmarks", {
     skip_if_not(supports_get_bookmarks())
     skip_if_not(supports_set_bookmarks())
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
 
     bookmarks <- get_bookmarks(f1)[[1]]
     set_bookmarks(bookmarks, f1, f2)
@@ -39,7 +39,7 @@ test_that("set_bookmarks_gs", {
     skip_if_not(supports_get_bookmarks())
     skip_if_not(supports_gs())
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
 
     bookmarks <- get_bookmarks(f1)[[1]]
     set_bookmarks_gs(bookmarks, f1, f2)
@@ -84,7 +84,7 @@ test_that("set_bookmarks_gs", {
 
     # Edit bookmarks of file with pre-existing bookmarks
     f3 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f3))
+    on.exit(unlink(f3), add = TRUE)
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks_gs(bookmarks, f2, f3)
@@ -97,7 +97,7 @@ test_that("bookmarks_pdftk", {
     expect_equal(nrow(get_bookmarks(f1)[[1]]), 0L)
 
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
 
     bookmarks <- get_bookmarks(f1)[[1]]
     set_bookmarks_pdftk(bookmarks, f1, f2)
@@ -139,7 +139,7 @@ test_that("bookmarks_pdftk", {
 
     # Edit bookmarks of file with pre-existing bookmarks
     f3 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f3))
+    on.exit(unlink(f3), add = TRUE)
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     set_bookmarks_pdftk(bookmarks, f2, f3)
@@ -152,7 +152,7 @@ test_that("bookmarks_pdftools", {
     expect_equal(nrow(get_bookmarks(f1)[[1]]), 0L)
 
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
 
     skip_if_not(supports_set_bookmarks())
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
@@ -198,11 +198,11 @@ test_that("`cat_bookmarks()` works", {
     bookmarks <- data.frame(title = c("Page 1", "Page 2"),
                             page = c(1L, 2L))
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
     set_bookmarks(bookmarks, f1, f2)
 
     f3 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f3))
+    on.exit(unlink(f3), add = TRUE)
     set_bookmarks(bookmarks, f1, f3)
 
     l <- get_bookmarks(c(f2, f3))

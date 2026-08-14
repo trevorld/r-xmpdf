@@ -7,7 +7,7 @@ test_that("get_xmp() / set_xmp()", {
     skip_if_not(l10n_info()[["UTF-8"]])
     skip_on_os("mac") # CRAN checks on macOS 14
     f <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f))
+    on.exit(unlink(f), add = TRUE)
     pdf(f)
     grid.text("Page 1")
     invisible(dev.off())
@@ -89,7 +89,7 @@ test_that("auto_xmp", {
 test_that("get_xmp_exiftool() / set_xmp_exiftool()", {
     skip_if_not(supports_exiftool())
     f <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f))
+    on.exit(unlink(f), add = TRUE)
     pdf(f)
     grid.text("Page 1")
     invisible(dev.off())

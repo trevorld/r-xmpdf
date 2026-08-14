@@ -1,7 +1,7 @@
 test_that("messages", {
     rlang::with_options({
         f <- tempfile(fileext = ".pdf")
-        on.exit(unlink(f))
+        on.exit(unlink(f), add = TRUE)
         pdf(f)
         plot(0, 0)
         invisible(dev.off())

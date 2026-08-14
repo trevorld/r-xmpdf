@@ -151,11 +151,11 @@ get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
 #'    invisible(dev.off())
 #'  }
 #'  f1 <- tempfile(fileext = "_doc1.pdf")
-#'  on.exit(unlink(f1))
+#'  on.exit(unlink(f1), add = TRUE)
 #'  make_pdf(f1, "Document 1")
 #'
 #'  f2 <- tempfile(fileext = "_doc2.pdf")
-#'  on.exit(unlink(f2))
+#'  on.exit(unlink(f2), add = TRUE)
 #'  make_pdf(f2, "Document 2")
 #'
 #'  # Add bookmarks to the two two-page pdf files
@@ -182,7 +182,7 @@ get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
 #'  # created with `cat_pages()`
 #'  if (supports_cat_pages()) {
 #'     fc <- tempfile(fileext = "_cat.pdf")
-#'     on.exit(unlink(fc))
+#'     on.exit(unlink(fc), add = TRUE)
 #'     cat_pages(c(f1, f2), fc)
 #'     set_bookmarks(bm, fc)
 #'     unlink(fc)
@@ -373,7 +373,7 @@ set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
     output <- normalizePath(output, mustWork = FALSE)
     if (input == output) {
         target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target))
+        on.exit(unlink(target), add = TRUE)
     } else {
         target <- output
     }
@@ -409,7 +409,7 @@ set_bookmarks_gs <- function(bookmarks, input, output = input) {
     output <- normalizePath(output, mustWork = FALSE)
     if (input == output) {
         target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target))
+        on.exit(unlink(target), add = TRUE)
     } else {
         target <- output
     }

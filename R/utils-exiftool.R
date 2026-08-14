@@ -5,7 +5,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
     filename <- normalizePath(filename, mustWork = TRUE)
 
     json_dir <- tempfile()
-    on.exit(unlink(json_dir))
+    on.exit(unlink(json_dir), add = TRUE)
 
     # Date format equivalent to R's "%Y-%m-%dT%H:%M:%S%z"
     args <- c(tags, "-G1", "-a", "-n", "-struct",
@@ -13,7 +13,7 @@ get_exiftool_metadata <- function(filename, tags=NULL) {
               filename)
     cmd <- exiftool()
     f_args <- tempfile(fileext = ".txt")
-    on.exit(unlink(f_args))
+    on.exit(unlink(f_args), add = TRUE)
     brio::write_lines(args, f_args)
     args <- c("-@", shQuote(f_args))
     if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
@@ -59,7 +59,7 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     output_exists <- file.exists(output)
     if (output_exists) {
         target <- tempfile(fileext = stri_join(".", tools::file_ext(input)))
-        on.exit(unlink(target))
+        on.exit(unlink(target), add = TRUE)
     } else {
         target <- output
     }
@@ -89,7 +89,7 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
     args <- c(args, "-n", "-o", target, input)
     cmd <- exiftool()
     f <- tempfile(fileext = ".txt")
-    on.exit(unlink(f))
+    on.exit(unlink(f), add = TRUE)
     brio::write_lines(args, f)
     args <- c("-@", shQuote(f))
     if (length(cmd) == 2L) { # i.e. c("/path/to/perl", "path/to/exiftool")
