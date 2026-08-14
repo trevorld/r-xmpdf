@@ -1,8 +1,9 @@
 *.swp
 
+.claude/
 codecov.yml
 pkgdown
 README.html
 tmp
-raw-data/spdx.json
-raw-data/spdx_license_list.html
+data-raw/spdx.json
+data-raw/spdx_license_list.html
