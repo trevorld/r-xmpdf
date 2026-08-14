@@ -50,47 +50,52 @@
 #' }
 #' @export
 cat_pages <- function(input, output) {
-    if (supports_qpdf()) {
-        cat_pages_qpdf(input, output)
-    } else if (supports_pdftk()) {
-        cat_pages_pdftk(input, output)
-    } else if (supports_gs()) {
-        cat_pages_gs(input, output)
-    } else {
-        abort(msg_cat_pages(), class = "xmpdf_suggested_package")
-    }
+	if (supports_qpdf()) {
+		cat_pages_qpdf(input, output)
+	} else if (supports_pdftk()) {
+		cat_pages_pdftk(input, output)
+	} else if (supports_gs()) {
+		cat_pages_gs(input, output)
+	} else {
+		abort(msg_cat_pages(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname cat_pages
 #' @export
 cat_pages_gs <- function(input, output) {
-    cmd <- gs()
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    args <- c("-q", "-o", shQuote(output),
-              "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
-              shQuote(input))
-    xmpdf_system2(cmd, args)
-    invisible(output)
+	cmd <- gs()
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	args <- c(
+		"-q",
+		"-o",
+		shQuote(output),
+		"-sDEVICE=pdfwrite",
+		"-sAutoRotatePages=None",
+		shQuote(input)
+	)
+	xmpdf_system2(cmd, args)
+	invisible(output)
 }
 
 #' @rdname cat_pages
 #' @export
 cat_pages_pdftk <- function(input, output) {
-    cmd <- pdftk()
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    args <- c(shQuote(input), "cat", "output", shQuote(output))
-    xmpdf_system2(cmd, args)
-    invisible(output)
+	cmd <- pdftk()
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	args <- c(shQuote(input), "cat", "output", shQuote(output))
+	xmpdf_system2(cmd, args)
+	invisible(output)
 }
 
 #' @rdname cat_pages
 #' @export
 cat_pages_qpdf <- function(input, output) {
-    assert_suggested("qpdf")
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    qpdf::pdf_combine(input, output)
-    invisible(output)
+	assert_suggested("qpdf")
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	qpdf::pdf_combine(input, output)
+	invisible(output)
 }

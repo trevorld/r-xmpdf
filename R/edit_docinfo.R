@@ -73,214 +73,235 @@ NULL
 #' @rdname edit_docinfo
 #' @export
 get_docinfo <- function(filename, use_names = TRUE) {
-    if (supports_pdftk()) {
-        get_docinfo_pdftk(filename, use_names = use_names)
-    } else if (supports_exiftool()) {
-        get_docinfo_exiftool(filename, use_names = use_names)
-    } else if (supports_pdftools()) {
-        get_docinfo_pdftools(filename, use_names = use_names)
-    } else {
-        abort(msg_get_docinfo(), class = "xmpdf_suggested_package")
-    }
+	if (supports_pdftk()) {
+		get_docinfo_pdftk(filename, use_names = use_names)
+	} else if (supports_exiftool()) {
+		get_docinfo_exiftool(filename, use_names = use_names)
+	} else if (supports_pdftools()) {
+		get_docinfo_pdftools(filename, use_names = use_names)
+	} else {
+		abort(msg_get_docinfo(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname edit_docinfo
 #' @export
 get_docinfo_pdftools <- function(filename, use_names = TRUE) {
-    assert_suggested("pdftools")
-    l <- lapply(filename, get_docinfo_pdftools_helper)
-    use_filenames(l, use_names, filename)
+	assert_suggested("pdftools")
+	l <- lapply(filename, get_docinfo_pdftools_helper)
+	use_filenames(l, use_names, filename)
 }
 
 get_docinfo_pdftools_helper <- function(filename) {
-    info <- pdftools::pdf_info(filename)
-    dinfo <- docinfo()
-    for (i in seq_along(info$keys)) {
-        key <- names(info$keys)[i]
-        if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
-            dinfo$set_item(names(info$keys)[i], info$keys[[i]])
-        } else {
-            msg <- sprintf("We don't support key '%s' yet.", key)
-            warn(msg)
-        }
-    }
-    if (!is.null(info$created))
-        dinfo$creation_date <- info$created
-    if (!is.null(info$modified))
-        dinfo$mod_date <- info$modified
-    dinfo
+	info <- pdftools::pdf_info(filename)
+	dinfo <- docinfo()
+	for (i in seq_along(info$keys)) {
+		key <- names(info$keys)[i]
+		if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
+			dinfo$set_item(names(info$keys)[i], info$keys[[i]])
+		} else {
+			msg <- sprintf("We don't support key '%s' yet.", key)
+			warn(msg)
+		}
+	}
+	if (!is.null(info$created)) {
+		dinfo$creation_date <- info$created
+	}
+	if (!is.null(info$modified)) {
+		dinfo$mod_date <- info$modified
+	}
+	dinfo
 }
 
 #' @rdname edit_docinfo
 #' @export
 get_docinfo_exiftool <- function(filename, use_names = TRUE) {
-    l <- lapply(filename, get_docinfo_exiftool_helper)
-    use_filenames(l, use_names, filename)
+	l <- lapply(filename, get_docinfo_exiftool_helper)
+	use_filenames(l, use_names, filename)
 }
 get_docinfo_exiftool_helper <- function(filename) {
-    md <- get_exiftool_metadata(filename, tags="-PDF:all")
-    md <- md[grep("^PDF:", names(md))]
-    names(md) <- gsub("^PDF:", "", names(md))
-    dinfo <- docinfo()
+	md <- get_exiftool_metadata(filename, tags = "-PDF:all")
+	md <- md[grep("^PDF:", names(md))]
+	names(md) <- gsub("^PDF:", "", names(md))
+	dinfo <- docinfo()
 
-    for (i in seq_along(md)) {
-        key <- names(md)[i]
-        if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
-            dinfo$set_item(names(md)[i], md[[i]])
-        } else if (key %in% c("PDFVersion", "Linearized", "PageCount", "CreateDate", "ModifyDate")) {
-            next
-        } else {
-            msg <- sprintf("We don't support key '%s' yet.", key)
-            warn(msg)
-        }
-    }
-    if (!is.null(md$CreateDate))
-        dinfo$creation_date <- md$CreateDate
-    if (!is.null(md$ModifyDate))
-        dinfo$mod_date <- md$ModifyDate
-    dinfo
+	for (i in seq_along(md)) {
+		key <- names(md)[i]
+		if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
+			dinfo$set_item(names(md)[i], md[[i]])
+		} else if (
+			key %in% c("PDFVersion", "Linearized", "PageCount", "CreateDate", "ModifyDate")
+		) {
+			next
+		} else {
+			msg <- sprintf("We don't support key '%s' yet.", key)
+			warn(msg)
+		}
+	}
+	if (!is.null(md$CreateDate)) {
+		dinfo$creation_date <- md$CreateDate
+	}
+	if (!is.null(md$ModifyDate)) {
+		dinfo$mod_date <- md$ModifyDate
+	}
+	dinfo
 }
 
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
-    docinfo <- as_docinfo(docinfo)
-    tags <- docinfo$exiftool_tags()
-    set_exiftool_metadata(tags, input, output, mode = "pdf")
+	docinfo <- as_docinfo(docinfo)
+	tags <- docinfo$exiftool_tags()
+	set_exiftool_metadata(tags, input, output, mode = "pdf")
 }
 
 #' @rdname edit_docinfo
 #' @export
 get_docinfo_pdftk <- function(filename, use_names = TRUE) {
-    l <- lapply(filename, get_docinfo_pdftk_helper)
-    use_filenames(l, use_names, filename)
+	l <- lapply(filename, get_docinfo_pdftk_helper)
+	use_filenames(l, use_names, filename)
 }
 
 get_docinfo_pdftk_helper <- function(filename) {
-    info <- get_pdftk_metadata(filename)
-    dinfo <- docinfo()
-    if (length(id <- grep("^InfoKey: Author", info))) {
-        dinfo$author <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: CreationDate", info))) {
-        dinfo$creation_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
-    }
-    if (length(id <- grep("^InfoKey: Creator", info))) {
-        dinfo$creator <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: Producer", info))) {
-        dinfo$producer <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: Title", info))) {
-        dinfo$title <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: Subject", info))) {
-        dinfo$subject <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: Keywords", info))) {
-        dinfo$keywords <- pdftk_string_value(info, id)
-    }
-    if (length(id <- grep("^InfoKey: ModDate", info))) {
-        dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
-    }
-    dinfo
+	info <- get_pdftk_metadata(filename)
+	dinfo <- docinfo()
+	if (length(id <- grep("^InfoKey: Author", info))) {
+		dinfo$author <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: CreationDate", info))) {
+		dinfo$creation_date <- datetimeoffset::as_datetimeoffset(gsub(
+			"^InfoValue: ",
+			"",
+			info[id + 1]
+		))
+	}
+	if (length(id <- grep("^InfoKey: Creator", info))) {
+		dinfo$creator <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: Producer", info))) {
+		dinfo$producer <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: Title", info))) {
+		dinfo$title <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: Subject", info))) {
+		dinfo$subject <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: Keywords", info))) {
+		dinfo$keywords <- pdftk_string_value(info, id)
+	}
+	if (length(id <- grep("^InfoKey: ModDate", info))) {
+		dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
+	}
+	dinfo
 }
 
 pdftk_string_value <- function(info, id) {
-    v <- gsub("^InfoValue: ", "", info[id + 1])
-    i_x <- id + 2
-    while ((i_x) < length(info) && is_pdftk_newline(info[i_x])) {
-        v <- stri_join(v, info[i_x], sep = "\n")
-        i_x <- i_x + 1
-    }
-    v
+	v <- gsub("^InfoValue: ", "", info[id + 1])
+	i_x <- id + 2
+	while ((i_x) < length(info) && is_pdftk_newline(info[i_x])) {
+		v <- stri_join(v, info[i_x], sep = "\n")
+		i_x <- i_x + 1
+	}
+	v
 }
 
 is_pdftk_newline <- function(line) {
-    if (grepl("^[[:alnum:]]+:", line) ||
-        grepl("^[[:alpha:]]+Begin$", line))
-        FALSE
-    else
-        TRUE
+	if (
+		grepl("^[[:alnum:]]+:", line) ||
+			grepl("^[[:alpha:]]+Begin$", line)
+	) {
+		FALSE
+	} else {
+		TRUE
+	}
 }
 
 #' @rdname edit_docinfo
 #' @export
 set_docinfo <- function(docinfo, input, output = input) {
-    if (supports_exiftool()) {
-        set_docinfo_exiftool(docinfo, input, output)
-    } else if (supports_gs()) {
-        set_docinfo_gs(docinfo, input, output)
-    } else if (supports_pdftk()) {
-        set_docinfo_pdftk(docinfo, input, output)
-    } else {
-        abort(msg_set_docinfo(), class = "xmpdf_suggested_package")
-    }
+	if (supports_exiftool()) {
+		set_docinfo_exiftool(docinfo, input, output)
+	} else if (supports_gs()) {
+		set_docinfo_gs(docinfo, input, output)
+	} else if (supports_pdftk()) {
+		set_docinfo_pdftk(docinfo, input, output)
+	} else {
+		abort(msg_set_docinfo(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_gs <- function(docinfo, input, output = input) {
-    docinfo <- as_docinfo(docinfo)
-    cmd <- gs()
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    if (input == output) {
-        target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target), add = TRUE)
-    } else {
-        target <- output
-    }
-    metafile <- tempfile(fileext = ".bin")
-    on.exit(unlink(metafile), add = TRUE)
-    pmc <- docinfo$pdfmark(raw = FALSE)
-    pmc_l1 <- iconv(pmc, to = "latin1")
-    if (is.na(pmc_l1)) { # Has non-Latin-1 characters
-        writeBin(docinfo$pdfmark(raw = TRUE),
-                 metafile,
-                 endian = "big")
-    } else { # Just Latin-1 characters
-        f <- file(metafile, encoding = "latin1")
-        open(f, "w")
-        writeLines(pmc_l1, f)
-        close(f)
-    }
-    metafile <- normalizePath(metafile, mustWork = TRUE)
-    args <- c("-q", "-o", shQuote(target), "-sDEVICE=pdfwrite", "-sAutoRotatePages=None",
-              shQuote(input), shQuote(metafile))
-    xmpdf_system2(cmd, args)
-    if (input == output)
-        file.copy(target, output, overwrite = TRUE)
-    invisible(output)
+	docinfo <- as_docinfo(docinfo)
+	cmd <- gs()
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	if (input == output) {
+		target <- tempfile(fileext = ".pdf")
+		on.exit(unlink(target), add = TRUE)
+	} else {
+		target <- output
+	}
+	metafile <- tempfile(fileext = ".bin")
+	on.exit(unlink(metafile), add = TRUE)
+	pmc <- docinfo$pdfmark(raw = FALSE)
+	pmc_l1 <- iconv(pmc, to = "latin1")
+	if (is.na(pmc_l1)) {
+		# Has non-Latin-1 characters
+		writeBin(docinfo$pdfmark(raw = TRUE), metafile, endian = "big")
+	} else {
+		# Just Latin-1 characters
+		f <- file(metafile, encoding = "latin1")
+		open(f, "w")
+		writeLines(pmc_l1, f)
+		close(f)
+	}
+	metafile <- normalizePath(metafile, mustWork = TRUE)
+	args <- c(
+		"-q",
+		"-o",
+		shQuote(target),
+		"-sDEVICE=pdfwrite",
+		"-sAutoRotatePages=None",
+		shQuote(input),
+		shQuote(metafile)
+	)
+	xmpdf_system2(cmd, args)
+	if (input == output) {
+		file.copy(target, output, overwrite = TRUE)
+	}
+	invisible(output)
 }
 
 #' @rdname edit_docinfo
 #' @export
 set_docinfo_pdftk <- function(docinfo, input, output = input) {
-    docinfo <- as_docinfo(docinfo)
-    cmd <- pdftk()
-    meta <- get_pdftk_metadata(input)
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    if (input == output) {
-        target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target), add = TRUE)
-    } else {
-        target <- output
-    }
-    id_info <- grep("^Info", meta)
-    if (length(id_info))
-        meta <- meta[-id_info]
-    meta <- append(docinfo$pdftk(), meta)
-    metafile <- tempfile(fileext = ".txt")
-    on.exit(unlink(metafile), add = TRUE)
-    brio::write_lines(meta, metafile)
-    metafile <- normalizePath(metafile, mustWork = TRUE)
-    args <- c(shQuote(input),
-              "update_info_utf8", shQuote(metafile),
-              "output", shQuote(target))
-    xmpdf_system2(cmd, args)
-    if (input == output)
-        file.copy(target, output, overwrite = TRUE)
-    invisible(output)
+	docinfo <- as_docinfo(docinfo)
+	cmd <- pdftk()
+	meta <- get_pdftk_metadata(input)
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	if (input == output) {
+		target <- tempfile(fileext = ".pdf")
+		on.exit(unlink(target), add = TRUE)
+	} else {
+		target <- output
+	}
+	id_info <- grep("^Info", meta)
+	if (length(id_info)) {
+		meta <- meta[-id_info]
+	}
+	meta <- append(docinfo$pdftk(), meta)
+	metafile <- tempfile(fileext = ".txt")
+	on.exit(unlink(metafile), add = TRUE)
+	brio::write_lines(meta, metafile)
+	metafile <- normalizePath(metafile, mustWork = TRUE)
+	args <- c(shQuote(input), "update_info_utf8", shQuote(metafile), "output", shQuote(target))
+	xmpdf_system2(cmd, args)
+	if (input == output) {
+		file.copy(target, output, overwrite = TRUE)
+	}
+	invisible(output)
 }

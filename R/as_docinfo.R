@@ -13,34 +13,35 @@
 #'
 #' @export
 as_docinfo <- function(x, ...) {
-    UseMethod("as_docinfo")
+	UseMethod("as_docinfo")
 }
 
 #' @export
 as_docinfo.docinfo <- function(x, ...) {
-    x
+	x
 }
 
 #' @export
 as_docinfo.default <- function(x, ...) {
-    l <- as.list(x)
-    d <- docinfo()
-    for (key in names(l))
-        d$set_item(key, l[[key]])
-    d
+	l <- as.list(x)
+	d <- docinfo()
+	for (key in names(l)) {
+		d$set_item(key, l[[key]])
+	}
+	d
 }
 
 #' @rdname as_docinfo
 #' @export
 as_docinfo.xmp <- function(x, ...) {
-    d <- docinfo()
-    d$title <- x$title[["x-default"]]
-    d$author <- stri_join(x$creator, collapse = " and ")
-    d$subject <- x$description[["x-default"]]
-    d$producer <- x$producer
-    d$keywords <- x$keywords
-    d$creation_date <- x$create_date
-    d$creator <- x$creator_tool
-    d$mod_date <- x$modify_date
-    d
+	d <- docinfo()
+	d$title <- x$title[["x-default"]]
+	d$author <- stri_join(x$creator, collapse = " and ")
+	d$subject <- x$description[["x-default"]]
+	d$producer <- x$producer
+	d$keywords <- x$keywords
+	d$creation_date <- x$create_date
+	d$creator <- x$creator_tool
+	d$mod_date <- x$modify_date
+	d
 }

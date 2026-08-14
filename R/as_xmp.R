@@ -15,30 +15,31 @@
 #'  as_xmp(l)
 #' @export
 as_xmp <- function(x, ...) {
-    UseMethod("as_xmp")
+	UseMethod("as_xmp")
 }
 
 #' @export
 as_xmp.default <- function(x, ...) {
-    as_xmp(as.list(x))
+	as_xmp(as.list(x))
 }
 
 #' @rdname as_xmp
 #' @export
 as_xmp.docinfo <- function(x, ...) {
-    x$xmp()
+	x$xmp()
 }
 
 #' @rdname as_xmp
 #' @export
 as_xmp.list <- function(x, ...) {
-    xmp <- xmp()
-    for (key in names(x))
-        xmp$set_item(key, x[[key]])
-    xmp
+	xmp <- xmp()
+	for (key in names(x)) {
+		xmp$set_item(key, x[[key]])
+	}
+	xmp
 }
 
 #' @export
 as_xmp.xmp <- function(x, ...) {
-    x
+	x
 }

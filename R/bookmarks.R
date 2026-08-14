@@ -85,27 +85,27 @@ NULL
 #' @rdname bookmarks
 #' @export
 get_bookmarks <- function(filename, use_names = TRUE) {
-    if (supports_pdftk()) {
-        get_bookmarks_pdftk(filename, use_names = use_names)
-    } else if (supports_pdftools()) {
-        get_bookmarks_pdftools(filename, use_names = use_names)
-    } else {
-        abort(msg_get_bookmarks(), class = "xmpdf_suggested_package")
-    }
+	if (supports_pdftk()) {
+		get_bookmarks_pdftk(filename, use_names = use_names)
+	} else if (supports_pdftools()) {
+		get_bookmarks_pdftools(filename, use_names = use_names)
+	} else {
+		abort(msg_get_bookmarks(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname bookmarks
 #' @export
 get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
-    l <- lapply(filename, get_bookmarks_pdftk_helper)
-    use_filenames(l, use_names, filename)
+	l <- lapply(filename, get_bookmarks_pdftk_helper)
+	use_filenames(l, use_names, filename)
 }
 
 #' @rdname bookmarks
 #' @export
 get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
-    l <- lapply(filename, get_bookmarks_pdftools_helper)
-    use_filenames(l, use_names, filename)
+	l <- lapply(filename, get_bookmarks_pdftools_helper)
+	use_filenames(l, use_names, filename)
 }
 
 #' Concatenate pdf bookmarks
@@ -194,431 +194,518 @@ get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
 #' @seealso [get_bookmarks()] and [set_bookmarks()] for setting bookmarks.
 #'          [cat_pages()] for concatenating pdf files together.
 #' @export
-cat_bookmarks <- function(l, method = c("flat", "filename", "title"),
-                          open = NA, color = NA_character_, fontface = NA_character_) {
-    stopifnot(length(l) > 0L)
-    method <- match.arg(method, c("flat", "filename", "title"))
-    l <- lapply(l, as_bookmarks)
+cat_bookmarks <- function(
+	l,
+	method = c("flat", "filename", "title"),
+	open = NA,
+	color = NA_character_,
+	fontface = NA_character_
+) {
+	stopifnot(length(l) > 0L)
+	method <- match.arg(method, c("flat", "filename", "title"))
+	l <- lapply(l, as_bookmarks)
 
-    v_total_pages <- vapply(l, function(x) attr(x, "total_pages"), integer(1L), USE.NAMES = FALSE)
-    cum_pages <- cumsum(v_total_pages)
-    n_docs <- length(l)
-    if (method == "filename") {
-        titles <- vapply(l, function(x) basename(attr(x, "filename")), character(1L), USE.NAMES = FALSE)
-    } else if (method == "title") {
-        titles <- vapply(l, function(x) attr(x, "title") %||% "Untitled", character(1L), USE.NAMES = FALSE)
-    }
+	v_total_pages <- vapply(l, function(x) attr(x, "total_pages"), integer(1L), USE.NAMES = FALSE)
+	cum_pages <- cumsum(v_total_pages)
+	n_docs <- length(l)
+	if (method == "filename") {
+		titles <- vapply(
+			l,
+			function(x) basename(attr(x, "filename")),
+			character(1L),
+			USE.NAMES = FALSE
+		)
+	} else if (method == "title") {
+		titles <- vapply(
+			l,
+			function(x) attr(x, "title") %||% "Untitled",
+			character(1L),
+			USE.NAMES = FALSE
+		)
+	}
 
-    if (method %in% c("filename", "title")) {
-        if (hasName(l[[1]], "level"))
-            l[[1]]$level <- l[[1]]$level + 1L
-        l[[1]] <- rbind(data.frame(title = basename(titles[1L]),
-                                   page = 1L,
-                                   level = 1L,
-                                   count = NA_integer_,
-                                   open = open,
-                                   color = color,
-                                   fontface = fontface,
-                                   stringsAsFactors = FALSE),
-                        l[[1]])
-    }
-    if (n_docs == 1L) {
-        return(l[[1L]])
-    }
-    for (i in seq.int(2L, n_docs)) {
-        if (hasName(l[[i]], "page"))
-            l[[i]]$page <- l[[i]]$page + cum_pages[i - 1L]
-        if (method %in% c("filename", "title")) {
-            if (hasName(l[[i]], "level"))
-                l[[i]]$level <- l[[i]]$level + 1L
-            l[[i]] <- rbind(data.frame(title = basename(titles[i]),
-                                       page = cum_pages[i - 1L] + 1L,
-                                       level = 1L,
-                                       count = NA_integer_,
-                                       open = open,
-                                       color = color,
-                                       fontface = fontface,
-                                       stringsAsFactors = FALSE),
-                            l[[i]])
-        }
-    }
+	if (method %in% c("filename", "title")) {
+		if (hasName(l[[1]], "level")) {
+			l[[1]]$level <- l[[1]]$level + 1L
+		}
+		l[[1]] <- rbind(
+			data.frame(
+				title = basename(titles[1L]),
+				page = 1L,
+				level = 1L,
+				count = NA_integer_,
+				open = open,
+				color = color,
+				fontface = fontface,
+				stringsAsFactors = FALSE
+			),
+			l[[1]]
+		)
+	}
+	if (n_docs == 1L) {
+		return(l[[1L]])
+	}
+	for (i in seq.int(2L, n_docs)) {
+		if (hasName(l[[i]], "page")) {
+			l[[i]]$page <- l[[i]]$page + cum_pages[i - 1L]
+		}
+		if (method %in% c("filename", "title")) {
+			if (hasName(l[[i]], "level")) {
+				l[[i]]$level <- l[[i]]$level + 1L
+			}
+			l[[i]] <- rbind(
+				data.frame(
+					title = basename(titles[i]),
+					page = cum_pages[i - 1L] + 1L,
+					level = 1L,
+					count = NA_integer_,
+					open = open,
+					color = color,
+					fontface = fontface,
+					stringsAsFactors = FALSE
+				),
+				l[[i]]
+			)
+		}
+	}
 
-    df <- do.call(function(...) rbind(..., make.row.names = FALSE), l)
-    df$count <- get_count(df$level, df$open)
-    attr(df, "total_pages") <- sum(v_total_pages)
-    df
+	df <- do.call(function(...) rbind(..., make.row.names = FALSE), l)
+	df$count <- get_count(df$level, df$open)
+	attr(df, "total_pages") <- sum(v_total_pages)
+	df
 }
 
-df_bookmarks_empty <- data.frame(title = character(0),
-                                 page = integer(0),
-                                 level = integer(0),
-                                 count = integer(0),
-                                 open = logical(0),
-                                 color = character(),
-                                 fontface = integer(0),
-                                 stringsAsFactors = FALSE)
+df_bookmarks_empty <- data.frame(
+	title = character(0),
+	page = integer(0),
+	level = integer(0),
+	count = integer(0),
+	open = logical(0),
+	color = character(),
+	fontface = integer(0),
+	stringsAsFactors = FALSE
+)
 
 get_bookmarks_pdftk_helper <- function(filename) {
-    meta <- get_pdftk_metadata(filename)
-    n_bookmarks <- length(grep("^BookmarkBegin", meta))
-    stopifnot(length(grep("^BookmarkTitle", meta)) == n_bookmarks,
-              length(grep("^BookmarkLevel", meta)) == n_bookmarks,
-              length(grep("^BookmarkPageNumber", meta)) == n_bookmarks)
-    df <- if (n_bookmarks > 0) {
-        title <- gsub("^BookmarkTitle: ", "", grep("^BookmarkTitle", meta, value = TRUE))
-        level <- gsub("^BookmarkLevel: ", "", grep("^BookmarkLevel", meta, value = TRUE))
-        page <- gsub("^BookmarkPageNumber: ", "", grep("^BookmarkPageNumber", meta, value = TRUE))
-        data.frame(title = title,
-                   page = as.integer(page),
-                   level = as.integer(level),
-                   count = NA_integer_,
-                   open = NA,
-                   color = NA_character_,
-                   fontface = NA_character_,
-                   stringsAsFactors = FALSE)
-    } else {
-        df_bookmarks_empty
-    }
-    tot_pages <- grep("^NumberOfPages:", meta, value=TRUE)
-    if (length(id <- grep("^InfoKey: Title", meta)))
-        title <- gsub("^InfoValue: ", "", meta[id + 1])
-    else
-        title <- NULL
-    attr(df, "filename") <- filename
-    attr(df, "title") <- title
-    attr(df, "total_pages") <- as.integer(strsplit(tot_pages, ":")[[1]][2])
-    df
+	meta <- get_pdftk_metadata(filename)
+	n_bookmarks <- length(grep("^BookmarkBegin", meta))
+	stopifnot(
+		length(grep("^BookmarkTitle", meta)) == n_bookmarks,
+		length(grep("^BookmarkLevel", meta)) == n_bookmarks,
+		length(grep("^BookmarkPageNumber", meta)) == n_bookmarks
+	)
+	df <- if (n_bookmarks > 0) {
+		title <- gsub("^BookmarkTitle: ", "", grep("^BookmarkTitle", meta, value = TRUE))
+		level <- gsub("^BookmarkLevel: ", "", grep("^BookmarkLevel", meta, value = TRUE))
+		page <- gsub("^BookmarkPageNumber: ", "", grep("^BookmarkPageNumber", meta, value = TRUE))
+		data.frame(
+			title = title,
+			page = as.integer(page),
+			level = as.integer(level),
+			count = NA_integer_,
+			open = NA,
+			color = NA_character_,
+			fontface = NA_character_,
+			stringsAsFactors = FALSE
+		)
+	} else {
+		df_bookmarks_empty
+	}
+	tot_pages <- grep("^NumberOfPages:", meta, value = TRUE)
+	if (length(id <- grep("^InfoKey: Title", meta))) {
+		title <- gsub("^InfoValue: ", "", meta[id + 1])
+	} else {
+		title <- NULL
+	}
+	attr(df, "filename") <- filename
+	attr(df, "title") <- title
+	attr(df, "total_pages") <- as.integer(strsplit(tot_pages, ":")[[1]][2])
+	df
 }
 
 gbph_helper <- function(l, level = 0L) {
-    if (level == 0L) {
-        df <- data.frame(title = character(0), level = integer(0))
-    } else {
-        df <- data.frame(title = l$title, level = level)
-    }
-    if (length(l[["children"]]) > 0L) {
-        df_children <- do.call(rbind, lapply(l[["children"]], gbph_helper, level = level + 1L))
-        df <- rbind(df, df_children)
-    }
-    df
+	if (level == 0L) {
+		df <- data.frame(title = character(0), level = integer(0))
+	} else {
+		df <- data.frame(title = l$title, level = level)
+	}
+	if (length(l[["children"]]) > 0L) {
+		df_children <- do.call(rbind, lapply(l[["children"]], gbph_helper, level = level + 1L))
+		df <- rbind(df, df_children)
+	}
+	df
 }
 
 get_bookmarks_pdftools_helper <- function(filename) {
-    toc <- pdftools::pdf_toc(filename)
-    df <- if (length(toc) > 0L) {
-        df <- gbph_helper(toc)
-        data.frame(title = df$title,
-                   page = NA,
-                   level = as.integer(df$level),
-                   count = NA_integer_,
-                   open = NA,
-                   color = NA_character_,
-                   fontface = NA_character_,
-                   stringsAsFactors = FALSE)
-    } else {
-        df_bookmarks_empty
-    }
-    info <- pdftools::pdf_info(filename)
-    if (!is.null(info$keys) && !is.null(info$keys$Title))
-        title <- info$keys$Title
-    else
-        title <- NULL
-    attr(df, "filename") <- filename
-    attr(df, "title") <- title
-    attr(df, "total_pages") <- as.integer(info$pages)
-    df
+	toc <- pdftools::pdf_toc(filename)
+	df <- if (length(toc) > 0L) {
+		df <- gbph_helper(toc)
+		data.frame(
+			title = df$title,
+			page = NA,
+			level = as.integer(df$level),
+			count = NA_integer_,
+			open = NA,
+			color = NA_character_,
+			fontface = NA_character_,
+			stringsAsFactors = FALSE
+		)
+	} else {
+		df_bookmarks_empty
+	}
+	info <- pdftools::pdf_info(filename)
+	if (!is.null(info$keys) && !is.null(info$keys$Title)) {
+		title <- info$keys$Title
+	} else {
+		title <- NULL
+	}
+	attr(df, "filename") <- filename
+	attr(df, "title") <- title
+	attr(df, "total_pages") <- as.integer(info$pages)
+	df
 }
 
 #' @rdname bookmarks
 #' @export
 set_bookmarks <- function(bookmarks, input, output = input) {
-    if (supports_gs()) {
-        set_bookmarks_gs(bookmarks, input, output)
-    } else if (supports_pdftk()) {
-        set_bookmarks_pdftk(bookmarks, input, output)
-    } else {
-        abort(msg_set_bookmarks(), class = "xmpdf_suggested_package")
-    }
+	if (supports_gs()) {
+		set_bookmarks_gs(bookmarks, input, output)
+	} else if (supports_pdftk()) {
+		set_bookmarks_pdftk(bookmarks, input, output)
+	} else {
+		abort(msg_set_bookmarks(), class = "xmpdf_suggested_package")
+	}
 }
 
 should_pdftk_message <- function(bookmarks) {
-    any(bookmarks$count < 0) || any(!is.na(bookmarks$color)) || any(!is.na(bookmarks$fontface))
+	any(bookmarks$count < 0) || any(!is.na(bookmarks$color)) || any(!is.na(bookmarks$fontface))
 }
 
 #' @rdname bookmarks
 #' @export
 set_bookmarks_pdftk <- function(bookmarks, input, output = input) {
-    bookmarks <- as_bookmarks(bookmarks)
-    if (should_pdftk_message(bookmarks)) {
-        msg <- c("!" = paste(sQuote("set_bookmarks_pdftk()"),
-                            "will ignore certain requested bookmarks features:"))
-        if (any(bookmarks$count < 0))
-            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"), "treats negative",
-                                      sQuote("count"), "values as positive ones."))
-        if (any(!is.na(bookmarks$color)))
-            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
-                                      "ignores non-missing", sQuote("color"), "values."))
-        if (any(!is.na(bookmarks$fontface)))
-            msg <- c(msg, "*" = paste(sQuote("set_bookmarks_pdftk()"),
-                                      "ignores non-missing", sQuote("fontface"), "values."))
-        msg <- c(msg, "i" = paste(sQuote("set_bookmarks_gs()"), "can handle these features"),
-                 "i" = paste("You can suppress these messages with",
-                             sQuote('suppressMessages(expr, classes = "xmpdf_inform")')))
-        inform(msg, class = "xmpdf_inform")
-    }
+	bookmarks <- as_bookmarks(bookmarks)
+	if (should_pdftk_message(bookmarks)) {
+		msg <- c(
+			"!" = paste(
+				sQuote("set_bookmarks_pdftk()"),
+				"will ignore certain requested bookmarks features:"
+			)
+		)
+		if (any(bookmarks$count < 0)) {
+			msg <- c(
+				msg,
+				"*" = paste(
+					sQuote("set_bookmarks_pdftk()"),
+					"treats negative",
+					sQuote("count"),
+					"values as positive ones."
+				)
+			)
+		}
+		if (any(!is.na(bookmarks$color))) {
+			msg <- c(
+				msg,
+				"*" = paste(
+					sQuote("set_bookmarks_pdftk()"),
+					"ignores non-missing",
+					sQuote("color"),
+					"values."
+				)
+			)
+		}
+		if (any(!is.na(bookmarks$fontface))) {
+			msg <- c(
+				msg,
+				"*" = paste(
+					sQuote("set_bookmarks_pdftk()"),
+					"ignores non-missing",
+					sQuote("fontface"),
+					"values."
+				)
+			)
+		}
+		msg <- c(
+			msg,
+			"i" = paste(sQuote("set_bookmarks_gs()"), "can handle these features"),
+			"i" = paste(
+				"You can suppress these messages with",
+				sQuote('suppressMessages(expr, classes = "xmpdf_inform")')
+			)
+		)
+		inform(msg, class = "xmpdf_inform")
+	}
 
-    cmd <- pdftk()
-    meta <- get_pdftk_metadata(input)
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    if (input == output) {
-        target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target), add = TRUE)
-    } else {
-        target <- output
-    }
-    id_info <- grep("^Bookmark", meta)
-    if (length(id_info))
-        meta <- meta[-id_info]
-    bookmarks_pdftk <- unlist(purrr::pmap(bookmarks, bookmark_pdftk))
-    meta <- append(bookmarks_pdftk, meta)
+	cmd <- pdftk()
+	meta <- get_pdftk_metadata(input)
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	if (input == output) {
+		target <- tempfile(fileext = ".pdf")
+		on.exit(unlink(target), add = TRUE)
+	} else {
+		target <- output
+	}
+	id_info <- grep("^Bookmark", meta)
+	if (length(id_info)) {
+		meta <- meta[-id_info]
+	}
+	bookmarks_pdftk <- unlist(purrr::pmap(bookmarks, bookmark_pdftk))
+	meta <- append(bookmarks_pdftk, meta)
 
-    metafile <- tempfile(fileext = ".txt")
-    metafile <- normalizePath(metafile, mustWork = FALSE)
-    on.exit(unlink(metafile), add = TRUE)
-    f <- file(metafile, encoding = "UTF-8")
-    open(f, "w")
-    brio::write_lines(meta, metafile)
-    close(f)
+	metafile <- tempfile(fileext = ".txt")
+	metafile <- normalizePath(metafile, mustWork = FALSE)
+	on.exit(unlink(metafile), add = TRUE)
+	f <- file(metafile, encoding = "UTF-8")
+	open(f, "w")
+	brio::write_lines(meta, metafile)
+	close(f)
 
-    args <- c(shQuote(input),
-              "update_info_utf8", shQuote(metafile),
-              "output", shQuote(target))
-    xmpdf_system2(cmd, args)
-    if (input == output)
-        file.copy(target, output, overwrite = TRUE)
-    invisible(output)
+	args <- c(shQuote(input), "update_info_utf8", shQuote(metafile), "output", shQuote(target))
+	xmpdf_system2(cmd, args)
+	if (input == output) {
+		file.copy(target, output, overwrite = TRUE)
+	}
+	invisible(output)
 }
 
 #' @rdname bookmarks
 #' @export
 set_bookmarks_gs <- function(bookmarks, input, output = input) {
-    bookmarks <- as_bookmarks(bookmarks)
-    cmd <- gs()
-    input <- normalizePath(input, mustWork = TRUE)
-    output <- normalizePath(output, mustWork = FALSE)
-    if (input == output) {
-        target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target), add = TRUE)
-    } else {
-        target <- output
-    }
-    metafile <- tempfile(fileext = ".bin")
-    metafile <- normalizePath(metafile, mustWork = FALSE)
-    on.exit(unlink(metafile), add = TRUE)
+	bookmarks <- as_bookmarks(bookmarks)
+	cmd <- gs()
+	input <- normalizePath(input, mustWork = TRUE)
+	output <- normalizePath(output, mustWork = FALSE)
+	if (input == output) {
+		target <- tempfile(fileext = ".pdf")
+		on.exit(unlink(target), add = TRUE)
+	} else {
+		target <- output
+	}
+	metafile <- tempfile(fileext = ".bin")
+	metafile <- normalizePath(metafile, mustWork = FALSE)
+	on.exit(unlink(metafile), add = TRUE)
 
-    if (any(is.na(iconv(bookmarks$title, to = "latin1")))) { # Has non-Latin-1 characters
-        bookmarks_raw <- unlist(purrr::pmap(bookmarks, bookmark_gs_raw))
-        writeBin(bookmarks_raw,
-                 metafile,
-                 endian = "big")
-    } else { # Latin-1
-        bookmarks_gs <- unlist(purrr::pmap(bookmarks, bookmark_gs))
-        f <- file(metafile, encoding = "latin1")
-        open(f, "w")
-        brio::write_lines(bookmarks_gs %||% character(0), metafile)
-        close(f)
-    }
+	if (any(is.na(iconv(bookmarks$title, to = "latin1")))) {
+		# Has non-Latin-1 characters
+		bookmarks_raw <- unlist(purrr::pmap(bookmarks, bookmark_gs_raw))
+		writeBin(bookmarks_raw, metafile, endian = "big")
+	} else {
+		# Latin-1
+		bookmarks_gs <- unlist(purrr::pmap(bookmarks, bookmark_gs))
+		f <- file(metafile, encoding = "latin1")
+		open(f, "w")
+		brio::write_lines(bookmarks_gs %||% character(0), metafile)
+		close(f)
+	}
 
-    args <- c("-q", "-o", shQuote(target),
-              "-sDEVICE=pdfwrite", "-sAutoRotatePages=None", "-dNO_PDFMARK_OUTLINES",
-              shQuote(input),
-              shQuote(metafile))
-    stdout <- xmpdf_system2(cmd, args)
-    if (input == output) {
-        file.copy(target, output, overwrite = TRUE)
-    }
-    invisible(output)
+	args <- c(
+		"-q",
+		"-o",
+		shQuote(target),
+		"-sDEVICE=pdfwrite",
+		"-sAutoRotatePages=None",
+		"-dNO_PDFMARK_OUTLINES",
+		shQuote(input),
+		shQuote(metafile)
+	)
+	stdout <- xmpdf_system2(cmd, args)
+	if (input == output) {
+		file.copy(target, output, overwrite = TRUE)
+	}
+	invisible(output)
 }
 
 #### open/closed
 as_bookmarks <- function(bookmarks) {
-    bookmarks <- as.data.frame(bookmarks)
-    if (nrow(bookmarks) == 0) {
-        bookmarks$title <- character()
-        bookmarks$page <- integer()
-        bookmarks$level <- integer()
-        bookmarks$count <- integer()
-        bookmarks$open <- logical()
-        bookmarks$color <- character()
-        bookmarks$fontface <- character()
-        return(bookmarks)
-    }
-    stopifnot(hasName(bookmarks, "title"),
-              !any(is.na(bookmarks$title)),
-              hasName(bookmarks, "page"),
-              !any(is.na(bookmarks$page)))
-    bookmarks[["title"]] <- as.character(bookmarks[["title"]])
-    bookmarks[["page"]] <- as.integer(bookmarks[["page"]])
+	bookmarks <- as.data.frame(bookmarks)
+	if (nrow(bookmarks) == 0) {
+		bookmarks$title <- character()
+		bookmarks$page <- integer()
+		bookmarks$level <- integer()
+		bookmarks$count <- integer()
+		bookmarks$open <- logical()
+		bookmarks$color <- character()
+		bookmarks$fontface <- character()
+		return(bookmarks)
+	}
+	stopifnot(
+		hasName(bookmarks, "title"),
+		!any(is.na(bookmarks$title)),
+		hasName(bookmarks, "page"),
+		!any(is.na(bookmarks$page))
+	)
+	bookmarks[["title"]] <- as.character(bookmarks[["title"]])
+	bookmarks[["page"]] <- as.integer(bookmarks[["page"]])
 
-    if (hasName(bookmarks, "open")) {
-        bookmarks[["open"]] <- as.logical(bookmarks[["open"]])
-    } else if (hasName(bookmarks, "count")) {
-        count <- as.integer(bookmarks[["count"]])
-        if (any(is.na(count)))
-            count[which(is.na(count))] <- 0L
-        open <- rep_len(NA, nrow(bookmarks))
-        if (length(which(count > 0)))
-            open[which(count > 0)] <- TRUE
-        if (length(which(count < 0)))
-            open[which(count < 0)] <- FALSE
-        bookmarks[["open"]] <- open
-    } else {
-        bookmarks[["open"]] <- NA
-    }
+	if (hasName(bookmarks, "open")) {
+		bookmarks[["open"]] <- as.logical(bookmarks[["open"]])
+	} else if (hasName(bookmarks, "count")) {
+		count <- as.integer(bookmarks[["count"]])
+		if (any(is.na(count))) {
+			count[which(is.na(count))] <- 0L
+		}
+		open <- rep_len(NA, nrow(bookmarks))
+		if (length(which(count > 0))) {
+			open[which(count > 0)] <- TRUE
+		}
+		if (length(which(count < 0))) {
+			open[which(count < 0)] <- FALSE
+		}
+		bookmarks[["open"]] <- open
+	} else {
+		bookmarks[["open"]] <- NA
+	}
 
-    if (hasName(bookmarks, "level") && hasName(bookmarks, "count")) {
-        bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
-        bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
-        if (any(is.na(bookmarks[["count"]])))
-            bookmarks[["count"]] <- get_count(bookmarks[["level"]],
-                                              bookmarks[["open"]])
-    } else if (hasName(bookmarks, "level")) {
-        bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
-        bookmarks[["count"]] <- get_count(bookmarks[["level"]],
-                                          bookmarks[["open"]])
-    } else if (hasName(bookmarks, "count")) {
-        bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
-        if (any(is.na(bookmarks[["count"]])))
-            bookmarks[["count"]][which(is.na(bookmarks[["count"]]))] <- 0L
-        bookmarks[["level"]] <- get_level(bookmarks[["count"]])
-    } else {
-        bookmarks[["level"]] <- 1L
-        bookmarks[["count"]] <- 0L
-    }
-    if (hasName(bookmarks, "color"))
-        bookmarks[["color"]] <- as.character(bookmarks[["color"]])
-    else
-        bookmarks[["color"]] <- NA_character_
-    if (hasName(bookmarks, "fontface")) {
-        bookmarks[["fontface"]] <- as.character(bookmarks[["fontface"]])
-        if (isTRUE(any(bookmarks[["fontface"]] == "1")))
-            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "1")] <- "plain"
-        if (isTRUE(any(bookmarks[["fontface"]] == "2")))
-            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "2")] <- "bold"
-        if (isTRUE(any(bookmarks[["fontface"]] == "3")))
-            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "3")] <- "italic"
-        if (isTRUE(any(bookmarks[["fontface"]] == "4")))
-            bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "4")] <- "bold.italic"
-        fontface_nonmissing <- Filter(Negate(is.na), bookmarks[["fontface"]])
-        stopifnot(all(fontface_nonmissing %in% c("plain", "bold", "italic", "bold.italic")))
-    } else {
-        bookmarks[["fontface"]] <- NA_character_
-    }
-    reordered <- bookmarks[, c("title", "page", "level", "count", "open", "color", "fontface")]
-    attr(reordered, "filename") <- attr(bookmarks, "filename")
-    attr(reordered, "title") <- attr(bookmarks, "title")
-    attr(reordered, "total_pages") <- attr(bookmarks, "total_pages")
-    reordered
+	if (hasName(bookmarks, "level") && hasName(bookmarks, "count")) {
+		bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
+		bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
+		if (any(is.na(bookmarks[["count"]]))) {
+			bookmarks[["count"]] <- get_count(bookmarks[["level"]], bookmarks[["open"]])
+		}
+	} else if (hasName(bookmarks, "level")) {
+		bookmarks[["level"]] <- as.integer(bookmarks[["level"]])
+		bookmarks[["count"]] <- get_count(bookmarks[["level"]], bookmarks[["open"]])
+	} else if (hasName(bookmarks, "count")) {
+		bookmarks[["count"]] <- as.integer(bookmarks[["count"]])
+		if (any(is.na(bookmarks[["count"]]))) {
+			bookmarks[["count"]][which(is.na(bookmarks[["count"]]))] <- 0L
+		}
+		bookmarks[["level"]] <- get_level(bookmarks[["count"]])
+	} else {
+		bookmarks[["level"]] <- 1L
+		bookmarks[["count"]] <- 0L
+	}
+	if (hasName(bookmarks, "color")) {
+		bookmarks[["color"]] <- as.character(bookmarks[["color"]])
+	} else {
+		bookmarks[["color"]] <- NA_character_
+	}
+	if (hasName(bookmarks, "fontface")) {
+		bookmarks[["fontface"]] <- as.character(bookmarks[["fontface"]])
+		if (isTRUE(any(bookmarks[["fontface"]] == "1"))) {
+			bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "1")] <- "plain"
+		}
+		if (isTRUE(any(bookmarks[["fontface"]] == "2"))) {
+			bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "2")] <- "bold"
+		}
+		if (isTRUE(any(bookmarks[["fontface"]] == "3"))) {
+			bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "3")] <- "italic"
+		}
+		if (isTRUE(any(bookmarks[["fontface"]] == "4"))) {
+			bookmarks[["fontface"]][which(bookmarks[["fontface"]] == "4")] <- "bold.italic"
+		}
+		fontface_nonmissing <- Filter(Negate(is.na), bookmarks[["fontface"]])
+		stopifnot(all(fontface_nonmissing %in% c("plain", "bold", "italic", "bold.italic")))
+	} else {
+		bookmarks[["fontface"]] <- NA_character_
+	}
+	reordered <- bookmarks[, c("title", "page", "level", "count", "open", "color", "fontface")]
+	attr(reordered, "filename") <- attr(bookmarks, "filename")
+	attr(reordered, "title") <- attr(bookmarks, "title")
+	attr(reordered, "total_pages") <- attr(bookmarks, "total_pages")
+	reordered
 }
 
 # get_count(c(1, 2, 3, 2)) == c(2, 1, 0, 0)
 get_count <- function(levels, open) {
-    closed <- vapply(open, isFALSE, logical(1))
-    levels <- as.integer(levels)
-    n <- length(levels)
-    counts <- integer(n)
-    for (i in seq_len(n)) {
-        if (i < n) {
-            count <- 0
-            for (j in seq(i + 1L, n)) {
-                if (levels[j] == levels[i])
-                    break
-                else if (levels[j] == levels[i] + 1L)
-                    count <- count + 1L
-            }
-            if (count > 0) counts[i] <- count
-        }
-    }
-    if (any(closed))
-        counts[which(closed)] <- -counts[which(closed)]
-    counts
+	closed <- vapply(open, isFALSE, logical(1))
+	levels <- as.integer(levels)
+	n <- length(levels)
+	counts <- integer(n)
+	for (i in seq_len(n)) {
+		if (i < n) {
+			count <- 0
+			for (j in seq(i + 1L, n)) {
+				if (levels[j] == levels[i]) {
+					break
+				} else if (levels[j] == levels[i] + 1L) {
+					count <- count + 1L
+				}
+			}
+			if (count > 0) counts[i] <- count
+		}
+	}
+	if (any(closed)) {
+		counts[which(closed)] <- -counts[which(closed)]
+	}
+	counts
 }
 
 # get_level(c(2, 1, 0, 0)) == c(1, 2, 3, 2)
 get_level <- function(counts) {
-    counts <- as.integer(abs(counts))
-    n <- length(counts)
-    levels <- rep_len(1L, n)
-    for (i in seq_len(n)) {
-        if (counts[i] == 0) next
-        n_left <- counts[i]
-        n_subordinate <- counts[i]
-        j <- i + 1L
-        while (n_left > 0 && j <= n) {
-            if (counts[j] > 0) {
-                n_left <- n_left + counts[j]
-                n_subordinate <- n_subordinate + counts[j]
-            }
-            n_left <- n_left - 1L
-            j <- j + 1L
-        }
-        indices <- seq.int(i + 1L, i + n_subordinate)
-        if (max(indices) > n) {
-            msg <- c(paste(sQuote("count"), "column seems mis-specified"),
-                     i = paste("The count should be number of immediate subordinates",
-                               "excluding any subordinates of subordinates"))
-            abort(msg)
-        }
-        levels[indices] <- levels[indices] + 1L
-    }
-    levels
+	counts <- as.integer(abs(counts))
+	n <- length(counts)
+	levels <- rep_len(1L, n)
+	for (i in seq_len(n)) {
+		if (counts[i] == 0) {
+			next
+		}
+		n_left <- counts[i]
+		n_subordinate <- counts[i]
+		j <- i + 1L
+		while (n_left > 0 && j <= n) {
+			if (counts[j] > 0) {
+				n_left <- n_left + counts[j]
+				n_subordinate <- n_subordinate + counts[j]
+			}
+			n_left <- n_left - 1L
+			j <- j + 1L
+		}
+		indices <- seq.int(i + 1L, i + n_subordinate)
+		if (max(indices) > n) {
+			msg <- c(
+				paste(sQuote("count"), "column seems mis-specified"),
+				i = paste(
+					"The count should be number of immediate subordinates",
+					"excluding any subordinates of subordinates"
+				)
+			)
+			abort(msg)
+		}
+		levels[indices] <- levels[indices] + 1L
+	}
+	levels
 }
 
 bookmark_pdftk <- function(title, level, page, ...) {
-    c("BookmarkBegin",
-      stri_join("BookmarkTitle:", title),
-      stri_join("BookmarkLevel:", level),
-      stri_join("BookmarkPageNumber:", page))
+	c(
+		"BookmarkBegin",
+		stri_join("BookmarkTitle:", title),
+		stri_join("BookmarkLevel:", level),
+		stri_join("BookmarkPageNumber:", page)
+	)
 }
 
 bookmark_gs <- function(title, page, count, fontface, color, ...) {
-    otc <- bookmark_gs_helper(title, page, count, fontface, color)
-    stri_join(unlist(otc), collapse = "")
+	otc <- bookmark_gs_helper(title, page, count, fontface, color)
+	stri_join(unlist(otc), collapse = "")
 }
 bookmark_gs_raw <- function(title, page, count, fontface, color, ...) {
-    otc <- bookmark_gs_helper(title, page, count, fontface, color)
-    do.call(raw_pdfmark_entry, otc)
+	otc <- bookmark_gs_helper(title, page, count, fontface, color)
+	do.call(raw_pdfmark_entry, otc)
 }
 bookmark_gs_helper <- function(title, page, count, fontface, color) {
-    if (count == 0)
-        count_str <- ""
-    else
-        count_str <- stri_join(" /Count ", count)
-    if (is.na(fontface)) {
-        style_str <- ""
-    } else {
-        style <- switch(fontface,
-                        "plain" = 0L,
-                        "italic" = 1L,
-                        "bold" = 2L,
-                        "bold.italic" = 3L)
+	if (count == 0) {
+		count_str <- ""
+	} else {
+		count_str <- stri_join(" /Count ", count)
+	}
+	if (is.na(fontface)) {
+		style_str <- ""
+	} else {
+		style <- switch(fontface, "plain" = 0L, "italic" = 1L, "bold" = 2L, "bold.italic" = 3L)
 
-        style_str <- stri_join(" /F ", style, "\n")
-    }
-    if (is.na(color)) {
-        color_str <- ""
-    } else {
-        rgb <- grDevices::col2rgb(color)
-        color_str <- sprintf("/C [%f %f %f]\n",
-                             rgb[1] / 255,
-                             rgb[2] / 255,
-                             rgb[3] / 255)
-    }
-    open <- sprintf("[%s /Page %d /View [/XYZ null null null]\n /Title (",
-                    count_str, page)
-    close <- sprintf(")\n%s%s /OUT pdfmark",
-                     color_str, style_str)
+		style_str <- stri_join(" /F ", style, "\n")
+	}
+	if (is.na(color)) {
+		color_str <- ""
+	} else {
+		rgb <- grDevices::col2rgb(color)
+		color_str <- sprintf("/C [%f %f %f]\n", rgb[1] / 255, rgb[2] / 255, rgb[3] / 255)
+	}
+	open <- sprintf("[%s /Page %d /View [/XYZ null null null]\n /Title (", count_str, page)
+	close <- sprintf(")\n%s%s /OUT pdfmark", color_str, style_str)
 
-    list(open = open, value = title, close = close)
+	list(open = open, value = title, close = close)
 }
