@@ -6,7 +6,7 @@
 \alias{xmpdf}
 \title{xmpdf: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info}
 \description{
-\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
 Edit 'XMP' metadata \url{https://en.wikipedia.org/wiki/Extensible_Metadata_Platform} in a variety of media file formats as well as edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files. Can detect and use a variety of command-line tools to perform these operations such as 'exiftool' \url{https://exiftool.org/}, 'ghostscript' \url{https://www.ghostscript.com/}, and/or 'pdftk' \url{https://gitlab.com/pdftk-java/pdftk}.
 }
@@ -27,7 +27,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Trevor L Davis \email{trevor.l.davis@gmail.com} (\href{https://orcid.org/0000-0001-6341-4639}{ORCID})
+\strong{Maintainer}: Trevor L. Davis \email{trevor.l.davis@gmail.com} (\href{https://orcid.org/0000-0001-6341-4639}{ORCID})
+
+Authors:
+\itemize{
+  \item Trevor L. Davis \email{trevor.l.davis@gmail.com} (\href{https://orcid.org/0000-0001-6341-4639}{ORCID})
+}
 
 Other contributors:
 \itemize{

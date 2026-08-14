@@ -71,7 +71,7 @@ Note many pdf viewers quietly ignore this feature.}
 \code{get_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{
 \item \code{get_bookmarks_pdftk()} which wraps \code{pdftk} command-line tool
-\item \code{get_bookmarks_pdftools()} which wraps \code{\link[pdftools:pdftools]{pdftools::pdf_toc()}}
+\item \code{get_bookmarks_pdftools()} which wraps \code{\link[pdftools:pdf_toc]{pdftools::pdf_toc()}}
 }
 
 \code{set_bookmarks()} will try to use the following helper functions in the following order:
