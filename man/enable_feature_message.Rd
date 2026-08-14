@@ -13,12 +13,12 @@ enable_feature_message(
 \item{feature}{Which \code{xmpdf} feature to give information for.}
 }
 \value{
-A character vector formatted for use with \code{\link[rlang:abort]{rlang::abort()}}, \code{\link[rlang:abort]{rlang::warn()}}, or \code{\link[rlang:abort]{rlang::inform()}}.
+A character vector formatted for use with \code{\link[rlang:abort]{rlang::abort()}}, \code{\link[rlang:warn]{rlang::warn()}}, or \code{\link[rlang:inform]{rlang::inform()}}.
 }
 \description{
 \code{enable_feature_message()} returns a character vector with the information
 needed to install the requested feature.
-Formatted for use with \code{\link[rlang:abort]{rlang::abort()}}, \code{\link[rlang:abort]{rlang::warn()}}, or \code{\link[rlang:abort]{rlang::inform()}}.
+Formatted for use with \code{\link[rlang:abort]{rlang::abort()}}, \code{\link[rlang:warn]{rlang::warn()}}, or \code{\link[rlang:inform]{rlang::inform()}}.
 }
 \examples{
   rlang::inform(enable_feature_message("get_bookmarks"))

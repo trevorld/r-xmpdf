@@ -29,7 +29,7 @@ The (output) filename invisibly.
 \details{
 \code{cat_pages()} will try to use the following helper functions in the following order:
 \enumerate{
-\item \code{cat_pages_qpdf()} which wraps \code{\link[qpdf:qpdf]{qpdf::pdf_combine()}}
+\item \code{cat_pages_qpdf()} which wraps \code{\link[qpdf:pdf_combine]{qpdf::pdf_combine()}}
 \item \code{cat_pages_pdftk()} which wraps \code{pdftk} command-line tool
 \item \code{cat_pages_gs()} which wraps \code{ghostscript} command-line tool
 }
