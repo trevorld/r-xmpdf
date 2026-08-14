@@ -1,7 +1,7 @@
 # xmpdf <img src="man/figures/logo.png" align="right" width="200px" alt="xmpdf hex sticker">
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/xmpdf)](https://cran.r-project.org/package=xmpdf)
-[![R-CMD-check](https://github.com/trevorld/r-xmpdf/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-xmpdf/actions)
+[![R-CMD-check](https://github.com/trevorld/r-xmpdf/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/trevorld/r-xmpdf/actions)
 [![codecov](https://codecov.io/github/trevorld/r-xmpdf/branch/main/graph/badge.svg)](https://app.codecov.io/github/trevorld/r-xmpdf)
 
 ### Table of Contents
