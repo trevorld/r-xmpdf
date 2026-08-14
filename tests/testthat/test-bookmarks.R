@@ -175,6 +175,18 @@ test_that("bookmarks_pdftools", {
 	set_bookmarks(bookmarks, f1, f2)
 	expect_equal(nrow(get_bookmarks_pdftools(f2)[[1]]), 3L)
 
+	# Positive/negative count from open/closed bookmarks
+	bookmarks <- data.frame(
+		title = c("Front", "Page 1", "Page 2"),
+		level = c(1, 2, 2),
+		page = c(1L, 1L, 2L),
+		open = c(FALSE, NA, NA)
+	)
+	set_bookmarks(bookmarks, f1, f2)
+	bm <- get_bookmarks_pdftools(f2)[[1]]
+	expect_equal(bm$count, c(-2L, 0L, 0L))
+	expect_equal(bm$open, c(FALSE, NA, NA))
+
 	# Does Unicode work
 	skip_if_not(l10n_info()[["UTF-8"]])
 	skip_on_os("mac") # CRAN checks on macOS 14

@@ -86,7 +86,7 @@ Note many pdf viewers quietly ignore this feature.}
 \item \code{get_bookmarks_pdftk()} doesn't report information about bookmarks color, fontface, and whether the bookmarks
 should start open or closed.
 \item \code{get_bookmarks_pdftools()} doesn't report information about bookmarks page number,
-color, fontface, and whether the bookmarks should start open or closed.
+color, and fontface.
 \item \code{set_bookmarks_gs()} supports most bookmarks features including color and font face but
 only action supported is to view a particular page.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.

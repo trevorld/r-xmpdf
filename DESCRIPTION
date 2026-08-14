@@ -3,8 +3,8 @@ Package: xmpdf
 Type: Package
 Title: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info
 Version: 0.2.2-1
-Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
-    in a variety of media file formats as well as 
+Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform>
+    in a variety of media file formats as well as
     edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files.
     Can detect and use a variety of command-line tools to perform these operations such as
     'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>,
@@ -34,7 +34,7 @@ Suggests:
     grid,
     knitr,
     qpdf,
-    pdftools,
+    pdftools (>= 3.8.0),
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr, rmarkdown

@@ -5,6 +5,9 @@ Bug fixes and minor improvements
 --------------------------------
 
 * Fixes `set_bookmarks()` bug where tempfile wasn't being deleted if `input == output` (@djvill, #63).
+* `get_bookmarks_pdftools()` now reports positive/negative `count`
+  (as well as `open`) using `pdftools::pdf_toc()`'s new `is_open` list element (#62).
+  This requires `pdftools` (>= 3.8.0).
 
 xmpdf 0.2.1
 ===========
