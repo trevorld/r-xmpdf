@@ -71,393 +71,483 @@
 #'   unlink(f)
 #' }
 #' @export
-docinfo <- function(author = NULL, creation_date = NULL, creator = NULL, producer = NULL,
-                    title = NULL, subject = NULL, keywords = NULL, mod_date = NULL) {
-
-    DocInfo$new(author = author, creation_date = creation_date,
-                creator = creator, producer = producer,
-                title = title, subject = subject, keywords = keywords, mod_date = mod_date)
+docinfo <- function(
+	author = NULL,
+	creation_date = NULL,
+	creator = NULL,
+	producer = NULL,
+	title = NULL,
+	subject = NULL,
+	keywords = NULL,
+	mod_date = NULL
+) {
+	DocInfo$new(
+		author = author,
+		creation_date = creation_date,
+		creator = creator,
+		producer = producer,
+		title = title,
+		subject = subject,
+		keywords = keywords,
+		mod_date = mod_date
+	)
 }
 
-DocInfo <- R6Class("docinfo",
-    public = list(
-        initialize = function(author = NULL, creation_date = NULL,
-                              creator = NULL, producer = NULL,
-                              title = NULL, subject = NULL,
-                              keywords = NULL, mod_date = NULL) {
-            if (!is.null(author))
-                self$author <- author
-            if (!is.null(creation_date))
-                self$creation_date <- creation_date
-            if (!is.null(creator))
-                self$creator <- creator
-            if (!is.null(producer))
-                self$producer <- producer
-            if (!is.null(title))
-                self$title <- title
-            if (!is.null(subject))
-                self$subject <- subject
-            if (!is.null(keywords))
-                self$keywords <- keywords
-            if (!is.null(mod_date))
-                self$mod_date <- mod_date
-            invisible(NULL)
-        },
-        print = function() {
-            text <- c(stri_join("Author: ", d_format(self$author)),
-                      stri_join("CreationDate: ", d_format(self$creation_date)),
-                      stri_join("Creator: ", d_format(self$creator)),
-                      stri_join("Producer: ", d_format(self$producer)),
-                      stri_join("Title: ", d_format(self$title)),
-                      stri_join("Subject: ", d_format(self$subject)),
-                      stri_join("Keywords: ",  d_format(self$keywords)),
-                      stri_join("ModDate: ", d_format(self$mod_date)))
-            invisible(cat(text, sep="\n"))
-        },
-        get_item = function(key) {
-            if (key %in% c("author", "Author")) {
-                self$author
-            } else if (key %in% c("creation_date", "CreationDate")) {
-                self$creation_date
-            } else if (key %in% c("creator", "Creator")) {
-                self$creator
-            } else if (key %in% c("producer", "Producer")) {
-                self$producer
-            } else if (key %in% c("title", "Title")) {
-                self$title
-            } else if (key %in% c("subject", "Subject")) {
-                self$subject
-            } else if (key %in% c("keywords", "Keywords")) {
-                self$keywords
-            } else if (key %in% c("mod_date", "ModDate")) {
-                self$mod_date
-            } else {
-                msg <- sprintf("We don't support key '%s' yet.", key)
-                abort(msg)
-            }
-        },
-        set_item = function(key, value) {
-            if (key %in% c("author", "Author")) {
-                self$author <- value
-            } else if (key %in% c("creation_date", "CreationDate")) {
-                self$creation_date <- value
-            } else if (key %in% c("creator", "Creator")) {
-                self$creator <- value
-            } else if (key %in% c("producer", "Producer")) {
-                self$producer <- value
-            } else if (key %in% c("title", "Title")) {
-                self$title <- value
-            } else if (key %in% c("subject", "Subject")) {
-                self$subject <- value
-            } else if (key %in% c("keywords", "Keywords")) {
-                self$keywords <- value
-            } else if (key %in% c("mod_date", "ModDate")) {
-                self$mod_date <- value
-            } else {
-                msg <- sprintf("We don't support key '%s' yet.", key)
-                abort(msg)
-            }
-        },
-        update = function(x) {
-            di <- as_docinfo(x)
-            for (key in x$get_nonnull_keys())
-                self$set_item(key, x$get_item(key))
-            invisible(NULL)
-        },
-        get_nonnull_keys = function() {
-            keys <- character(0)
-            if (!is.null(self$author))
-                keys <- append(keys, "Author")
-            if (!is.null(self$creation_date))
-                keys <- append(keys, "CreationDate")
-            if (!is.null(self$creator))
-                keys <- append(keys, "Creator")
-            if (!is.null(self$producer))
-                keys <- append(keys, "Producer")
-            if (!is.null(self$title))
-                keys <- append(keys, "Title")
-            if (!is.null(self$subject))
-                keys <- append(keys, "Subject")
-            if (!is.null(self$keywords))
-                keys <- append(keys, "Keywords")
-            if (!is.null(self$mod_date))
-                keys <- append(keys, "ModDate")
-            keys
-        },
-        exiftool_tags = function() {
-            tags <- list()
-            if (!is.null(self$author))
-                tags[["PDF:Author"]] <- self$author
-            if (!is.null(self$creation_date))
-                tags[["PDF:CreateDate"]] <- to_date_pdfmark_exiftool(self$creation_date)
-            if (!is.null(self$creator))
-                tags[["PDF:Creator"]] <- self$creator
-            if (!is.null(self$producer))
-                tags[["PDF:Producer"]] <- self$producer
-            if (!is.null(self$title))
-                tags[["PDF:Title"]] <- self$title
-            if (!is.null(self$subject))
-                tags[["PDF:Subject"]] <- self$subject
-            if (!is.null(self$keywords))
-                tags[["PDF:Keywords"]] <- self$keywords
-            if (!is.null(self$mod_date))
-                tags[["PDF:ModifyDate"]] <-  to_date_pdfmark_exiftool(self$mod_date)
-            tags
-        },
-        pdfmark = function(raw = FALSE) {
-            if (raw)
-                private$pdfmark_raw()
-            else
-                private$pdfmark_character()
-        },
-        pdftk = function() {
-            tags <- character()
-            if (!is.null(self$author))
-                tags <- append(tags, entry_pdftk("Author", self$author))
-            if (!is.null(self$creation_date))
-                tags <- append(tags, entry_pdftk("CreationDate",
-                                                 to_date_pdfmark(self$creation_date)))
-            if (!is.null(self$creator))
-                tags <- append(tags, entry_pdftk("Creator", self$creator))
-            if (!is.null(self$producer))
-                tags <- append(tags, entry_pdftk("Producer", self$producer))
-            if (!is.null(self$title))
-                tags <- append(tags, entry_pdftk("Title", self$title))
-            if (!is.null(self$subject))
-                tags <- append(tags, entry_pdftk("Subject", self$subject))
-            if (!is.null(self$keywords))
-                tags <- append(tags, entry_pdftk("Keywords",
-                                                 self$keywords))
-            if (!is.null(self$mod_date))
-                tags <- append(tags, entry_pdftk("ModDate",
-                                                 to_date_pdfmark(self$mod_date)))
-            tags
-        },
-        xmp = function() {
-            # these are the XMP tags that `ghostscript` chooses as equivalent
-            # to the eight documentation info dictionary entries
-            tags <- list()
-            if (!is.null(self$title))
-                tags[["dc:title"]] <- self$title
-            if (!is.null(self$author))
-                tags[["dc:creator"]] <- self$author
-            if (!is.null(self$subject))
-                tags[["dc:description"]] <- self$subject
+DocInfo <- R6Class(
+	"docinfo",
+	public = list(
+		initialize = function(
+			author = NULL,
+			creation_date = NULL,
+			creator = NULL,
+			producer = NULL,
+			title = NULL,
+			subject = NULL,
+			keywords = NULL,
+			mod_date = NULL
+		) {
+			if (!is.null(author)) {
+				self$author <- author
+			}
+			if (!is.null(creation_date)) {
+				self$creation_date <- creation_date
+			}
+			if (!is.null(creator)) {
+				self$creator <- creator
+			}
+			if (!is.null(producer)) {
+				self$producer <- producer
+			}
+			if (!is.null(title)) {
+				self$title <- title
+			}
+			if (!is.null(subject)) {
+				self$subject <- subject
+			}
+			if (!is.null(keywords)) {
+				self$keywords <- keywords
+			}
+			if (!is.null(mod_date)) {
+				self$mod_date <- mod_date
+			}
+			invisible(NULL)
+		},
+		print = function() {
+			text <- c(
+				stri_join("Author: ", d_format(self$author)),
+				stri_join("CreationDate: ", d_format(self$creation_date)),
+				stri_join("Creator: ", d_format(self$creator)),
+				stri_join("Producer: ", d_format(self$producer)),
+				stri_join("Title: ", d_format(self$title)),
+				stri_join("Subject: ", d_format(self$subject)),
+				stri_join("Keywords: ", d_format(self$keywords)),
+				stri_join("ModDate: ", d_format(self$mod_date))
+			)
+			invisible(cat(text, sep = "\n"))
+		},
+		get_item = function(key) {
+			if (key %in% c("author", "Author")) {
+				self$author
+			} else if (key %in% c("creation_date", "CreationDate")) {
+				self$creation_date
+			} else if (key %in% c("creator", "Creator")) {
+				self$creator
+			} else if (key %in% c("producer", "Producer")) {
+				self$producer
+			} else if (key %in% c("title", "Title")) {
+				self$title
+			} else if (key %in% c("subject", "Subject")) {
+				self$subject
+			} else if (key %in% c("keywords", "Keywords")) {
+				self$keywords
+			} else if (key %in% c("mod_date", "ModDate")) {
+				self$mod_date
+			} else {
+				msg <- sprintf("We don't support key '%s' yet.", key)
+				abort(msg)
+			}
+		},
+		set_item = function(key, value) {
+			if (key %in% c("author", "Author")) {
+				self$author <- value
+			} else if (key %in% c("creation_date", "CreationDate")) {
+				self$creation_date <- value
+			} else if (key %in% c("creator", "Creator")) {
+				self$creator <- value
+			} else if (key %in% c("producer", "Producer")) {
+				self$producer <- value
+			} else if (key %in% c("title", "Title")) {
+				self$title <- value
+			} else if (key %in% c("subject", "Subject")) {
+				self$subject <- value
+			} else if (key %in% c("keywords", "Keywords")) {
+				self$keywords <- value
+			} else if (key %in% c("mod_date", "ModDate")) {
+				self$mod_date <- value
+			} else {
+				msg <- sprintf("We don't support key '%s' yet.", key)
+				abort(msg)
+			}
+		},
+		update = function(x) {
+			di <- as_docinfo(x)
+			for (key in x$get_nonnull_keys()) {
+				self$set_item(key, x$get_item(key))
+			}
+			invisible(NULL)
+		},
+		get_nonnull_keys = function() {
+			keys <- character(0)
+			if (!is.null(self$author)) {
+				keys <- append(keys, "Author")
+			}
+			if (!is.null(self$creation_date)) {
+				keys <- append(keys, "CreationDate")
+			}
+			if (!is.null(self$creator)) {
+				keys <- append(keys, "Creator")
+			}
+			if (!is.null(self$producer)) {
+				keys <- append(keys, "Producer")
+			}
+			if (!is.null(self$title)) {
+				keys <- append(keys, "Title")
+			}
+			if (!is.null(self$subject)) {
+				keys <- append(keys, "Subject")
+			}
+			if (!is.null(self$keywords)) {
+				keys <- append(keys, "Keywords")
+			}
+			if (!is.null(self$mod_date)) {
+				keys <- append(keys, "ModDate")
+			}
+			keys
+		},
+		exiftool_tags = function() {
+			tags <- list()
+			if (!is.null(self$author)) {
+				tags[["PDF:Author"]] <- self$author
+			}
+			if (!is.null(self$creation_date)) {
+				tags[["PDF:CreateDate"]] <- to_date_pdfmark_exiftool(self$creation_date)
+			}
+			if (!is.null(self$creator)) {
+				tags[["PDF:Creator"]] <- self$creator
+			}
+			if (!is.null(self$producer)) {
+				tags[["PDF:Producer"]] <- self$producer
+			}
+			if (!is.null(self$title)) {
+				tags[["PDF:Title"]] <- self$title
+			}
+			if (!is.null(self$subject)) {
+				tags[["PDF:Subject"]] <- self$subject
+			}
+			if (!is.null(self$keywords)) {
+				tags[["PDF:Keywords"]] <- self$keywords
+			}
+			if (!is.null(self$mod_date)) {
+				tags[["PDF:ModifyDate"]] <- to_date_pdfmark_exiftool(self$mod_date)
+			}
+			tags
+		},
+		pdfmark = function(raw = FALSE) {
+			if (raw) {
+				private$pdfmark_raw()
+			} else {
+				private$pdfmark_character()
+			}
+		},
+		pdftk = function() {
+			tags <- character()
+			if (!is.null(self$author)) {
+				tags <- append(tags, entry_pdftk("Author", self$author))
+			}
+			if (!is.null(self$creation_date)) {
+				tags <- append(
+					tags,
+					entry_pdftk("CreationDate", to_date_pdfmark(self$creation_date))
+				)
+			}
+			if (!is.null(self$creator)) {
+				tags <- append(tags, entry_pdftk("Creator", self$creator))
+			}
+			if (!is.null(self$producer)) {
+				tags <- append(tags, entry_pdftk("Producer", self$producer))
+			}
+			if (!is.null(self$title)) {
+				tags <- append(tags, entry_pdftk("Title", self$title))
+			}
+			if (!is.null(self$subject)) {
+				tags <- append(tags, entry_pdftk("Subject", self$subject))
+			}
+			if (!is.null(self$keywords)) {
+				tags <- append(tags, entry_pdftk("Keywords", self$keywords))
+			}
+			if (!is.null(self$mod_date)) {
+				tags <- append(tags, entry_pdftk("ModDate", to_date_pdfmark(self$mod_date)))
+			}
+			tags
+		},
+		xmp = function() {
+			# these are the XMP tags that `ghostscript` chooses as equivalent
+			# to the eight documentation info dictionary entries
+			tags <- list()
+			if (!is.null(self$title)) {
+				tags[["dc:title"]] <- self$title
+			}
+			if (!is.null(self$author)) {
+				tags[["dc:creator"]] <- self$author
+			}
+			if (!is.null(self$subject)) {
+				tags[["dc:description"]] <- self$subject
+			}
 
-            if (!is.null(self$producer))
-                tags[["pdf:Producer"]] <- self$producer
-            if (!is.null(self$keywords))
-                tags[["pdf:Keywords"]] <- self$keywords
+			if (!is.null(self$producer)) {
+				tags[["pdf:Producer"]] <- self$producer
+			}
+			if (!is.null(self$keywords)) {
+				tags[["pdf:Keywords"]] <- self$keywords
+			}
 
-            if (!is.null(self$creation_date))
-                tags[["xmp:CreateDate"]] <- self$creation_date
-            if (!is.null(self$creator))
-                tags[["xmp:CreatorTool"]] <- self$creator
-            if (!is.null(self$mod_date))
-                tags[["xmp:ModifyDate"]] <-  self$mod_date
+			if (!is.null(self$creation_date)) {
+				tags[["xmp:CreateDate"]] <- self$creation_date
+			}
+			if (!is.null(self$creator)) {
+				tags[["xmp:CreatorTool"]] <- self$creator
+			}
+			if (!is.null(self$mod_date)) {
+				tags[["xmp:ModifyDate"]] <- self$mod_date
+			}
 
-            as_xmp(tags)
-        }
-    ),
-    active = list(
-        author = function(value) {
-            if (missing(value)) {
-                private$val$author
-            } else {
-                private$val$author <- as_character_value(value)
-            }
-        },
-        creation_date = function(value) {
-            if (missing(value)) {
-                private$val$creation_date
-            } else {
-                private$val$creation_date <- as_datetime_value(value)
-            }
-        },
-        creator = function(value) {
-            if (missing(value)) {
-                private$val$creator
-            } else {
-                private$val$creator <- as_character_value(value)
-            }
-        },
-        producer = function(value) {
-            if (missing(value)) {
-                private$val$producer
-            } else {
-                private$val$producer <- as_character_value(value)
-            }
-        },
-        title = function(value) {
-            if (missing(value)) {
-                private$val$title
-            } else {
-                private$val$title <- as_character_value(value)
-            }
-        },
-        subject = function(value) {
-            if (missing(value)) {
-                private$val$subject
-            } else {
-                private$val$subject <- as_character_value(value)
-            }
-        },
-        keywords = function(value) {
-            if (missing(value)) {
-                private$val$keywords
-            } else {
-                private$val$keywords <- stri_join(value, collapse = ", ")
-            }
-        },
-        mod_date = function(value) {
-            if (missing(value)) {
-                private$val$mod_date
-            } else {
-                private$val$mod_date <- as_datetime_value(value)
-            }
-        }
-    ),
-    private = list(
-        val = list(),
-        pdfmark_character = function() {
-            tags <- "["
-            if (!is.null(self$author))
-                tags <- append(tags, sprintf(" /Author (%s)\n", self$author))
-            if (!is.null(self$creation_date))
-                tags <- append(tags, sprintf(" /CreationDate (%s)\n",
-                                             to_date_pdfmark(self$creation_date)))
-            if (!is.null(self$creator))
-                tags <- append(tags, sprintf(" /Creator (%s)\n", self$creator))
-            if (!is.null(self$producer))
-                tags <- append(tags, sprintf(" /Producer (%s)\n", self$producer))
-            if (!is.null(self$title))
-                tags <- append(tags, sprintf(" /Title (%s)\n", self$title))
-            if (!is.null(self$subject))
-                tags <- append(tags, sprintf(" /Subject (%s)\n", self$subject))
-            if (!is.null(self$keywords))
-                tags <- append(tags, sprintf(" /Keywords (%s)\n",
-                                             stri_join(self$keywords, collapse = ", ")))
-            if (!is.null(self$mod_date))
-                tags <- append(tags, sprintf(" /ModDate (%s)\n",
-                                             to_date_pdfmark(self$mod_date)))
-            tags <- append(tags, " /DOCINFO pdfmark\n")
-            stri_join(tags, collapse="")
-        },
-        pdfmark_raw = function() {
-            tags <- iconv("[", to = "latin1", toRaw = TRUE)[[1]]
-            if (!is.null(self$author))
-                tags <- append(tags, raw_pdfmark_entry(" /Author (", self$author, ")\n"))
-            if (!is.null(self$creation_date)) {
-                creation_date <- sprintf(" /CreationDate (%s)\n", to_date_pdfmark(self$creation_date))
-                tags <- append(tags, iconv(creation_date, to = "latin1", toRaw = TRUE)[[1]])
-            }
-            if (!is.null(self$creator))
-                tags <- append(tags, raw_pdfmark_entry(" /Creator (", self$creator, ")\n"))
-            if (!is.null(self$producer))
-                tags <- append(tags, raw_pdfmark_entry(" /Producer (", self$producer, ")\n"))
-            if (!is.null(self$title))
-                tags <- append(tags, raw_pdfmark_entry(" /Title (", self$title, ")\n"))
-            if (!is.null(self$subject))
-                tags <- append(tags, raw_pdfmark_entry(" /Subject (", self$subject, ")\n"))
-            if (!is.null(self$keywords)) {
-                keywords <- stri_join(self$keywords, collapse = ", ")
-                tags <- append(tags, raw_pdfmark_entry(" /Keywords (", keywords, ")\n"))
-            }
-            if (!is.null(self$mod_date)) {
-                mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
-                tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
-            }
-            tags <- append(tags,
-                           iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
-            tags
-        }
-    )
+			as_xmp(tags)
+		}
+	),
+	active = list(
+		author = function(value) {
+			if (missing(value)) {
+				private$val$author
+			} else {
+				private$val$author <- as_character_value(value)
+			}
+		},
+		creation_date = function(value) {
+			if (missing(value)) {
+				private$val$creation_date
+			} else {
+				private$val$creation_date <- as_datetime_value(value)
+			}
+		},
+		creator = function(value) {
+			if (missing(value)) {
+				private$val$creator
+			} else {
+				private$val$creator <- as_character_value(value)
+			}
+		},
+		producer = function(value) {
+			if (missing(value)) {
+				private$val$producer
+			} else {
+				private$val$producer <- as_character_value(value)
+			}
+		},
+		title = function(value) {
+			if (missing(value)) {
+				private$val$title
+			} else {
+				private$val$title <- as_character_value(value)
+			}
+		},
+		subject = function(value) {
+			if (missing(value)) {
+				private$val$subject
+			} else {
+				private$val$subject <- as_character_value(value)
+			}
+		},
+		keywords = function(value) {
+			if (missing(value)) {
+				private$val$keywords
+			} else {
+				private$val$keywords <- stri_join(value, collapse = ", ")
+			}
+		},
+		mod_date = function(value) {
+			if (missing(value)) {
+				private$val$mod_date
+			} else {
+				private$val$mod_date <- as_datetime_value(value)
+			}
+		}
+	),
+	private = list(
+		val = list(),
+		pdfmark_character = function() {
+			tags <- "["
+			if (!is.null(self$author)) {
+				tags <- append(tags, sprintf(" /Author (%s)\n", self$author))
+			}
+			if (!is.null(self$creation_date)) {
+				tags <- append(
+					tags,
+					sprintf(" /CreationDate (%s)\n", to_date_pdfmark(self$creation_date))
+				)
+			}
+			if (!is.null(self$creator)) {
+				tags <- append(tags, sprintf(" /Creator (%s)\n", self$creator))
+			}
+			if (!is.null(self$producer)) {
+				tags <- append(tags, sprintf(" /Producer (%s)\n", self$producer))
+			}
+			if (!is.null(self$title)) {
+				tags <- append(tags, sprintf(" /Title (%s)\n", self$title))
+			}
+			if (!is.null(self$subject)) {
+				tags <- append(tags, sprintf(" /Subject (%s)\n", self$subject))
+			}
+			if (!is.null(self$keywords)) {
+				tags <- append(
+					tags,
+					sprintf(" /Keywords (%s)\n", stri_join(self$keywords, collapse = ", "))
+				)
+			}
+			if (!is.null(self$mod_date)) {
+				tags <- append(tags, sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date)))
+			}
+			tags <- append(tags, " /DOCINFO pdfmark\n")
+			stri_join(tags, collapse = "")
+		},
+		pdfmark_raw = function() {
+			tags <- iconv("[", to = "latin1", toRaw = TRUE)[[1]]
+			if (!is.null(self$author)) {
+				tags <- append(tags, raw_pdfmark_entry(" /Author (", self$author, ")\n"))
+			}
+			if (!is.null(self$creation_date)) {
+				creation_date <- sprintf(
+					" /CreationDate (%s)\n",
+					to_date_pdfmark(self$creation_date)
+				)
+				tags <- append(tags, iconv(creation_date, to = "latin1", toRaw = TRUE)[[1]])
+			}
+			if (!is.null(self$creator)) {
+				tags <- append(tags, raw_pdfmark_entry(" /Creator (", self$creator, ")\n"))
+			}
+			if (!is.null(self$producer)) {
+				tags <- append(tags, raw_pdfmark_entry(" /Producer (", self$producer, ")\n"))
+			}
+			if (!is.null(self$title)) {
+				tags <- append(tags, raw_pdfmark_entry(" /Title (", self$title, ")\n"))
+			}
+			if (!is.null(self$subject)) {
+				tags <- append(tags, raw_pdfmark_entry(" /Subject (", self$subject, ")\n"))
+			}
+			if (!is.null(self$keywords)) {
+				keywords <- stri_join(self$keywords, collapse = ", ")
+				tags <- append(tags, raw_pdfmark_entry(" /Keywords (", keywords, ")\n"))
+			}
+			if (!is.null(self$mod_date)) {
+				mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
+				tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
+			}
+			tags <- append(tags, iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
+			tags
+		}
+	)
 )
 
 #' @export
 as.list.docinfo <- function(x, ...) {
-    l <- list()
-    if (!is.null(x$author))
-        l$author <- x$author
-    if (!is.null(x$creation_date))
-        l$creation_date <- x$creation_date
-    if (!is.null(x$creator))
-        l$creator <- x$creator
-    if (!is.null(x$producer))
-        l$producer <- x$producer
-    if (!is.null(x$title))
-        l$title <- x$title
-    if (!is.null(x$subject))
-        l$subject <- x$subject
-    if (!is.null(x$keywords))
-        l$keywords <- x$keywords
-    if (!is.null(x$mod_date))
-        l$mod_date <-  x$mod_date
-    l
+	l <- list()
+	if (!is.null(x$author)) {
+		l$author <- x$author
+	}
+	if (!is.null(x$creation_date)) {
+		l$creation_date <- x$creation_date
+	}
+	if (!is.null(x$creator)) {
+		l$creator <- x$creator
+	}
+	if (!is.null(x$producer)) {
+		l$producer <- x$producer
+	}
+	if (!is.null(x$title)) {
+		l$title <- x$title
+	}
+	if (!is.null(x$subject)) {
+		l$subject <- x$subject
+	}
+	if (!is.null(x$keywords)) {
+		l$keywords <- x$keywords
+	}
+	if (!is.null(x$mod_date)) {
+		l$mod_date <- x$mod_date
+	}
+	l
 }
 
 #' @export
 update.docinfo <- function(object, ...) {
-    d <- object$clone()
-    d$update(as_docinfo(list(...)))
-    d
+	d <- object$clone()
+	d$update(as_docinfo(list(...)))
+	d
 }
 
 to_date_pdfmark <- function(date) {
-    if (is.null(date)) {
-        NULL
-    } else {
-        datetimeoffset::format_pdfmark(date)
-    }
+	if (is.null(date)) {
+		NULL
+	} else {
+		datetimeoffset::format_pdfmark(date)
+	}
 }
 
 to_date_pdfmark_exiftool <- function(date) {
-    s <- datetimeoffset::format_pdfmark(date) #### Update when {datetimeoffset} allows suppressing prefix
-    substr(s, 3L, nchar(s))
+	s <- datetimeoffset::format_pdfmark(date) #### Update when {datetimeoffset} allows suppressing prefix
+	substr(s, 3L, nchar(s))
 }
 
 raw_pdfmark_entry <- function(open, value, close) {
-    r <- iconv(open, to = "latin1", toRaw = TRUE)[[1]]
-    l1 <- iconv(value, to = "latin1")
-    if (is.na(l1)) {
-        # Unicode needs to be "UTF-16BE" while rest needs to be "latin1"
-        # Replacing `paste0()` with `stringi::stri_join()` causes an error here
-        r <- append(r, iconv(paste0("\ufeff", value), to = "UTF-16BE", toRaw = TRUE)[[1]])
-    } else {
-        r <- append(r, iconv(value, to = "latin1", toRaw = TRUE)[[1]])
-    }
-    append(r, iconv(close, to = "latin1", toRaw = TRUE)[[1]])
+	r <- iconv(open, to = "latin1", toRaw = TRUE)[[1]]
+	l1 <- iconv(value, to = "latin1")
+	if (is.na(l1)) {
+		# Unicode needs to be "UTF-16BE" while rest needs to be "latin1"
+		# Replacing `paste0()` with `stringi::stri_join()` causes an error here
+		r <- append(r, iconv(paste0("\ufeff", value), to = "UTF-16BE", toRaw = TRUE)[[1]])
+	} else {
+		r <- append(r, iconv(value, to = "latin1", toRaw = TRUE)[[1]])
+	}
+	append(r, iconv(close, to = "latin1", toRaw = TRUE)[[1]])
 }
 
 d_format <- function(value) {
-    if (is.null(value)) {
-        "NULL"
-    } else if (length(value) > 1) {
-        stri_join(value, collapse = ", ")
-    } else if (is.character(value)) {
-        value
-    } else {
-        format(value)
-    }
+	if (is.null(value)) {
+		"NULL"
+	} else if (length(value) > 1) {
+		stri_join(value, collapse = ", ")
+	} else if (is.character(value)) {
+		value
+	} else {
+		format(value)
+	}
 }
 
 entry_pdftk <- function(key, value) {
-    c("InfoBegin",
-      stri_join("InfoKey: ", key),
-      stri_join("InfoValue: ", value))
+	c("InfoBegin", stri_join("InfoKey: ", key), stri_join("InfoValue: ", value))
 }
 
 as_character_value <- function(value) {
-    if (is.null(value))
-        NULL
-    else
-        value
+	if (is.null(value)) {
+		NULL
+	} else {
+		value
+	}
 }
 
 as_datetime_value <- function(value) {
-    if (is.null(value)) {
-        NULL
-    } else {
-        datetimeoffset::as_datetimeoffset(value)
-    }
+	if (is.null(value)) {
+		NULL
+	} else {
+		datetimeoffset::as_datetimeoffset(value)
+	}
 }

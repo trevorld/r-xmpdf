@@ -49,128 +49,133 @@ NULL
 #' @rdname supports
 #' @export
 supports_get_bookmarks <- function() {
-    supports_pdftk() || supports_pdftools()
+	supports_pdftk() || supports_pdftools()
 }
 
 #' @rdname supports
 #' @export
 supports_set_bookmarks <- function() {
-    supports_pdftk() || supports_gs()
+	supports_pdftk() || supports_gs()
 }
 
 #' @rdname supports
 #' @export
 supports_get_docinfo <- function() {
-    supports_exiftool() || supports_pdftk() || supports_pdftools()
+	supports_exiftool() || supports_pdftk() || supports_pdftools()
 }
 
 #' @rdname supports
 #' @export
 supports_set_docinfo <- function() {
-    supports_pdftk() || supports_gs()
+	supports_pdftk() || supports_gs()
 }
 
 #' @rdname supports
 #' @export
 supports_get_xmp <- function() {
-    supports_exiftool()
+	supports_exiftool()
 }
 
 #' @rdname supports
 #' @export
 supports_set_xmp <- function() {
-    supports_exiftool()
+	supports_exiftool()
 }
 
 #' @rdname supports
 #' @export
 supports_cat_pages <- function() {
-    supports_qpdf() || supports_pdftk() || supports_gs()
+	supports_qpdf() || supports_pdftk() || supports_gs()
 }
 
 #' @rdname supports
 #' @export
 supports_n_pages <- function() {
-    supports_exiftool() || supports_qpdf() || supports_pdftk() || supports_gs()
+	supports_exiftool() || supports_qpdf() || supports_pdftk() || supports_gs()
 }
 
 #' @rdname supports
 #' @export
 supports_exiftool <- function() {
-    as.logical(find_exiftool_cmd() != "")
+	as.logical(find_exiftool_cmd() != "")
 }
 
 #' @rdname supports
 #' @export
 supports_gs <- function() {
-    as.logical(find_gs_cmd() != "")
+	as.logical(find_gs_cmd() != "")
 }
 
 #' @rdname supports
 #' @export
 supports_pdftk <- function() {
-    as.logical(find_pdftk_cmd() != "")
+	as.logical(find_pdftk_cmd() != "")
 }
 
 find_exiftool_cmd <- function() {
-    if (getOption("xmpdf_disable_exiftool", FALSE)) {
-        ""
-    } else if (requireNamespace("exiftoolr", quietly = TRUE)) {
-        cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE),
-                   silent = TRUE)
-        if (inherits(cmd, "try-error"))
-            ""
-        else
-            cmd
-    } else {
-        Sys.which(Sys.getenv("ET_EXIFTOOL_PATH", "exiftool"))
-    }
+	if (getOption("xmpdf_disable_exiftool", FALSE)) {
+		""
+	} else if (requireNamespace("exiftoolr", quietly = TRUE)) {
+		cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE), silent = TRUE)
+		if (inherits(cmd, "try-error")) {
+			""
+		} else {
+			cmd
+		}
+	} else {
+		Sys.which(Sys.getenv("ET_EXIFTOOL_PATH", "exiftool"))
+	}
 }
 
 find_gs_cmd <- function() {
-    if (getOption("xmpdf_disable_gs", FALSE))
-        ""
-    else
-        tools::find_gs_cmd()
+	if (getOption("xmpdf_disable_gs", FALSE)) {
+		""
+	} else {
+		tools::find_gs_cmd()
+	}
 }
 
 find_pdftk_cmd <- function() {
-    if (getOption("xmpdf_disable_pdftk", FALSE)) {
-        ""
-    } else {
-        cmd <- Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
-        if (cmd == "")
-            cmd <- Sys.which("pdftk-java")
-        cmd
-    }
+	if (getOption("xmpdf_disable_pdftk", FALSE)) {
+		""
+	} else {
+		cmd <- Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
+		if (cmd == "") {
+			cmd <- Sys.which("pdftk-java")
+		}
+		cmd
+	}
 }
 
 supports_qpdf <- function() {
-    requireNamespace("qpdf", quietly = TRUE) &&
-        !getOption("xmpdf_disable_qpdf", FALSE)
+	requireNamespace("qpdf", quietly = TRUE) &&
+		!getOption("xmpdf_disable_qpdf", FALSE)
 }
 supports_pdftools <- function() {
-    requireNamespace("pdftools", quietly = TRUE) &&
-        !getOption("xmpdf_disable_pdftools", FALSE)
+	requireNamespace("pdftools", quietly = TRUE) &&
+		!getOption("xmpdf_disable_pdftools", FALSE)
 }
 
 gs <- function() {
-    get_cmd("ghostscript", find_gs_cmd, install_gs_str)
+	get_cmd("ghostscript", find_gs_cmd, install_gs_str)
 }
 
 pdftk <- function() {
-    get_cmd("pdftk", find_pdftk_cmd, install_pdftk_str)
+	get_cmd("pdftk", find_pdftk_cmd, install_pdftk_str)
 }
 
 exiftool <- function() {
-    get_cmd("exiftool", find_exiftool_cmd, install_exiftool_str)
+	get_cmd("exiftool", find_exiftool_cmd, install_exiftool_str)
 }
 
-get_cmd <- function(name,
-                    cmd_fn = function() Sys.which(name),
-                    msg_fn = function() install_cmd_str(name)) {
-    cmd <- cmd_fn()
-    if (cmd == "")
-        abort(msg_fn(), class = "xmpdf_suggested_package")
-    cmd
+get_cmd <- function(
+	name,
+	cmd_fn = function() Sys.which(name),
+	msg_fn = function() install_cmd_str(name)
+) {
+	cmd <- cmd_fn()
+	if (cmd == "") {
+		abort(msg_fn(), class = "xmpdf_suggested_package")
+	}
+	cmd
 }

@@ -50,64 +50,61 @@ NULL
 #' @rdname edit_xmp
 #' @export
 get_xmp <- function(filename, use_names = TRUE) {
-    if (supports_exiftool()) {
-        get_xmp_exiftool(filename, use_names = use_names)
-    } else {
-        abort(msg_get_xmp(), class = "xmpdf_suggested_package")
-    }
+	if (supports_exiftool()) {
+		get_xmp_exiftool(filename, use_names = use_names)
+	} else {
+		abort(msg_get_xmp(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname edit_xmp
 #' @export
 get_xmp_exiftool <- function(filename, use_names = TRUE) {
-    l <- lapply(filename, get_xmp_exiftool_helper)
-    use_filenames(l, use_names, filename)
+	l <- lapply(filename, get_xmp_exiftool_helper)
+	use_filenames(l, use_names, filename)
 }
 get_xmp_exiftool_helper <- function(filename) {
-    md <- get_exiftool_metadata(filename, tags="-XMP:all")
-    md <- md[grep("^XMP-", names(md))]
-    names(md) <- gsub("^XMP-", "", names(md))
-    names(md) <- gsub("^iptc", "Iptc4xmp", names(md))
-    names(md) <- ifelse(grepl("^dc:", names(md)),
-                        tolower(names(md)),
-                        names(md))
-    if (any(grepl("-", names(md)))) {
-        md <- extract_lang_alt(md)
-    }
-    x <- as_xmp(md)
-    x$auto_xmp <- NULL
-    x
+	md <- get_exiftool_metadata(filename, tags = "-XMP:all")
+	md <- md[grep("^XMP-", names(md))]
+	names(md) <- gsub("^XMP-", "", names(md))
+	names(md) <- gsub("^iptc", "Iptc4xmp", names(md))
+	names(md) <- ifelse(grepl("^dc:", names(md)), tolower(names(md)), names(md))
+	if (any(grepl("-", names(md)))) {
+		md <- extract_lang_alt(md)
+	}
+	x <- as_xmp(md)
+	x$auto_xmp <- NULL
+	x
 }
 
 #### lang_alt
 extract_lang_alt <- function(x) {
-    tags <- unique(gsub("^([[:alnum:]:]+)-(.*)$", "\\1",
-                        grep("-", names(x), value = TRUE)))
-    for (tag in tags) {
-        names(x) <- ifelse(names(x) == tag, stri_join(tag, "-x-default"), names(x))
-        i <- grep(stri_join("^", tag), names(x))
-        x_tag <- x[i]
-        names(x_tag) <- substr(names(x_tag), nchar(tag) + 2L, nchar(names(x_tag)))
-        x_la <- list(as_lang_alt(x_tag))
-        names(x_la) <- tag
-        x <- c(x[-i], x_la)
-    }
-    x
+	tags <- unique(gsub("^([[:alnum:]:]+)-(.*)$", "\\1", grep("-", names(x), value = TRUE)))
+	for (tag in tags) {
+		names(x) <- ifelse(names(x) == tag, stri_join(tag, "-x-default"), names(x))
+		i <- grep(stri_join("^", tag), names(x))
+		x_tag <- x[i]
+		names(x_tag) <- substr(names(x_tag), nchar(tag) + 2L, nchar(names(x_tag)))
+		x_la <- list(as_lang_alt(x_tag))
+		names(x_la) <- tag
+		x <- c(x[-i], x_la)
+	}
+	x
 }
 
 #' @rdname edit_xmp
 #' @export
 set_xmp <- function(xmp, input, output = input) {
-    if (supports_exiftool()) {
-        set_xmp_exiftool(xmp, input, output)
-    } else {
-        abort(msg_set_xmp(), class = "xmpdf_suggested_package")
-    }
+	if (supports_exiftool()) {
+		set_xmp_exiftool(xmp, input, output)
+	} else {
+		abort(msg_set_xmp(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname edit_xmp
 #' @export
 set_xmp_exiftool <- function(xmp, input, output = input) {
-    xmp <- as_xmp(xmp)
-    set_exiftool_metadata(xmp$exiftool_tags(), input, output, mode = "xmp")
+	xmp <- as_xmp(xmp)
+	set_exiftool_metadata(xmp$exiftool_tags(), input, output, mode = "xmp")
 }

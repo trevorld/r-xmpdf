@@ -28,37 +28,37 @@
 #' @seealso [supports_n_pages()] detects support for this feature.
 #' @export
 n_pages <- function(filename, use_names = TRUE) {
-    if (supports_qpdf()) {
-        n_pages_qpdf(filename, use_names = use_names)
-    } else if (supports_exiftool()) {
-        n_pages_exiftool(filename, use_names = use_names)
-    } else if (supports_pdftk()) {
-        n_pages_pdftk(filename, use_names = use_names)
-    # } else if (has_cmd("pdfinfo")) {
-    #     n_pages_pdfinfo(filename, use_names = use_names)
-    } else if (supports_gs()) {
-        n_pages_gs(filename, use_names = use_names)
-    } else {
-        abort(msg_n_pages(), class = "xmpdf_suggested_package")
-    }
+	if (supports_qpdf()) {
+		n_pages_qpdf(filename, use_names = use_names)
+	} else if (supports_exiftool()) {
+		n_pages_exiftool(filename, use_names = use_names)
+	} else if (supports_pdftk()) {
+		n_pages_pdftk(filename, use_names = use_names)
+		# } else if (has_cmd("pdfinfo")) {
+		#     n_pages_pdfinfo(filename, use_names = use_names)
+	} else if (supports_gs()) {
+		n_pages_gs(filename, use_names = use_names)
+	} else {
+		abort(msg_n_pages(), class = "xmpdf_suggested_package")
+	}
 }
 
 #' @rdname n_pages
 #' @export
 n_pages_exiftool <- function(filename, use_names = TRUE) {
-    filename <- normalizePath(filename, mustWork = TRUE)
-    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
-        md <- get_exiftool_metadata(f, "-pdf:pagecount")
-        as.integer(md[["PDF:PageCount"]])
-    })
+	filename <- normalizePath(filename, mustWork = TRUE)
+	sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+		md <- get_exiftool_metadata(f, "-pdf:pagecount")
+		as.integer(md[["PDF:PageCount"]])
+	})
 }
 
 #' @rdname n_pages
 #' @export
 n_pages_qpdf <- function(filename, use_names = TRUE) {
-    assert_suggested("qpdf")
-    filename <- normalizePath(filename, mustWork = TRUE)
-    sapply(filename, USE.NAMES = use_names, FUN = function(f) qpdf::pdf_length(f))
+	assert_suggested("qpdf")
+	filename <- normalizePath(filename, mustWork = TRUE)
+	sapply(filename, USE.NAMES = use_names, FUN = function(f) qpdf::pdf_length(f))
 }
 
 # #' @rdname n_pages
@@ -76,25 +76,29 @@ n_pages_qpdf <- function(filename, use_names = TRUE) {
 #' @rdname n_pages
 #' @export
 n_pages_pdftk <- function(filename, use_names = TRUE) {
-    cmd <- pdftk()
-    filename <- shQuote(normalizePath(filename, mustWork = TRUE))
-    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
-        args <- c(f, "dump_data_utf8")
-        pdfinfo <- xmpdf_system2(cmd, args)
-        pdfinfo <- grep("^NumberOfPages:", pdfinfo, value=TRUE)
-        as.integer(strsplit(pdfinfo, ":")[[1]][2])
-    })
+	cmd <- pdftk()
+	filename <- shQuote(normalizePath(filename, mustWork = TRUE))
+	sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+		args <- c(f, "dump_data_utf8")
+		pdfinfo <- xmpdf_system2(cmd, args)
+		pdfinfo <- grep("^NumberOfPages:", pdfinfo, value = TRUE)
+		as.integer(strsplit(pdfinfo, ":")[[1]][2])
+	})
 }
 
 #' @rdname n_pages
 #' @export
 n_pages_gs <- function(filename, use_names = TRUE) {
-    cmd <- gs()
-    filename <- normalizePath(filename, winslash="/", mustWork = TRUE)
-    sapply(filename, USE.NAMES = use_names, FUN = function(f) {
-        args <- c("-q", "-dNODISPLAY", "-dNOSAFER", "-c",
-                  stri_join(stri_join('"(', f, ")"),
-                            ' (r) file runpdfbegin pdfpagecount = quit"'))
-        as.integer(xmpdf_system2(cmd, args))
-    })
+	cmd <- gs()
+	filename <- normalizePath(filename, winslash = "/", mustWork = TRUE)
+	sapply(filename, USE.NAMES = use_names, FUN = function(f) {
+		args <- c(
+			"-q",
+			"-dNODISPLAY",
+			"-dNOSAFER",
+			"-c",
+			stri_join(stri_join('"(', f, ")"), ' (r) file runpdfbegin pdfpagecount = quit"')
+		)
+		as.integer(xmpdf_system2(cmd, args))
+	})
 }
