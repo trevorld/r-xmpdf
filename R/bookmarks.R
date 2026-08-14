@@ -54,7 +54,7 @@
 #'   * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, fontface, and whether the bookmarks
 #'     should start open or closed.
 #'   * `get_bookmarks_pdftools()` doesn't report information about bookmarks page number,
-#'     color, fontface, and whether the bookmarks should start open or closed.
+#'     color, and fontface.
 #'   * `set_bookmarks_gs()` supports most bookmarks features including color and font face but
 #'     only action supported is to view a particular page.
 #'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
@@ -325,9 +325,11 @@ get_bookmarks_pdftk_helper <- function(filename) {
 
 gbph_helper <- function(l, level = 0L) {
 	if (level == 0L) {
-		df <- data.frame(title = character(0), level = integer(0))
+		df <- data.frame(title = character(0), level = integer(0), open = logical(0))
 	} else {
-		df <- data.frame(title = l$title, level = level)
+		has_children <- length(l[["children"]]) > 0L
+		open <- if (has_children) isTRUE(l[["is_open"]]) else NA
+		df <- data.frame(title = l$title, level = level, open = open)
 	}
 	if (length(l[["children"]]) > 0L) {
 		df_children <- do.call(rbind, lapply(l[["children"]], gbph_helper, level = level + 1L))
@@ -344,8 +346,8 @@ get_bookmarks_pdftools_helper <- function(filename) {
 			title = df$title,
 			page = NA,
 			level = as.integer(df$level),
-			count = NA_integer_,
-			open = NA,
+			count = get_count(df$level, df$open),
+			open = df$open,
 			color = NA_character_,
 			fontface = NA_character_,
 			stringsAsFactors = FALSE
