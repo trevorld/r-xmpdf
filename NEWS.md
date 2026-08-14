@@ -1,5 +1,12 @@
-xmpdf 0.2.2 (development)
+xmpdf 0.3.0 (development)
 =========================
+
+New features
+------------
+
+* New `get_bookmarks_augmented()` which augments `get_bookmarks_pdftk()`'s support
+  for bookmark page numbers with `get_bookmarks_pdftools()`'s new support for
+  whether bookmarks should start open or closed (#62).
 
 Bug fixes and minor improvements
 --------------------------------
@@ -8,6 +15,7 @@ Bug fixes and minor improvements
 * `get_bookmarks_pdftools()` now reports positive/negative `count`
   (as well as `open`) using `pdftools::pdf_toc()`'s new `is_open` list element (#62).
   This requires `pdftools` (>= 3.8.0).
+* `get_bookmarks()` now prefers the new `get_bookmarks_augmented()` when supported.
 
 xmpdf 0.2.1
 ===========
@@ -109,14 +117,14 @@ Initial features
 
 * `cat_pages()` concatenates (pdf) file(s) into a single output pdf.
   `cat_pages()` will try to use the following helper functions in the following order:
- 
+
   1. `cat_pages_qpdf()` which wraps `qpdf::pdf_combine()`
   2. `cat_pages_pdftk()` which wraps `pdftk` command-line tool
   3. `cat_pages_gs()` which wraps `ghostscript` command-line tool
 
 * `n_pages()` returns the number of pages in the (pdf) file(s).
   `n_pages()` will try to use the following helper functions in the following order:
- 
+
   1. `n_pages_qpdf()` which wraps `qpdf::pdf_length()`
   2. `n_pages_exiftool()` which wraps `exiftool` command-line tool
   3. `n_pages_pdftk()` which wraps `pdftk` command-line tool

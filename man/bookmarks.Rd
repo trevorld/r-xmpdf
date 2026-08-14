@@ -5,6 +5,7 @@
 \alias{get_bookmarks}
 \alias{get_bookmarks_pdftk}
 \alias{get_bookmarks_pdftools}
+\alias{get_bookmarks_augmented}
 \alias{set_bookmarks}
 \alias{set_bookmarks_pdftk}
 \alias{set_bookmarks_gs}
@@ -15,6 +16,8 @@ get_bookmarks(filename, use_names = TRUE)
 get_bookmarks_pdftk(filename, use_names = TRUE)
 
 get_bookmarks_pdftools(filename, use_names = TRUE)
+
+get_bookmarks_augmented(filename, use_names = TRUE)
 
 set_bookmarks(bookmarks, input, output = input)
 
@@ -70,9 +73,15 @@ Note many pdf viewers quietly ignore this feature.}
 \details{
 \code{get_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{
+\item \code{get_bookmarks_augmented()} if both \code{pdftk} and \code{pdftools} are supported
 \item \code{get_bookmarks_pdftk()} which wraps \code{pdftk} command-line tool
 \item \code{get_bookmarks_pdftools()} which wraps \code{\link[pdftools:pdf_toc]{pdftools::pdf_toc()}}
 }
+
+\code{get_bookmarks_augmented()} gets bookmarks with \code{get_bookmarks_pdftk()} and
+then augments the \code{count} and \code{open} columns using \code{get_bookmarks_pdftools()},
+combining \code{pdftk}'s support for page numbers with \code{pdftools}' support for
+whether the bookmarks should start open or closed.  Requires both \code{pdftk} and \code{pdftools}.
 
 \code{set_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{
@@ -87,6 +96,7 @@ Note many pdf viewers quietly ignore this feature.}
 should start open or closed.
 \item \code{get_bookmarks_pdftools()} doesn't report information about bookmarks page number,
 color, and fontface.
+\item \code{get_bookmarks_augmented()} doesn't report information about bookmarks color and fontface.
 \item \code{set_bookmarks_gs()} supports most bookmarks features including color and font face but
 only action supported is to view a particular page.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.

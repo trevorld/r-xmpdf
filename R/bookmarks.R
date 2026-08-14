@@ -7,8 +7,9 @@
 #'
 #' `get_bookmarks()` will try to use the following helper functions in the following order:
 #'
-#' 1. `get_bookmarks_pdftk()` which wraps `pdftk` command-line tool
-#' 2. `get_bookmarks_pdftools()` which wraps [pdftools::pdf_toc()]
+#' 1. `get_bookmarks_augmented()` which augments data from `get_bookmarks_pdftk()` with open/close data from `get_bookmarks_pdftools()`
+#' 2. `get_bookmarks_pdftk()` which wraps `pdftk` command-line tool
+#' 3. `get_bookmarks_pdftools()` which wraps [pdftools::pdf_toc()]
 #'
 #' `set_bookmarks()` will try to use the following helper functions in the following order:
 #'
@@ -55,6 +56,7 @@
 #'     should start open or closed.
 #'   * `get_bookmarks_pdftools()` doesn't report information about bookmarks page number,
 #'     color, and fontface.
+#'   * `get_bookmarks_augmented()` doesn't report information about bookmarks color and fontface.
 #'   * `set_bookmarks_gs()` supports most bookmarks features including color and font face but
 #'     only action supported is to view a particular page.
 #'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
@@ -85,7 +87,9 @@ NULL
 #' @rdname bookmarks
 #' @export
 get_bookmarks <- function(filename, use_names = TRUE) {
-	if (supports_pdftk()) {
+	if (supports_pdftk() && supports_pdftools()) {
+		get_bookmarks_augmented(filename, use_names = use_names)
+	} else if (supports_pdftk()) {
 		get_bookmarks_pdftk(filename, use_names = use_names)
 	} else if (supports_pdftools()) {
 		get_bookmarks_pdftools(filename, use_names = use_names)
@@ -105,6 +109,13 @@ get_bookmarks_pdftk <- function(filename, use_names = TRUE) {
 #' @export
 get_bookmarks_pdftools <- function(filename, use_names = TRUE) {
 	l <- lapply(filename, get_bookmarks_pdftools_helper)
+	use_filenames(l, use_names, filename)
+}
+
+#' @rdname bookmarks
+#' @export
+get_bookmarks_augmented <- function(filename, use_names = TRUE) {
+	l <- lapply(filename, get_bookmarks_augmented_helper)
 	use_filenames(l, use_names, filename)
 }
 
@@ -364,6 +375,17 @@ get_bookmarks_pdftools_helper <- function(filename) {
 	attr(df, "filename") <- filename
 	attr(df, "title") <- title
 	attr(df, "total_pages") <- as.integer(info$pages)
+	df
+}
+
+get_bookmarks_augmented_helper <- function(filename) {
+	df <- get_bookmarks_pdftk_helper(filename)
+	if (nrow(df) > 0L) {
+		df_pdftools <- get_bookmarks_pdftools_helper(filename)
+		stopifnot(nrow(df_pdftools) == nrow(df))
+		df$count <- df_pdftools$count
+		df$open <- df_pdftools$open
+	}
 	df
 }
 
