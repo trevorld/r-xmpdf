@@ -1,3 +1,11 @@
+xmpdf 0.2.2 (development)
+=========================
+
+Bug fixes and minor improvements
+--------------------------------
+
+* Fixes `set_bookmarks()` bug where tempfile wasn't being deleted if `input == output` (@djvill, #63).
+
 xmpdf 0.2.1
 ===========
 
