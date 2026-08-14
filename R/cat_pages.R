@@ -26,15 +26,15 @@
 #'     invisible(dev.off())
 #'   }
 #'   f1 <- tempfile(fileext = "_doc1.pdf")
-#'   on.exit(unlink(f1))
+#'   on.exit(unlink(f1), add = TRUE)
 #'   make_pdf(f1, "Document 1")
 #'
 #'   f2 <- tempfile(fileext = "_doc2.pdf")
-#'   on.exit(unlink(f2))
+#'   on.exit(unlink(f2), add = TRUE)
 #'   make_pdf(f2, "Document 2")
 #'
 #'   fc <- tempfile(fileext = "_cat.pdf")
-#'   on.exit(unlink(fc))
+#'   on.exit(unlink(fc), add = TRUE)
 #'   cat_pages(c(f1, f2), fc)
 #'
 #'   # Use `cat_bookmarks()` to create pdf bookmarks for concatenated output files

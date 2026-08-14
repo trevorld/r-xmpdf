@@ -2,7 +2,7 @@ skip_if_not_installed("grid")
 library("grid")
 
 f1 <- tempfile(fileext = ".pdf")
-on.exit(unlink(f1))
+on.exit(unlink(f1), add = TRUE)
 pdf(f1, onefile = TRUE)
 grid.text("Page 1")
 grid.newpage()
@@ -23,7 +23,7 @@ test_that("docinfo_pdftk", {
     expect_equal(get_docinfo_pdftk(f1)[[1]]$title, "R Graphics Output")
 
     f2 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f2))
+    on.exit(unlink(f2), add = TRUE)
 
     di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
     set_docinfo_pdftk(di_set, f1, f2)
@@ -55,7 +55,7 @@ test_that("docinfo_pdftk", {
 
     skip_if_not(supports_exiftool())
     f5 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f5))
+    on.exit(unlink(f5), add = TRUE)
     di_set <- docinfo(subject = "A subject\nwith a newline")
     set_docinfo_exiftool(di_set, f1, f5)
 
@@ -92,7 +92,7 @@ test_that("set_docinfo_gs", {
     skip_if_not(supports_gs())
 
     f3 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f3))
+    on.exit(unlink(f3), add = TRUE)
 
     di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
     set_docinfo_gs(di_set, f1, f3)
@@ -133,7 +133,7 @@ test_that("docinfo_exiftool", {
     expect_equal(get_docinfo_exiftool(f1)[[1]]$title, "R Graphics Output")
 
     f3 <- tempfile(fileext = ".pdf")
-    on.exit(unlink(f3))
+    on.exit(unlink(f3), add = TRUE)
 
     di_set <- docinfo(author = "John Doe", title = "Two Boring Pages")
     set_docinfo_exiftool(di_set, f1, f3)

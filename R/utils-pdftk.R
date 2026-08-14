@@ -2,7 +2,7 @@
 
 get_pdftk_metadata <- function(filename) {
     f <- tempfile(fileext = ".txt")
-    on.exit(unlink(f))
+    on.exit(unlink(f), add = TRUE)
     cmd <- pdftk()
     filename <- shQuote(normalizePath(filename, mustWork = TRUE))
     args <- c(filename, "dump_data_utf8", "output", f)

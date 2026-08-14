@@ -2,7 +2,7 @@ skip_if_not_installed("grid")
 library("grid")
 
 f <- tempfile(fileext = ".pdf")
-on.exit(unlink(f))
+on.exit(unlink(f), add = TRUE)
 pdf(f, onefile = TRUE)
 grid.text("Page 1")
 grid.newpage()

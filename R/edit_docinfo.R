@@ -227,12 +227,12 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
     output <- normalizePath(output, mustWork = FALSE)
     if (input == output) {
         target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target))
+        on.exit(unlink(target), add = TRUE)
     } else {
         target <- output
     }
     metafile <- tempfile(fileext = ".bin")
-    on.exit(unlink(metafile))
+    on.exit(unlink(metafile), add = TRUE)
     pmc <- docinfo$pdfmark(raw = FALSE)
     pmc_l1 <- iconv(pmc, to = "latin1")
     if (is.na(pmc_l1)) { # Has non-Latin-1 characters
@@ -264,7 +264,7 @@ set_docinfo_pdftk <- function(docinfo, input, output = input) {
     output <- normalizePath(output, mustWork = FALSE)
     if (input == output) {
         target <- tempfile(fileext = ".pdf")
-        on.exit(unlink(target))
+        on.exit(unlink(target), add = TRUE)
     } else {
         target <- output
     }
@@ -273,7 +273,7 @@ set_docinfo_pdftk <- function(docinfo, input, output = input) {
         meta <- meta[-id_info]
     meta <- append(docinfo$pdftk(), meta)
     metafile <- tempfile(fileext = ".txt")
-    on.exit(unlink(metafile))
+    on.exit(unlink(metafile), add = TRUE)
     brio::write_lines(meta, metafile)
     metafile <- normalizePath(metafile, mustWork = TRUE)
     args <- c(shQuote(input),
