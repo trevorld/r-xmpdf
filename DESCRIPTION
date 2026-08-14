@@ -2,14 +2,14 @@ Encoding: UTF-8
 Package: xmpdf
 Type: Package
 Title: Edit 'XMP' Metadata and 'PDF' Bookmarks and Documentation Info
-Version: 0.2.1
+Version: 0.2.2-1
 Description: Edit 'XMP' metadata <https://en.wikipedia.org/wiki/Extensible_Metadata_Platform> 
     in a variety of media file formats as well as 
     edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files.
     Can detect and use a variety of command-line tools to perform these operations such as
-    'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>, 
+    'exiftool' <https://exiftool.org/>, 'ghostscript' <https://www.ghostscript.com/>,
     and/or 'pdftk' <https://gitlab.com/pdftk-java/pdftk>.
-Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
+Authors@R: c(person("Trevor L.", "Davis", role=c("aut", "cre"),
                     email="trevor.l.davis@gmail.com", comment = c(ORCID = "0000-0001-6341-4639")),
              person("Linux Foundation", role="dtc",
                     comment = 'Uses some data from the "SPDX License List" <https://github.com/spdx/license-list-XML>'))
