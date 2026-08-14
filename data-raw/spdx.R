@@ -6,7 +6,7 @@ if (TRUE) {
 	library("jsonlite")
 	library("rvest")
 
-	spdx_file <- "raw-data/spdx_license_list.html"
+	spdx_file <- "data-raw/spdx_license_list.html"
 
 	if (!file.exists(spdx_file)) {
 		download.file("https://spdx.org/licenses/", spdx_file)
@@ -16,7 +16,7 @@ if (TRUE) {
 
 	names(spdx) <- c("name", "id", "fsf", "osi", "deprecated")
 
-	spdx_json_file <- "raw-data/spdx.json"
+	spdx_json_file <- "data-raw/spdx.json"
 	if (!file.exists(spdx_json_file)) {
 		download.file(
 			"https://raw.githubusercontent.com/sindresorhus/spdx-license-list/main/spdx.json",
