@@ -200,6 +200,26 @@ test_that("bookmarks_pdftools", {
 	expect_equal(bm$title[1], "R\u5f88\u68d2\uff01")
 })
 
+test_that("get_bookmarks_augmented", {
+	skip_if_not(supports_pdftk())
+	skip_if_not(supports_pdftools())
+
+	f2 <- tempfile(fileext = ".pdf")
+	on.exit(unlink(f2), add = TRUE)
+
+	bookmarks <- data.frame(
+		title = c("Front", "Page 1", "Page 2"),
+		level = c(1, 2, 2),
+		page = c(1L, 1L, 2L),
+		open = c(FALSE, NA, NA)
+	)
+	set_bookmarks(bookmarks, f1, f2)
+	bm <- get_bookmarks_augmented(f2)[[1]]
+	expect_equal(bm$page, c(1L, 1L, 2L))
+	expect_equal(bm$count, c(-2L, 0L, 0L))
+	expect_equal(bm$open, c(FALSE, NA, NA))
+})
+
 test_that("`get_count()` and `get_level()`", {
 	expect_equal(get_count(c(1, 2, 3, 2), c(TRUE, FALSE, NA, NA)), c(2, -1, 0, 0))
 	expect_equal(
