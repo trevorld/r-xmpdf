@@ -2,6 +2,9 @@ destination: "../../websites/R/xmpdf/"
 url: "https://trevorldavis.com/R/xmpdf"
 development:
     mode: auto
+template:
+  bootstrap: 5
+llm-docs: false
 reference:
   - title: "Get/set XMP metadata"
     desc: "Functions for getting/setting XMP metadata in a variety of media formats"
