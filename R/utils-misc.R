@@ -90,10 +90,25 @@ use_filenames <- function(l, use_names, filename) {
 	l
 }
 
-xmpdf_system2 <- function(cmd, args, stdout = TRUE) {
-	output <- system2(cmd, args, stdout = stdout)
-	if (!is.null(attr(output, "status"))) {
-		msg <- c(paste(sQuote("system2()"), "command failed."))
+xmpdf_system2 <- function(cmd, args, stdout = TRUE, timeout = 0) {
+	output <- system2(cmd, args, stdout = stdout, timeout = timeout)
+	status <- attr(output, "status")
+	if (!is.null(status)) {
+		msg <- c(
+			paste(sQuote("system2()"), "command failed."),
+			"*" = paste("Command:", paste(c(cmd, args), collapse = " ")),
+			"*" = paste("Exit status:", status)
+		)
+		if (timeout > 0) {
+			msg <- c(
+				msg,
+				"i" = paste0(
+					"A timeout of ",
+					timeout,
+					"s was set and the command may have been killed for exceeding it."
+				)
+			)
+		}
 		abort(msg)
 	}
 	invisible(output)
