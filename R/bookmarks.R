@@ -382,9 +382,34 @@ get_bookmarks_augmented_helper <- function(filename) {
 	df <- get_bookmarks_pdftk_helper(filename)
 	if (nrow(df) > 0L) {
 		df_pdftools <- get_bookmarks_pdftools_helper(filename)
-		stopifnot(nrow(df_pdftools) == nrow(df))
-		df$count <- df_pdftools$count
-		df$open <- df_pdftools$open
+		if (nrow(df_pdftools) == nrow(df)) {
+			df$count <- df_pdftools$count
+			df$open <- df_pdftools$open
+		} else {
+			msg <- c(
+				paste(
+					sQuote("get_bookmarks_augmented()"),
+					"got a different number of bookmarks from",
+					sQuote("pdftk"),
+					"and",
+					sQuote("pdftools"),
+					"for this file."
+				),
+				"*" = paste("File:", filename),
+				"*" = paste(sQuote("pdftk"), "bookmarks:", nrow(df)),
+				"*" = paste(sQuote("pdftools"), "bookmarks:", nrow(df_pdftools)),
+				"i" = paste(
+					"Omitting",
+					sQuote("count"),
+					"and",
+					sQuote("open"),
+					"information and falling back to",
+					sQuote("get_bookmarks_pdftk()"),
+					"data."
+				)
+			)
+			warn(msg)
+		}
 	}
 	df
 }

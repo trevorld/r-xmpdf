@@ -16,6 +16,9 @@ Bug fixes and minor improvements
   (as well as `open`) using `pdftools::pdf_toc()`'s new `is_open` list element (#62).
   This requires `pdftools` (>= 3.8.0).
 * `get_bookmarks()` now prefers the new `get_bookmarks_augmented()` when supported.
+* Calls to the `pdftk` command-line tool to read bookmark/documentation info metadata
+  now time out after 60s by default (configurable via the `xmpdf_pdftk_timeout` option)
+  rather than being able to hang indefinitely on a pathological pdf outline.
 
 xmpdf 0.2.1
 ===========

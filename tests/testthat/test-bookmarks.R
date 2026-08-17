@@ -220,6 +220,26 @@ test_that("get_bookmarks_augmented", {
 	expect_equal(bm$open, c(FALSE, NA, NA))
 })
 
+test_that("get_bookmarks_augmented() falls back gracefully on a bookmark count mismatch", {
+	skip_if_not(supports_pdftk())
+	skip_if_not(supports_pdftools())
+
+	f2 <- tempfile(fileext = ".pdf")
+	on.exit(unlink(f2), add = TRUE)
+	bookmarks <- data.frame(title = c("Page 1", "Page 2"), page = c(1L, 2L))
+	set_bookmarks(bookmarks, f1, f2)
+
+	local_mocked_bindings(
+		get_bookmarks_pdftools_helper = function(filename) {
+			get_bookmarks_pdftk_helper(filename)[-1, ]
+		}
+	)
+	expect_warning(bm <- get_bookmarks_augmented_helper(f2), "different number of bookmarks")
+	expect_equal(nrow(bm), 2L)
+	expect_true(all(is.na(bm$count)))
+	expect_true(all(is.na(bm$open)))
+})
+
 test_that("`get_count()` and `get_level()`", {
 	expect_equal(get_count(c(1, 2, 3, 2), c(TRUE, FALSE, NA, NA)), c(2, -1, 0, 0))
 	expect_equal(

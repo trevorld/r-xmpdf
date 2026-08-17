@@ -73,15 +73,10 @@ Note many pdf viewers quietly ignore this feature.}
 \details{
 \code{get_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{
-\item \code{get_bookmarks_augmented()} if both \code{pdftk} and \code{pdftools} are supported
+\item \code{get_bookmarks_augmented()} which augments data from \code{get_bookmarks_pdftk()} with open/close data from \code{get_bookmarks_pdftools()}
 \item \code{get_bookmarks_pdftk()} which wraps \code{pdftk} command-line tool
 \item \code{get_bookmarks_pdftools()} which wraps \code{\link[pdftools:pdf_toc]{pdftools::pdf_toc()}}
 }
-
-\code{get_bookmarks_augmented()} gets bookmarks with \code{get_bookmarks_pdftk()} and
-then augments the \code{count} and \code{open} columns using \code{get_bookmarks_pdftools()},
-combining \code{pdftk}'s support for page numbers with \code{pdftools}' support for
-whether the bookmarks should start open or closed.  Requires both \code{pdftk} and \code{pdftools}.
 
 \code{set_bookmarks()} will try to use the following helper functions in the following order:
 \enumerate{

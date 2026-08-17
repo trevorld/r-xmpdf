@@ -36,7 +36,7 @@ Suggests:
     qpdf,
     pdftools (>= 3.8.0),
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.1.4)
 VignetteBuilder: knitr, rmarkdown
 SystemRequirements: 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries.
  'exiftool' for editing pdf documentation info entries and/or xmp metadata.
