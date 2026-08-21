@@ -205,6 +205,24 @@ test_that("conversion to/from docinfo()", {
 	expect_equal(d3$subject, "Generic Subject")
 })
 
+test_that("docinfo() arbitrary keys", {
+	d <- docinfo(author = "John Doe", ADBETest_MyKey = "My private information")
+	expect_equal(d$get_item("ADBETest_MyKey"), "My private information")
+	expect_equal(d$get_nonnull_keys(), c("Author", "ADBETest_MyKey"))
+
+	dl <- as.list(d)
+	expect_equal(dl$ADBETest_MyKey, "My private information")
+
+	expect_snapshot(print(d))
+
+	d2 <- docinfo()
+	d2$update(d)
+	expect_equal(d2$get_item("ADBETest_MyKey"), "My private information")
+
+	d$set_item("ADBETest_MyKey", "Updated information")
+	expect_equal(d$get_item("ADBETest_MyKey"), "Updated information")
+})
+
 test_that("update", {
 	d <- docinfo(author = "John Doe")
 	expect_equal(d$author, "John Doe")

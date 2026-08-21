@@ -5,6 +5,8 @@
 #' `docinfo()` creates a PDF documentation info dictionary object.
 #' Such objects can be used with [set_docinfo()] to edit PDF documentation info dictionary entries
 #' and such objects are returned by [get_docinfo()].
+#' @param ... Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
+#'            and the values (which should be strings) are the info dictionary values.
 #' @param author The document's author.  Matching xmp metadata tag is `dc:creator`.
 #' @param creation_date The date the document was created.
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
@@ -72,6 +74,7 @@
 #' }
 #' @export
 docinfo <- function(
+	...,
 	author = NULL,
 	creation_date = NULL,
 	creator = NULL,
@@ -82,6 +85,7 @@ docinfo <- function(
 	mod_date = NULL
 ) {
 	DocInfo$new(
+		...,
 		author = author,
 		creation_date = creation_date,
 		creator = creator,
@@ -96,39 +100,13 @@ docinfo <- function(
 DocInfo <- R6Class(
 	"docinfo",
 	public = list(
-		initialize = function(
-			author = NULL,
-			creation_date = NULL,
-			creator = NULL,
-			producer = NULL,
-			title = NULL,
-			subject = NULL,
-			keywords = NULL,
-			mod_date = NULL
-		) {
-			if (!is.null(author)) {
-				self$author <- author
-			}
-			if (!is.null(creation_date)) {
-				self$creation_date <- creation_date
-			}
-			if (!is.null(creator)) {
-				self$creator <- creator
-			}
-			if (!is.null(producer)) {
-				self$producer <- producer
-			}
-			if (!is.null(title)) {
-				self$title <- title
-			}
-			if (!is.null(subject)) {
-				self$subject <- subject
-			}
-			if (!is.null(keywords)) {
-				self$keywords <- keywords
-			}
-			if (!is.null(mod_date)) {
-				self$mod_date <- mod_date
+		initialize = function(...) {
+			l <- list(...)
+			for (key in names(l)) {
+				value <- l[[key]]
+				if (!is.null(value)) {
+					self$set_item(key, value)
+				}
 			}
 			invisible(NULL)
 		},
@@ -143,6 +121,9 @@ DocInfo <- R6Class(
 				stri_join("Keywords: ", d_format(self$keywords)),
 				stri_join("ModDate: ", d_format(self$mod_date))
 			)
+			for (key in names(private$val$arbitrary)) {
+				text <- append(text, stri_join(key, ": ", d_format(private$val$arbitrary[[key]])))
+			}
 			invisible(cat(text, sep = "\n"))
 		},
 		get_item = function(key) {
@@ -163,8 +144,7 @@ DocInfo <- R6Class(
 			} else if (key %in% c("mod_date", "ModDate")) {
 				self$mod_date
 			} else {
-				msg <- sprintf("We don't support key '%s' yet.", key)
-				abort(msg)
+				private$val$arbitrary[[key]]
 			}
 		},
 		set_item = function(key, value) {
@@ -185,8 +165,7 @@ DocInfo <- R6Class(
 			} else if (key %in% c("mod_date", "ModDate")) {
 				self$mod_date <- value
 			} else {
-				msg <- sprintf("We don't support key '%s' yet.", key)
-				abort(msg)
+				private$val$arbitrary[[key]] <- value
 			}
 		},
 		update = function(x) {
@@ -222,6 +201,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				keys <- append(keys, "ModDate")
 			}
+			keys <- append(keys, names(private$val$arbitrary))
 			keys
 		},
 		exiftool_tags = function() {
@@ -383,7 +363,7 @@ DocInfo <- R6Class(
 		}
 	),
 	private = list(
-		val = list(),
+		val = list(arbitrary = list()),
 		pdfmark_character = function() {
 			tags <- "["
 			if (!is.null(self$author)) {
@@ -483,6 +463,19 @@ as.list.docinfo <- function(x, ...) {
 	}
 	if (!is.null(x$mod_date)) {
 		l$mod_date <- x$mod_date
+	}
+	known_keys <- c(
+		"Author",
+		"CreationDate",
+		"Creator",
+		"Producer",
+		"Title",
+		"Subject",
+		"Keywords",
+		"ModDate"
+	)
+	for (key in setdiff(x$get_nonnull_keys(), known_keys)) {
+		l[[key]] <- x$get_item(key)
 	}
 	l
 }
