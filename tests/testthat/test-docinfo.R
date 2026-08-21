@@ -17,6 +17,19 @@ test_that("get_docinfo_pdftools", {
 	skip_if_not_installed("pdftools")
 	expect_equal(get_docinfo_pdftools(f1)[[1]]$title, "R Graphics Output")
 })
+test_that("get_docinfo_pdftools arbitrary keys", {
+	skip_if_not_installed("pdftools")
+	skip_if_not(supports_pdftk())
+
+	f2 <- tempfile(fileext = ".pdf")
+	on.exit(unlink(f2), add = TRUE)
+	di_set <- docinfo(author = "John Doe", ADBETest_MyKey = "My private information")
+	set_docinfo_pdftk(di_set, f1, f2)
+
+	di_get <- get_docinfo_pdftools(f2)[[1]]
+	expect_equal(di_get$author, "John Doe")
+	expect_equal(di_get$get_item("ADBETest_MyKey"), "My private information")
+})
 test_that("docinfo_pdftk", {
 	skip_if_not(supports_pdftk())
 
