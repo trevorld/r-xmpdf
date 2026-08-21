@@ -191,6 +191,20 @@ test_that("docinfo_exiftool", {
 	skip_on_os("mac") # CRAN checks on macOS 14
 	set_docinfo_exiftool(docinfo(subject = "R\u5f88\u68d2\uff01"), f4)
 	expect_equal(get_docinfo_exiftool(f4)[[1]]$subject, "R\u5f88\u68d2\uff01")
+
+	# Arbitrary (non-standard) info dictionary entries
+	di_set <- docinfo(author = "John Doe", ADBETest_MyKey = "My private information")
+	set_docinfo_exiftool(di_set, f1, f3)
+	di_get <- get_docinfo_exiftool(f3)[[1]]
+	expect_equal(di_get$author, "John Doe")
+	expect_equal(di_get$get_item("ADBETest_MyKey"), "My private information")
+
+	# Arbitrary entry with a quote/backslash (exercises `-config` escaping)
+	di_set <- docinfo()
+	di_set$set_item("WeirdKey", "value with a 'quote' and a \\backslash")
+	set_docinfo_exiftool(di_set, f1, f3)
+	di_get <- get_docinfo_exiftool(f3)[[1]]
+	expect_equal(di_get$get_item("WeirdKey"), "value with a 'quote' and a \\backslash")
 })
 
 test_that("docinfo()", {

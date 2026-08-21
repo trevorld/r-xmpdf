@@ -203,6 +203,9 @@ DocInfo <- R6Class(
 			keys <- append(keys, names(private$val$arbitrary))
 			keys
 		},
+		arbitrary_keys = function() {
+			names(private$val$arbitrary)
+		},
 		exiftool_tags = function() {
 			tags <- list()
 			if (!is.null(self$author)) {
@@ -228,6 +231,9 @@ DocInfo <- R6Class(
 			}
 			if (!is.null(self$mod_date)) {
 				tags[["PDF:ModifyDate"]] <- to_date_pdfmark_exiftool(self$mod_date)
+			}
+			for (key in names(private$val$arbitrary)) {
+				tags[[stri_join("PDF:", key)]] <- private$val$arbitrary[[key]]
 			}
 			tags
 		},
