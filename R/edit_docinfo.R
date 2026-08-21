@@ -94,8 +94,9 @@ get_docinfo_pdftools <- function(filename, use_names = TRUE) {
 get_docinfo_pdftools_helper <- function(filename) {
 	info <- pdftools::pdf_info(filename)
 	dinfo <- docinfo()
-	for (i in seq_along(info$keys)) {
-		dinfo$set_item(names(info$keys)[i], info$keys[[i]])
+	skip_keys <- c("CreationDate", "ModDate")
+	for (key in setdiff(names(info$keys), skip_keys)) {
+		dinfo$set_item(key, info$keys[[key]])
 	}
 	if (!is.null(info$created)) {
 		dinfo$creation_date <- info$created
@@ -153,47 +154,37 @@ get_docinfo_pdftk <- function(filename, use_names = TRUE) {
 get_docinfo_pdftk_helper <- function(filename) {
 	info <- get_pdftk_metadata(filename)
 	dinfo <- docinfo()
-	if (length(id <- grep("^InfoKey: Author", info))) {
+	if (length(id <- grep("^InfoKey: Author$", info))) {
 		dinfo$author <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: CreationDate", info))) {
+	if (length(id <- grep("^InfoKey: CreationDate$", info))) {
 		dinfo$creation_date <- datetimeoffset::as_datetimeoffset(gsub(
 			"^InfoValue: ",
 			"",
 			info[id + 1]
 		))
 	}
-	if (length(id <- grep("^InfoKey: Creator", info))) {
+	if (length(id <- grep("^InfoKey: Creator$", info))) {
 		dinfo$creator <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: Producer", info))) {
+	if (length(id <- grep("^InfoKey: Producer$", info))) {
 		dinfo$producer <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: Title", info))) {
+	if (length(id <- grep("^InfoKey: Title$", info))) {
 		dinfo$title <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: Subject", info))) {
+	if (length(id <- grep("^InfoKey: Subject$", info))) {
 		dinfo$subject <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: Keywords", info))) {
+	if (length(id <- grep("^InfoKey: Keywords$", info))) {
 		dinfo$keywords <- pdftk_string_value(info, id)
 	}
-	if (length(id <- grep("^InfoKey: ModDate", info))) {
+	if (length(id <- grep("^InfoKey: ModDate$", info))) {
 		dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
 	}
-	known_keys <- c(
-		"Author",
-		"CreationDate",
-		"Creator",
-		"Producer",
-		"Title",
-		"Subject",
-		"Keywords",
-		"ModDate"
-	)
 	for (id in grep("^InfoKey: ", info)) {
 		key <- gsub("^InfoKey: ", "", info[id])
-		if (!key %in% known_keys) {
+		if (!key %in% docinfo_known_keys()) {
 			dinfo$set_item(key, pdftk_string_value(info, id))
 		}
 	}

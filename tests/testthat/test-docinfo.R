@@ -57,6 +57,14 @@ test_that("docinfo_pdftk", {
 	expect_equal(di_get$author, "John Doe")
 	expect_equal(di_get$get_item("ADBETest_MyKey"), "My private information")
 
+	# Arbitrary key that is a prefix-collision with a standard key name
+	di_set <- docinfo(author = "John Doe")
+	di_set$set_item("AuthorX", "custom value")
+	set_docinfo_pdftk(di_set, f1, f2)
+	di_get <- get_docinfo_pdftk(f2)[[1]]
+	expect_equal(di_get$author, "John Doe")
+	expect_equal(di_get$get_item("AuthorX"), "custom value")
+
 	# Only partial update
 	f4 <- tempfile(fileext = ".pdf")
 	pdf(f4)
@@ -205,6 +213,19 @@ test_that("docinfo_exiftool", {
 	set_docinfo_exiftool(di_set, f1, f3)
 	di_get <- get_docinfo_exiftool(f3)[[1]]
 	expect_equal(di_get$get_item("WeirdKey"), "value with a 'quote' and a \\backslash")
+})
+
+test_that("docinfo() positional arguments", {
+	d <- docinfo("John Doe")
+	expect_equal(d$author, "John Doe")
+})
+
+test_that("docinfo() rejects invalid arbitrary keys", {
+	d <- docinfo()
+	d$set_item("My Key", "val")
+	expect_error(d$pdfmark())
+	expect_error(d$pdftk())
+	expect_error(d$exiftool_tags())
 })
 
 test_that("docinfo()", {
