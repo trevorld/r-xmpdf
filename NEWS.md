@@ -7,6 +7,13 @@ New features
 * New `get_bookmarks_augmented()` which augments `get_bookmarks_pdftk()`'s support
   for bookmark page numbers with `get_bookmarks_pdftools()`'s new support for
   whether bookmarks should start open or closed (#62).
+* `docinfo()` objects now support arbitrary (non-standard) info dictionary entries (#7).
+  Read/write support among the various backends is as follows:
+
+  * `get_docinfo_pdftk()`/`set_docinfo_pdftk()` support reading and writing them.
+  * `get_docinfo_exiftool()`/`set_docinfo_exiftool()` support reading and writing them.
+  * `get_docinfo_pdftools()` supports reading them.
+  * `set_docinfo_gs()` supports writing them.
 
 Bug fixes and minor improvements
 --------------------------------
