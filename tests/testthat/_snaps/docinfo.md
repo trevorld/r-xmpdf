@@ -32,3 +32,18 @@
          xmp:CreatorTool := Generic Creator
          xmp:ModifyDate := 2022-11-11T11:11:11
 
+# docinfo() arbitrary keys
+
+    Code
+      print(d)
+    Output
+      Author: John Doe
+      CreationDate: NULL
+      Creator: NULL
+      Producer: NULL
+      Title: NULL
+      Subject: NULL
+      Keywords: NULL
+      ModDate: NULL
+      ADBETest_MyKey: My private information
+
