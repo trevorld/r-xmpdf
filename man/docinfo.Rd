@@ -5,6 +5,7 @@
 \title{PDF documentation info dictionary object}
 \usage{
 docinfo(
+  ...,
   author = NULL,
   creation_date = NULL,
   creator = NULL,
@@ -16,6 +17,9 @@ docinfo(
 )
 }
 \arguments{
+\item{...}{Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
+and the values (which should be strings) are the info dictionary values.}
+
 \item{author}{The document's author.  Matching xmp metadata tag is \code{dc:creator}.}
 
 \item{creation_date}{The date the document was created.
@@ -45,13 +49,6 @@ Matching xmp metadata tag is \code{xmp:ModifyDate}.}
 Such objects can be used with \code{\link[=set_docinfo]{set_docinfo()}} to edit PDF documentation info dictionary entries
 and such objects are returned by \code{\link[=get_docinfo]{get_docinfo()}}.
 }
-\section{Known limitations}{
-
-\itemize{
-\item Currently does not support arbitrary info dictionary entries.
-}
-}
-
 \section{\code{docinfo} R6 Class Methods}{
 \describe{
 \item{\code{get_item(key)}}{Get documentation info value for key \code{key}.
@@ -105,4 +102,6 @@ if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly 
 \code{\link[=get_docinfo]{get_docinfo()}} and \code{\link[=set_docinfo]{set_docinfo()}} for getting/setting such information from/to PDF files.
 \code{\link[=as_docinfo]{as_docinfo()}} for coercing to this object.
 \code{\link[=as_xmp]{as_xmp()}} can be used to coerce \code{docinfo()} objects into \code{\link[=xmp]{xmp()}} objects.
+See \code{\link[=edit_docinfo]{edit_docinfo()}} for known limitations regarding arbitrary (non-standard)
+info dictionary entry support across the different get/set backends.
 }

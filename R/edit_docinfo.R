@@ -27,7 +27,9 @@
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * Currently does not support arbitrary info dictionary entries.
+#'   * `get_docinfo_pdftk()`/`set_docinfo_pdftk()` support arbitrary (non-standard) info dictionary entries.
+#'     `get_docinfo_exiftool()`/`get_docinfo_pdftools()`/`set_docinfo_gs()`/`set_docinfo_exiftool()`
+#'     don't support them yet.
 #'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
 #'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
 #'     any previously set matching XPN metadata.
@@ -192,6 +194,22 @@ get_docinfo_pdftk_helper <- function(filename) {
 	}
 	if (length(id <- grep("^InfoKey: ModDate", info))) {
 		dinfo$mod_date <- datetimeoffset::as_datetimeoffset(gsub("^InfoValue: ", "", info[id + 1]))
+	}
+	known_keys <- c(
+		"Author",
+		"CreationDate",
+		"Creator",
+		"Producer",
+		"Title",
+		"Subject",
+		"Keywords",
+		"ModDate"
+	)
+	for (id in grep("^InfoKey: ", info)) {
+		key <- gsub("^InfoKey: ", "", info[id])
+		if (!key %in% known_keys) {
+			dinfo$set_item(key, pdftk_string_value(info, id))
+		}
 	}
 	dinfo
 }
