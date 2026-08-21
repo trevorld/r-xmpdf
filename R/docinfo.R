@@ -5,8 +5,6 @@
 #' `docinfo()` creates a PDF documentation info dictionary object.
 #' Such objects can be used with [set_docinfo()] to edit PDF documentation info dictionary entries
 #' and such objects are returned by [get_docinfo()].
-#' @param ... Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
-#'            and the values (which should be strings) are the info dictionary values.
 #' @param author The document's author.  Matching xmp metadata tag is `dc:creator`.
 #' @param creation_date The date the document was created.
 #'                Will be coerced by [datetimeoffset::as_datetimeoffset()].
@@ -23,6 +21,8 @@
 #' @param mod_date The date the document was last modified.
 #'                 Will be coerced by [datetimeoffset::as_datetimeoffset()].
 #'                 Matching xmp metadata tag is `xmp:ModifyDate`.
+#' @param ... Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
+#'            and the values (which should be strings) are the info dictionary values.
 #' @seealso [get_docinfo()] and [set_docinfo()] for getting/setting such information from/to PDF files.
 #'          [as_docinfo()] for coercing to this object.
 #'    [as_xmp()] can be used to coerce `docinfo()` objects into [xmp()] objects.
@@ -73,7 +73,6 @@
 #' }
 #' @export
 docinfo <- function(
-	...,
 	author = NULL,
 	creation_date = NULL,
 	creator = NULL,
@@ -81,10 +80,10 @@ docinfo <- function(
 	title = NULL,
 	subject = NULL,
 	keywords = NULL,
-	mod_date = NULL
+	mod_date = NULL,
+	...
 ) {
 	DocInfo$new(
-		...,
 		author = author,
 		creation_date = creation_date,
 		creator = creator,
@@ -92,7 +91,8 @@ docinfo <- function(
 		title = title,
 		subject = subject,
 		keywords = keywords,
-		mod_date = mod_date
+		mod_date = mod_date,
+		...
 	)
 }
 
@@ -232,7 +232,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags[["PDF:ModifyDate"]] <- to_date_pdfmark_exiftool(self$mod_date)
 			}
-			for (key in names(private$val$arbitrary)) {
+			for (key in private$validated_arbitrary_keys()) {
 				tags[[stri_join("PDF:", key)]] <- private$val$arbitrary[[key]]
 			}
 			tags
@@ -273,7 +273,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, entry_pdftk("ModDate", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in names(private$val$arbitrary)) {
+			for (key in private$validated_arbitrary_keys()) {
 				tags <- append(tags, entry_pdftk(key, private$val$arbitrary[[key]]))
 			}
 			tags
@@ -404,7 +404,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in names(private$val$arbitrary)) {
+			for (key in private$validated_arbitrary_keys()) {
 				tags <- append(tags, sprintf(" /%s (%s)\n", key, private$val$arbitrary[[key]]))
 			}
 			tags <- append(tags, " /DOCINFO pdfmark\n")
@@ -442,7 +442,7 @@ DocInfo <- R6Class(
 				mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
 				tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
 			}
-			for (key in names(private$val$arbitrary)) {
+			for (key in private$validated_arbitrary_keys()) {
 				tags <- append(
 					tags,
 					raw_pdfmark_entry(sprintf(" /%s (", key), private$val$arbitrary[[key]], ")\n")
@@ -450,6 +450,13 @@ DocInfo <- R6Class(
 			}
 			tags <- append(tags, iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
 			tags
+		},
+		validated_arbitrary_keys = function() {
+			keys <- names(private$val$arbitrary)
+			for (key in keys) {
+				assert_valid_docinfo_key(key)
+			}
+			keys
 		}
 	)
 )
@@ -481,7 +488,15 @@ as.list.docinfo <- function(x, ...) {
 	if (!is.null(x$mod_date)) {
 		l$mod_date <- x$mod_date
 	}
-	known_keys <- c(
+	for (key in setdiff(x$get_nonnull_keys(), docinfo_known_keys())) {
+		l[[key]] <- x$get_item(key)
+	}
+	l
+}
+
+# The standard (non-arbitrary) PDF Info dictionary key names
+docinfo_known_keys <- function() {
+	c(
 		"Author",
 		"CreationDate",
 		"Creator",
@@ -491,10 +506,17 @@ as.list.docinfo <- function(x, ...) {
 		"Keywords",
 		"ModDate"
 	)
-	for (key in setdiff(x$get_nonnull_keys(), known_keys)) {
-		l[[key]] <- x$get_item(key)
+}
+
+# Arbitrary info dictionary keys are written as literal PDF names / exiftool tag names
+# by the various backends, so restrict them to a safe, portable character set.
+assert_valid_docinfo_key <- function(key) {
+	if (!grepl("^[A-Za-z][A-Za-z0-9_]*$", key)) {
+		abort(c(
+			sprintf("Invalid (arbitrary) info dictionary key: %s", sQuote(key)),
+			"i" = "Keys must start with a letter and contain only letters, digits, and underscores."
+		))
 	}
-	l
 }
 
 #' @export

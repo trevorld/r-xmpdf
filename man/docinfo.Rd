@@ -5,7 +5,6 @@
 \title{PDF documentation info dictionary object}
 \usage{
 docinfo(
-  ...,
   author = NULL,
   creation_date = NULL,
   creator = NULL,
@@ -13,13 +12,11 @@ docinfo(
   title = NULL,
   subject = NULL,
   keywords = NULL,
-  mod_date = NULL
+  mod_date = NULL,
+  ...
 )
 }
 \arguments{
-\item{...}{Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
-and the values (which should be strings) are the info dictionary values.}
-
 \item{author}{The document's author.  Matching xmp metadata tag is \code{dc:creator}.}
 
 \item{creation_date}{The date the document was created.
@@ -43,6 +40,9 @@ Will be coerced into a string by \code{stringi::stri_join(keywords, collapse = "
 \item{mod_date}{The date the document was last modified.
 Will be coerced by \code{\link[datetimeoffset:as_datetimeoffset]{datetimeoffset::as_datetimeoffset()}}.
 Matching xmp metadata tag is \code{xmp:ModifyDate}.}
+
+\item{...}{Arbitrary (non-standard) info dictionary entries.  The names are the info dictionary key names
+and the values (which should be strings) are the info dictionary values.}
 }
 \description{
 \code{docinfo()} creates a PDF documentation info dictionary object.
