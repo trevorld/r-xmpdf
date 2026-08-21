@@ -45,19 +45,19 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
 * **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files as well as documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
 
-  + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform) 
+  + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform)
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
   + `brew install exiftool` (Homebrew)
   + `choco install exiftool` (Chocolately)
 
-* **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files. 
+* **[ghostscript](https://www.ghostscript.com/)** can be used to set bookmarks and documentation info entries in pdf files.
   Can also be used to concatenate pdf files together as well as get the number of pages in a pdf.
 
   + `sudo apt-get install ghostscript` (Debian/Ubuntu)
   + `brew install ghostscript` (Homebrew)
   + `choco install ghostscript` (Chocolately)
 
-* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.  
+* **[pdftk-java](https://gitlab.com/pdftk-java/pdftk)** or perhaps **[pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)** can be used to get/set bookmarks and documentation info entries in pdf files.
   Can also be used to concatenate pdf files together as well as get the number of pages in a pdf.
 
   + `sudo apt-get install pdftk-java` (Debian/Ubuntu)
@@ -328,14 +328,13 @@ Known limitations:
 * `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * `set_docinfo_pdftk()` may not handle entries with newlines in them.
-* All of the `set_docinfo()` methods currently do not support arbitrary info dictionary entries.
 * As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
   while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
   any previously set matching XPN metadata.
   Some pdf viewers will preferentially use the previously set document title from XPN metadata
   if it exists instead of using the title set in documentation info dictionary entry.
-  Consider also manually setting this XPN metadata using `set_xmp()` 
-* Old metadata information is usually not deleted from the files by these 
+  Consider also manually setting this XPN metadata using `set_xmp()`
+* Old metadata information is usually not deleted from the files by these
   operations (i.e. these operations are often theoretically reversible).
   If deleting the old metadata is important one may want to consider calling
   `qpdf::pdf_compress(input, linearize = TRUE)` at the end.
@@ -363,10 +362,10 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 
 #### exiftool
 
-* [{exifr}](https://github.com/paleolimbot/exifr) 
+* [{exifr}](https://github.com/paleolimbot/exifr)
   provides a high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
   Can download `exiftool`.
-* [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr) 
+* [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)
   provides high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
   Can download `exiftool`.
 * [exiftool](https://exiftool.org/)

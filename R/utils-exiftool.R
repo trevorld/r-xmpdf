@@ -61,8 +61,9 @@ as_exif_name <- function(x, name) {
 }
 
 #' @param tags Named list of metadata tags to set
+#' @param config Optional path to an `exiftool` `-config` file declaring any custom/arbitrary tags in `tags`.
 #' @noRd
-set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
+set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp", config = NULL) {
 	stopifnot(supports_exiftool())
 	input <- normalizePath(input, mustWork = TRUE)
 	output <- normalizePath(output, mustWork = FALSE)
@@ -100,6 +101,11 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
 	on.exit(unlink(f), add = TRUE)
 	brio::write_lines(args, f)
 	args <- c("-@", shQuote(f))
+	# `-config` must be the literal first option on the command line, not merely
+	# first inside the `-@` argfile, or `exiftool` ignores it.
+	if (!is.null(config)) {
+		args <- c("-config", shQuote(config), args)
+	}
 	if (length(cmd) == 2L) {
 		# i.e. c("/path/to/perl", "path/to/exiftool")
 		args <- c(cmd[-1L], args)
@@ -110,4 +116,29 @@ set_exiftool_metadata <- function(tags, input, output = input, mode = "xmp") {
 		file.copy(target, output, overwrite = TRUE)
 	}
 	invisible(output)
+}
+
+# Generate a temp `exiftool` `-config` file declaring `keys` as writable string tags
+# in the classic PDF Info dictionary.  Returns `NULL` if `keys` is empty.
+exiftool_config_pdf_info <- function(keys) {
+	if (!length(keys)) {
+		return(NULL)
+	}
+	entries <- stri_join("        '", escape_perl_string(keys), "' => { Writable => 'string' },")
+	lines <- c(
+		"%Image::ExifTool::UserDefined = (",
+		"    'Image::ExifTool::PDF::Info' => {",
+		entries,
+		"    },",
+		");",
+		"1;"
+	)
+	f <- tempfile(fileext = ".pl")
+	brio::write_lines(lines, f)
+	f
+}
+
+escape_perl_string <- function(x) {
+	x <- gsub("\\", "\\\\", x, fixed = TRUE)
+	gsub("'", "\\'", x, fixed = TRUE)
 }

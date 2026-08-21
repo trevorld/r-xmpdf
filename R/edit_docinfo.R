@@ -27,10 +27,7 @@
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * `get_docinfo_pdftk()`/`set_docinfo_pdftk()`, `get_docinfo_pdftools()`, and `set_docinfo_gs()`
-#'     support arbitrary (non-standard) info dictionary entries.
-#'     `get_docinfo_exiftool()`/`set_docinfo_exiftool()` don't support them yet.
-#'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
+#'   * As a side effect `set_docinfo_gs()` seems to also update previously set matching XPN metadata
 #'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
 #'     any previously set matching XPN metadata.
 #'     Some pdf viewers will preferentially use the previously set document title from XPN metadata
@@ -121,18 +118,9 @@ get_docinfo_exiftool_helper <- function(filename) {
 	names(md) <- gsub("^PDF:", "", names(md))
 	dinfo <- docinfo()
 
-	for (i in seq_along(md)) {
-		key <- names(md)[i]
-		if (key %in% c("Author", "Creator", "Producer", "Title", "Subject", "Keywords")) {
-			dinfo$set_item(names(md)[i], md[[i]])
-		} else if (
-			key %in% c("PDFVersion", "Linearized", "PageCount", "CreateDate", "ModifyDate")
-		) {
-			next
-		} else {
-			msg <- sprintf("We don't support key '%s' yet.", key)
-			warn(msg)
-		}
+	skip_keys <- c("PDFVersion", "Linearized", "PageCount", "CreateDate", "ModifyDate")
+	for (key in setdiff(names(md), skip_keys)) {
+		dinfo$set_item(key, md[[key]])
 	}
 	if (!is.null(md$CreateDate)) {
 		dinfo$creation_date <- md$CreateDate
@@ -148,7 +136,11 @@ get_docinfo_exiftool_helper <- function(filename) {
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
 	docinfo <- as_docinfo(docinfo)
 	tags <- docinfo$exiftool_tags()
-	set_exiftool_metadata(tags, input, output, mode = "pdf")
+	config <- exiftool_config_pdf_info(docinfo$arbitrary_keys())
+	if (!is.null(config)) {
+		on.exit(unlink(config), add = TRUE)
+	}
+	set_exiftool_metadata(tags, input, output, mode = "pdf", config = config)
 }
 
 #' @rdname edit_docinfo
