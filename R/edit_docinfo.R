@@ -27,8 +27,8 @@
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * `get_docinfo_pdftk()`/`set_docinfo_pdftk()` support arbitrary (non-standard) info dictionary entries.
-#'     `get_docinfo_exiftool()`/`get_docinfo_pdftools()`/`set_docinfo_gs()`/`set_docinfo_exiftool()`
+#'   * `get_docinfo_pdftk()`/`set_docinfo_pdftk()` and `set_docinfo_gs()` support arbitrary (non-standard)
+#'     info dictionary entries.  `get_docinfo_exiftool()`/`get_docinfo_pdftools()`/`set_docinfo_exiftool()`
 #'     don't support them yet.
 #'   * As a side effect `set_docinfo_gs()` seems to also update in previously set matching XPN metadata
 #'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update

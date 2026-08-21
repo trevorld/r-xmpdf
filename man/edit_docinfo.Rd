@@ -66,8 +66,8 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \section{Known limitations}{
 
 \itemize{
-\item \code{get_docinfo_pdftk()}/\code{set_docinfo_pdftk()} support arbitrary (non-standard) info dictionary entries.
-\code{get_docinfo_exiftool()}/\code{get_docinfo_pdftools()}/\code{set_docinfo_gs()}/\code{set_docinfo_exiftool()}
+\item \code{get_docinfo_pdftk()}/\code{set_docinfo_pdftk()} and \code{set_docinfo_gs()} support arbitrary (non-standard)
+info dictionary entries.  \code{get_docinfo_exiftool()}/\code{get_docinfo_pdftools()}/\code{set_docinfo_exiftool()}
 don't support them yet.
 \item As a side effect \code{set_docinfo_gs()} seems to also update in previously set matching XPN metadata
 while \code{set_docinfo_exiftool()} and \code{set_docinfo_pdftk()} don't update

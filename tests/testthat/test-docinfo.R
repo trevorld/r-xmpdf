@@ -132,6 +132,20 @@ test_that("set_docinfo_gs", {
 	d <- get_docinfo(f4)[[1]]
 	expect_equal(d$subject, "R\u5f88\u68d2\uff01")
 	expect_equal(d$title, "Test title")
+
+	# Arbitrary (non-standard) info dictionary entries
+	di_set <- docinfo(author = "John Doe", ADBETest_MyKey = "My private information")
+	set_docinfo_gs(di_set, f1, f3)
+	di_get <- get_docinfo(f3)[[1]]
+	expect_equal(di_get$author, "John Doe")
+	expect_equal(di_get$get_item("ADBETest_MyKey"), "My private information")
+
+	# Arbitrary entry with non-Latin-1 characters
+	di_set <- docinfo()
+	di_set$set_item("CustomUnicodeKey", "R\u5f88\u68d2\uff01")
+	set_docinfo_gs(di_set, f1, f3)
+	di_get <- get_docinfo(f3)[[1]]
+	expect_equal(di_get$get_item("CustomUnicodeKey"), "R\u5f88\u68d2\uff01")
 })
 
 test_that("docinfo_exiftool", {

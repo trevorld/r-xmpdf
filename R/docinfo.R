@@ -398,6 +398,9 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date)))
 			}
+			for (key in names(private$val$arbitrary)) {
+				tags <- append(tags, sprintf(" /%s (%s)\n", key, private$val$arbitrary[[key]]))
+			}
 			tags <- append(tags, " /DOCINFO pdfmark\n")
 			stri_join(tags, collapse = "")
 		},
@@ -432,6 +435,12 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
 				tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
+			}
+			for (key in names(private$val$arbitrary)) {
+				tags <- append(
+					tags,
+					raw_pdfmark_entry(sprintf(" /%s (", key), private$val$arbitrary[[key]], ")\n")
+				)
 			}
 			tags <- append(tags, iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
 			tags
