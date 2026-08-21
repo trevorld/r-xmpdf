@@ -37,6 +37,13 @@ test_that("docinfo_pdftk", {
 	expect_equal(di_get$title, "Two Boring Pages")
 	expect_equal(di_get$author, "John Doe")
 
+	# Arbitrary (non-standard) info dictionary entries
+	di_set <- docinfo(author = "John Doe", ADBETest_MyKey = "My private information")
+	set_docinfo_pdftk(di_set, f1, f2)
+	di_get <- get_docinfo_pdftk(f2)[[1]]
+	expect_equal(di_get$author, "John Doe")
+	expect_equal(di_get$get_item("ADBETest_MyKey"), "My private information")
+
 	# Only partial update
 	f4 <- tempfile(fileext = ".pdf")
 	pdf(f4)

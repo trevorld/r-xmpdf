@@ -26,10 +26,9 @@
 #' @seealso [get_docinfo()] and [set_docinfo()] for getting/setting such information from/to PDF files.
 #'          [as_docinfo()] for coercing to this object.
 #'    [as_xmp()] can be used to coerce `docinfo()` objects into [xmp()] objects.
-#' @section Known limitations:
-#'
-#'   * Currently does not support arbitrary info dictionary entries.
-#'
+#'    See [edit_docinfo()] for known limitations regarding arbitrary (non-standard)
+#'    info dictionary entry support across the different get/set backends.
+
 #' @section `docinfo` R6 Class Methods:\describe{
 #'     \item{`get_item(key)`}{Get documentation info value for key `key`.
 #'           Can also use the relevant active bindings to get documentation info values.}
@@ -267,6 +266,9 @@ DocInfo <- R6Class(
 			}
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, entry_pdftk("ModDate", to_date_pdfmark(self$mod_date)))
+			}
+			for (key in names(private$val$arbitrary)) {
+				tags <- append(tags, entry_pdftk(key, private$val$arbitrary[[key]]))
 			}
 			tags
 		},
