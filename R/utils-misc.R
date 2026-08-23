@@ -66,7 +66,7 @@ install_gs_str <- function() {
 install_exiftool_str <- function() {
 	c(
 		install_cmd_str("exiftool"),
-		i = "<https://exiftool.org/index.html> (Official)",
+		i = "<https://exiftool.sourceforge.net/index.html> (Official)",
 		i = paste(
 			sQuote('install.packages("exiftoolr"); exiftoolr::install_exiftool()'),
 			"(Cross-Platform)"

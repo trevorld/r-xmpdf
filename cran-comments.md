@@ -1,11 +1,11 @@
-* System requirements of 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries 
+* System requirements of 'ghostscript' or 'pdftk' for editing pdf bookmarks and/or documentation info entries
   and 'exiftool' for editing pdf documentation info entries and/or xmp metadata.
   The examples and tests shouldn't throw an ERROR if one (or all)
   of these are not installed.
 
 ## Test environments
 
-* local (linux, R 4.3.3)
+* local (linux, R 4.6.1)
 * win-builder (windows, R devel)
 * github actions (windows, R release)
 * github actions (linux, R devel)
@@ -14,13 +14,12 @@
 
 ## R CMD check --as-cran results
 
-1 NOTE generated on a subset of platforms:
+OK
 
-```
-found 3 marked UTF-8 strings 
-```
+## revdepcheck results
 
-The `spdx_license_list` data set contains details about 478 open source license
-from the "SPDX License List" <https://spdx.org/licenses/>.
-The "name" column of this data set includes the official name of the licenses.
-Three of these official license names use non-ASCII characters.
+We checked 2 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
+

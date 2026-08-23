@@ -153,7 +153,7 @@
 #'
 #' @section XMP tag recommendations:
 #'
-#' * <https://exiftool.org/TagNames/XMP.html> recommends "dc", "xmp", "Iptc4xmpCore", and "Iptc4xmpExt" schemas if possible
+#' * <https://exiftool.sourceforge.net/TagNames/XMP.html> recommends "dc", "xmp", "Iptc4xmpCore", and "Iptc4xmpExt" schemas if possible
 #' * <https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces> are descriptions of some common XMP tags
 #' * <https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers> is popular for photos
 #' * <https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata#iptc-photo-metadata> are the subset of IPTC photo metadata which Google Photos uses (if no structured data on web page)

@@ -170,7 +170,7 @@ Although some XMP metadata tags must be a string in a single language but some X
 * `dc:rights`
 * `dc:title`
 * `xmpRights:UsageTerms`
-* Plus [other XMP tags](https://exiftool.org/TagNames/XMP.html) which will need to be manually coerced by `as_lang_alt()` and set with the `xmp()` object's `set_item()` method
+* Plus [other XMP tags](https://exiftool.sourceforge.net/TagNames/XMP.html) which will need to be manually coerced by `as_lang_alt()` and set with the `xmp()` object's `set_item()` method
 
 See `?as_lang_alt` for more details but essentially create a character vector or list and name the entries with an RFC 3066 name tag.
 
@@ -191,7 +191,7 @@ x$set_item("Iptc4xmpExt:Transcript", transcript)
 
 Currently `{xmpdf}` does not officially support entering in "struct" XMP tags (although it does support "lang-alt" tags and simple lists of basic XMP value types).
 
-If necessary you'll need to use an external program such as [exiftool](https://exiftool.org/) (perhaps via [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)) to [embed structured](https://exiftool.org/struct.html) XMP tags.
+If necessary you'll need to use an external program such as [exiftool](https://exiftool.sourceforge.net/) (perhaps via [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)) to [embed structured](https://exiftool.sourceforge.net/struct.html) XMP tags.
 
 ## <a name="knitr">Is there an easy way to embed XMP metadata when using {knitr}?</a>
 
@@ -219,4 +219,4 @@ knitr::opts_chunk$set(fig.process = x$fig_process())
 * [Quick guide to IPTC Photo Metadata on Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) (IPTC) describes the subset of the IPTC Photo Metadata Standard used by Google Photos to list photo credits and license information
 * [xmp-docs](https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces) (Adobe) describes some common XMP tags
 * [XMP](https://wiki.creativecommons.org/wiki/XMP) (Creative Commons) describes a standard for using XMP to embed Creative Commons license information
-* [XMP tags](https://exiftool.org/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags
+* [XMP tags](https://exiftool.sourceforge.net/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags
