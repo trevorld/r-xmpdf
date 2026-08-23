@@ -43,7 +43,7 @@ Depending on what you'd like to do you'll need to install some additional R pack
 
   + `install.packages("pdftools")` will probably install `{qpdf}` as well
 
-* **[exiftool](https://exiftool.org/)** can be used to get/set xmp metadata in a variety of media files as well as documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
+* **[exiftool](https://exiftool.sourceforge.net/)** can be used to get/set xmp metadata in a variety of media files as well as documentation info entries in pdf files.  Can also be used to get the number of pages in a pdf.  Note can be installed by [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr).
 
   + `install.packages("exiftoolr"); exiftoolr::install_exiftool()` (Cross-Platform)
   + `sudo apt-get install libimage-exiftool-perl` (Debian/Ubuntu)
@@ -186,7 +186,7 @@ get_bookmarks(f)[[1]] |> print()
 
 ### <a name="pnglicense">Add Google Images and Creative Commons license XMP metadata to a png image</a>
 
-Besides pdf files with `exiftool` we can also edit the XMP metadata for [a large number of image formats](https://exiftool.org/#supported)
+Besides pdf files with `exiftool` we can also edit the XMP metadata for [a large number of image formats](https://exiftool.sourceforge.net/#supported)
 including "gif", "png", "jpeg", "tiff", and "webp".  In particular we may be interested in setting the subset of [IPTC Photo XMP metadata displayed by Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) as well as embedding [Creative Commons license XMP metadata](https://wiki.creativecommons.org/wiki/XMP).
 
 
@@ -348,7 +348,7 @@ Known limitations:
 * [Quick guide to IPTC Photo Metadata on Google Images](https://iptc.org/standards/photo-metadata/quick-guide-to-iptc-photo-metadata-and-google-images/) (IPTC) describes the subset of the IPTC Photo Metadata Standard used by Google Photos to list photo credits and license information
 * [xmp-docs](https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces) (Adobe) describes some common XMP tags
 * [XMP](https://wiki.creativecommons.org/wiki/XMP) (Creative Commons) describes a standard for using XMP to embed Creative Commons license information
-* [XMP tags](https://exiftool.org/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags
+* [XMP tags](https://exiftool.sourceforge.net/TagNames/XMP.html) (exiftool) is a fairly comprehensive list of XMP tags
 
 ### <a name="similar">Related software</a>
 
@@ -368,7 +368,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 * [{exiftoolr}](https://github.com/JoshOBrien/exiftoolr)
   provides high-level wrapper to read metadata as well as a low-level wrapper around the `exiftool` command-line tool.
   Can download `exiftool`.
-* [exiftool](https://exiftool.org/)
+* [exiftool](https://exiftool.sourceforge.net/)
 
 #### exiv2
 
@@ -404,7 +404,7 @@ Please feel free to [open a pull request to add any missing relevant R packages]
 
 #### tabula
 
-* [{tabulizer}](https://github.com/ropensci/tabulizer)
+* [{tabulapdf}](https://github.com/ropensci/tabulapdf)
 * [tabula-java](https://github.com/tabulapdf/tabula-java/)
 
 #### xpdf

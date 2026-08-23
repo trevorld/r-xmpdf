@@ -21,7 +21,7 @@
 #' @return `get_xmp()` returns a list of [xmp()] objects.
 #'         `set_xmp()` returns the (output) filename invisibly.
 #' @seealso [xmp()] for more information about xmp metadata objects.
-#'   [supports_get_xmp()], [supports_set_xmp()], and [supports_exiftool()] to detect support for these features.  For more info about xmp metadata see <https://www.exiftool.org/TagNames/XMP.html>.
+#'   [supports_get_xmp()], [supports_set_xmp()], and [supports_exiftool()] to detect support for these features.  For more info about xmp metadata see <https://exiftool.sourceforge.net/TagNames/XMP.html>.
 #' @examples
 #'   x <- xmp(attribution_url = "https://example.com/attribution",
 #'            creator = "John Doe",

@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
-Edit 'XMP' metadata \url{https://en.wikipedia.org/wiki/Extensible_Metadata_Platform} in a variety of media file formats as well as edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files. Can detect and use a variety of command-line tools to perform these operations such as 'exiftool' \url{https://exiftool.org/}, 'ghostscript' \url{https://www.ghostscript.com/}, and/or 'pdftk' \url{https://gitlab.com/pdftk-java/pdftk}.
+Edit 'XMP' metadata \url{https://en.wikipedia.org/wiki/Extensible_Metadata_Platform} in a variety of media file formats as well as edit bookmarks (aka outline aka table of contents) and documentation info entries in 'pdf' files. Can detect and use a variety of command-line tools to perform these operations such as 'exiftool' \url{https://exiftool.sourceforge.net/}, 'ghostscript' \url{https://www.ghostscript.com/}, and/or 'pdftk' \url{https://gitlab.com/pdftk-java/pdftk}.
 }
 \section{Package options}{
 

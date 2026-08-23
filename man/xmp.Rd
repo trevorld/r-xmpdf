@@ -217,7 +217,7 @@ if missing from other XMP metadata and \code{spdx_id}.}
 \section{XMP tag recommendations}{
 
 \itemize{
-\item \url{https://exiftool.org/TagNames/XMP.html} recommends "dc", "xmp", "Iptc4xmpCore", and "Iptc4xmpExt" schemas if possible
+\item \url{https://exiftool.sourceforge.net/TagNames/XMP.html} recommends "dc", "xmp", "Iptc4xmpCore", and "Iptc4xmpExt" schemas if possible
 \item \url{https://github.com/adobe/xmp-docs/tree/master/XMPNamespaces} are descriptions of some common XMP tags
 \item \url{https://www.iptc.org/std/photometadata/specification/IPTC-PhotoMetadata#xmp-namespaces-and-identifiers} is popular for photos
 \item \url{https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata#iptc-photo-metadata} are the subset of IPTC photo metadata which Google Photos uses (if no structured data on web page)

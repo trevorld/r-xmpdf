@@ -28,7 +28,7 @@
 
     ! You must install (only) one suggested R package or system command to use 'get_docinfo()'
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -53,7 +53,7 @@
     i 'choco install ghostscript' (Chocolately)
     i 'Sys.setenv(R_GSCMD = "/path/to/gs")' if installed but not detected on PATH
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -70,7 +70,7 @@
 
     ! You must install (only) one suggested R package or system command to use 'get_xmp()'
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -81,7 +81,7 @@
 
     ! You must install (only) one suggested R package or system command to use 'set_xmp()'
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -112,7 +112,7 @@
     x The suggested package 'qpdf' is not installed
     i 'install.packages("qpdf")'
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -143,7 +143,7 @@
 ---
 
     x The system command 'exiftool' is not installed (or detected)
-    i <https://exiftool.org/index.html> (Official)
+    i <https://exiftool.sourceforge.net/index.html> (Official)
     i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
     i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
     i 'brew install exiftool' (Homebrew)
@@ -206,7 +206,7 @@
     Message
       ! You must install (only) one suggested R package or system command to use 'get_docinfo()'
       x The system command 'exiftool' is not installed (or detected)
-      i <https://exiftool.org/index.html> (Official)
+      i <https://exiftool.sourceforge.net/index.html> (Official)
       i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
       i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
       i 'brew install exiftool' (Homebrew)
@@ -228,7 +228,7 @@
     Message
       ! You must install (only) one suggested R package or system command to use 'get_xmp()'
       x The system command 'exiftool' is not installed (or detected)
-      i <https://exiftool.org/index.html> (Official)
+      i <https://exiftool.sourceforge.net/index.html> (Official)
       i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
       i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
       i 'brew install exiftool' (Homebrew)
@@ -244,7 +244,7 @@
       x The suggested package 'qpdf' is not installed
       i 'install.packages("qpdf")'
       x The system command 'exiftool' is not installed (or detected)
-      i <https://exiftool.org/index.html> (Official)
+      i <https://exiftool.sourceforge.net/index.html> (Official)
       i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
       i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
       i 'brew install exiftool' (Homebrew)
@@ -295,7 +295,7 @@
       i 'choco install ghostscript' (Chocolately)
       i 'Sys.setenv(R_GSCMD = "/path/to/gs")' if installed but not detected on PATH
       x The system command 'exiftool' is not installed (or detected)
-      i <https://exiftool.org/index.html> (Official)
+      i <https://exiftool.sourceforge.net/index.html> (Official)
       i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
       i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
       i 'brew install exiftool' (Homebrew)
@@ -315,7 +315,7 @@
     Message
       ! You must install (only) one suggested R package or system command to use 'set_xmp()'
       x The system command 'exiftool' is not installed (or detected)
-      i <https://exiftool.org/index.html> (Official)
+      i <https://exiftool.sourceforge.net/index.html> (Official)
       i 'install.packages("exiftoolr"); exiftoolr::install_exiftool()' (Cross-Platform)
       i 'sudo apt-get install libimage-exiftool-perl' (Debian/Ubuntu)
       i 'brew install exiftool' (Homebrew)

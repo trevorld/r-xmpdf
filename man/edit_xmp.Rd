@@ -71,5 +71,5 @@ set_xmp_exiftool(xmp, input, output = input)
 }
 \seealso{
 \code{\link[=xmp]{xmp()}} for more information about xmp metadata objects.
-\code{\link[=supports_get_xmp]{supports_get_xmp()}}, \code{\link[=supports_set_xmp]{supports_set_xmp()}}, and \code{\link[=supports_exiftool]{supports_exiftool()}} to detect support for these features.  For more info about xmp metadata see \url{https://www.exiftool.org/TagNames/XMP.html}.
+\code{\link[=supports_get_xmp]{supports_get_xmp()}}, \code{\link[=supports_set_xmp]{supports_set_xmp()}}, and \code{\link[=supports_exiftool]{supports_exiftool()}} to detect support for these features.  For more info about xmp metadata see \url{https://exiftool.sourceforge.net/TagNames/XMP.html}.
 }
