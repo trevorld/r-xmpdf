@@ -13,6 +13,7 @@
 #' @param input Filename(s) (pdf) to concatenate together
 #' @param output Filename (pdf) to save concatenated output to
 #' @return The (output) filename invisibly.
+#'
 #' @seealso [supports_cat_pages()], [supports_gs()], and [supports_pdftk()] to detect support for these features.
 #'          [cat_bookmarks()] for generating bookmarks for concatenated files.
 #' @examples

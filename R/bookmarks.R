@@ -59,6 +59,8 @@
 #'   * `get_bookmarks_augmented()` doesn't report information about bookmarks color and fontface.
 #'   * `set_bookmarks_gs()` supports most bookmarks features including color and font face but
 #'     only action supported is to view a particular page.
+#'   * `set_bookmarks_gs()` has a destructive side effect on any existing XMP metadata,
+#'     since it uses `ghostscript`'s `pdfwrite` device.  See [edit_docinfo()] for details.
 #'   * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 #'
 #' @seealso [supports_get_bookmarks()], [supports_set_bookmarks()], [supports_gs()], and [supports_pdftk()] to detect support for these features.  For more info about the pdf bookmarks feature see <https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html#bookmarks-out>.

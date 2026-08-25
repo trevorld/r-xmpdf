@@ -66,18 +66,35 @@ set_docinfo_pdftk(docinfo, input, output = input)
 \section{Known limitations}{
 
 \itemize{
-\item As a side effect \code{set_docinfo_gs()} seems to also update previously set matching XPN metadata
-while \code{set_docinfo_exiftool()} and \code{set_docinfo_pdftk()} don't update
-any previously set matching XPN metadata.
-Some pdf viewers will preferentially use the previously set document title from XPN metadata
-if it exists instead of using the title set in documentation info dictionary entry.
-Consider also manually setting this XPN metadata using \code{\link[=set_xmp]{set_xmp()}}.
+\item Whenever \code{ghostscript}'s \code{pdfwrite} device is used to write a pdf it
+regenerates the \emph{entire} XMP metadata packet from the current documentation info dictionary,
+discarding any existing XMP metadata that isn't one of the eight standard documentation info
+entries (e.g. Creative Commons or IPTC XMP tags set via \code{\link[=set_xmp]{set_xmp()}} will be silently erased,
+not merely left alone or updated). This affects \code{set_docinfo_gs()} and \code{\link[=set_bookmarks_gs]{set_bookmarks_gs()}}.
+If you need both custom XMP metadata and \code{set_docinfo_gs()}/\code{set_bookmarks_gs()}, call \code{\link[=set_xmp]{set_xmp()}}
+\emph{after} them, never before.
+\item Some pdf viewers will also preferentially use a previously set document title from XMP metadata
+instead of the title set in the documentation info dictionary entry.
 \item Old metadata information is usually not deleted from the pdf file by these operations.
 If deleting the old metadata is important one may want to try
 \code{qpdf::pdf_compress(input, linearize = TRUE)}.
 \item \code{get_docinfo_exiftool()} will "widen" datetimes to second precision.
+\item \code{get_docinfo_exiftool()} reports arbitrary (non-standard) info dictionary keys under a
+"sanitized" name rather than their literal name in the pdf, since \code{exiftool} itself
+rewrites any character it doesn't allow in a tag name to \verb{_}
+(e.g. a literal key \code{PTEX.Fullbanner} is reported as \code{PTEX_Fullbanner})
+and prepends \code{Tag} to a key that doesn't start with a letter
+(e.g. a literal key \verb{1Key} is reported as \code{Tag1Key}).
+Writing this "sanitized" key back out (with any backend, including \code{set_docinfo_exiftool()})
+creates a new entry under the sanitized name rather than updating the original one.
 \item \code{get_docinfo_pdftools()}'s datetimes may not accurately reflect the embedded datetimes.
 \item \code{set_docinfo_pdftk()} may not correctly handle documentation info entries with newlines in them.
+\item In general arbitrary (non-standard) info dictionary keys can start with a letter and otherwise contain only letters, digits, underscores, and hyphens.
+\itemize{
+\item \code{set_docinfo_exiftool()} only allows these.
+\item \code{set_docinfo_gs()} also allows periods.
+\item \code{set_docinfo_pdftk()} is the most permissive: any Latin-1-representable key without control characters (e.g. a newline) is allowed.
+}
 }
 }
 
