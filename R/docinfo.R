@@ -203,8 +203,23 @@ DocInfo <- R6Class(
 			keys <- append(keys, names(private$val$arbitrary))
 			keys
 		},
-		arbitrary_keys = function() {
-			names(private$val$arbitrary)
+		arbitrary_keys = function(backend = NULL, warn = TRUE) {
+			keys <- names(private$val$arbitrary)
+			if (is.null(backend)) {
+				return(keys)
+			}
+			valid <- vapply(keys, is_valid_docinfo_key, logical(1), backend = backend)
+			bad <- keys[!valid]
+			if (warn && length(bad)) {
+				rlang::warn(c(
+					sprintf(
+						"Arbitrary info dictionary key(s) not supported by the %s backend will be skipped:",
+						sQuote(backend)
+					),
+					structure(sQuote(bad), names = rep_len("*", length(bad)))
+				))
+			}
+			keys[valid]
 		},
 		exiftool_tags = function() {
 			tags <- list()
@@ -232,16 +247,16 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags[["PDF:ModifyDate"]] <- to_date_pdfmark_exiftool(self$mod_date)
 			}
-			for (key in private$validated_arbitrary_keys("exiftool")) {
+			for (key in self$arbitrary_keys("exiftool")) {
 				tags[[stri_join("PDF:", key)]] <- private$val$arbitrary[[key]]
 			}
 			tags
 		},
-		pdfmark = function(raw = FALSE) {
+		pdfmark = function(raw = FALSE, warn = TRUE) {
 			if (raw) {
-				private$pdfmark_raw()
+				private$pdfmark_raw(warn)
 			} else {
-				private$pdfmark_character()
+				private$pdfmark_character(warn)
 			}
 		},
 		pdftk = function() {
@@ -273,7 +288,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, entry_pdftk("ModDate", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in private$validated_arbitrary_keys("pdftk")) {
+			for (key in self$arbitrary_keys("pdftk")) {
 				tags <- append(tags, entry_pdftk(key, private$val$arbitrary[[key]]))
 			}
 			tags
@@ -372,7 +387,7 @@ DocInfo <- R6Class(
 	),
 	private = list(
 		val = list(arbitrary = list()),
-		pdfmark_character = function() {
+		pdfmark_character = function(warn = TRUE) {
 			tags <- "["
 			if (!is.null(self$author)) {
 				tags <- append(tags, sprintf(" /Author (%s)\n", self$author))
@@ -404,13 +419,13 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in private$validated_arbitrary_keys("gs")) {
+			for (key in self$arbitrary_keys("gs", warn = warn)) {
 				tags <- append(tags, sprintf(" /%s (%s)\n", key, private$val$arbitrary[[key]]))
 			}
 			tags <- append(tags, " /DOCINFO pdfmark\n")
 			stri_join(tags, collapse = "")
 		},
-		pdfmark_raw = function() {
+		pdfmark_raw = function(warn = TRUE) {
 			tags <- iconv("[", to = "latin1", toRaw = TRUE)[[1]]
 			if (!is.null(self$author)) {
 				tags <- append(tags, raw_pdfmark_entry(" /Author (", self$author, ")\n"))
@@ -442,7 +457,7 @@ DocInfo <- R6Class(
 				mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
 				tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
 			}
-			for (key in private$validated_arbitrary_keys("gs")) {
+			for (key in self$arbitrary_keys("gs", warn = warn)) {
 				tags <- append(
 					tags,
 					raw_pdfmark_entry(sprintf(" /%s (", key), private$val$arbitrary[[key]], ")\n")
@@ -450,21 +465,6 @@ DocInfo <- R6Class(
 			}
 			tags <- append(tags, iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
 			tags
-		},
-		validated_arbitrary_keys = function(backend) {
-			keys <- names(private$val$arbitrary)
-			valid <- vapply(keys, is_valid_docinfo_key, logical(1), backend = backend)
-			bad <- keys[!valid]
-			if (length(bad)) {
-				warn(c(
-					sprintf(
-						"Arbitrary info dictionary key(s) not supported by the %s backend will be skipped:",
-						sQuote(backend)
-					),
-					structure(sQuote(bad), names = rep_len("*", length(bad)))
-				))
-			}
-			keys[valid]
 		}
 	)
 )
