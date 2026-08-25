@@ -27,18 +27,34 @@
 #'         `set_docinfo()` returns the (output) filename invisibly.
 #' @section Known limitations:
 #'
-#'   * As a side effect `set_docinfo_gs()` seems to also update previously set matching XPN metadata
-#'     while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
-#'     any previously set matching XPN metadata.
-#'     Some pdf viewers will preferentially use the previously set document title from XPN metadata
-#'     if it exists instead of using the title set in documentation info dictionary entry.
-#'     Consider also manually setting this XPN metadata using [set_xmp()].
+#'   * Whenever `ghostscript`'s `pdfwrite` device is used to write a pdf it
+#'     regenerates the *entire* XMP metadata packet from the current documentation info dictionary,
+#'     discarding any existing XMP metadata that isn't one of the eight standard documentation info
+#'     entries (e.g. Creative Commons or IPTC XMP tags set via [set_xmp()] will be silently erased,
+#'     not merely left alone or updated). This affects `set_docinfo_gs()` and [set_bookmarks_gs()].
+#'     If you need both custom XMP metadata and `set_docinfo_gs()`/`set_bookmarks_gs()`, call [set_xmp()]
+#'     *after* them, never before.
+#'   * Some pdf viewers will also preferentially use a previously set document title from XMP metadata
+#'     instead of the title set in the documentation info dictionary entry.
 #'   * Old metadata information is usually not deleted from the pdf file by these operations.
 #'     If deleting the old metadata is important one may want to try
 #'     `qpdf::pdf_compress(input, linearize = TRUE)`.
 #'   * `get_docinfo_exiftool()` will "widen" datetimes to second precision.
+#'   * `get_docinfo_exiftool()` reports arbitrary (non-standard) info dictionary keys under a
+#'     "sanitized" name rather than their literal name in the pdf, since `exiftool` itself
+#'     rewrites any character it doesn't allow in a tag name to `_`
+#'     (e.g. a literal key `PTEX.Fullbanner` is reported as `PTEX_Fullbanner`)
+#'     and prepends `Tag` to a key that doesn't start with a letter
+#'     (e.g. a literal key `1Key` is reported as `Tag1Key`).
+#'     Writing this "sanitized" key back out (with any backend, including `set_docinfo_exiftool()`)
+#'     creates a new entry under the sanitized name rather than updating the original one.
 #'   * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
 #'   * `set_docinfo_pdftk()` may not correctly handle documentation info entries with newlines in them.
+#'   * In general arbitrary (non-standard) info dictionary keys can start with a letter and otherwise contain only letters, digits, underscores, and hyphens.
+#'
+#'     + `set_docinfo_exiftool()` only allows these.
+#'     + `set_docinfo_gs()` also allows periods.
+#'     + `set_docinfo_pdftk()` is the most permissive: any Latin-1-representable key without control characters (e.g. a newline) is allowed.
 #'
 #' @examples
 #' if (supports_set_docinfo() && supports_get_docinfo() && require("grid", quietly = TRUE)) {

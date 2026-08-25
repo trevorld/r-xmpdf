@@ -182,30 +182,48 @@ unlink(f_b)
 `{xmpdf}` feature | `exiftool` | `pdftk` | `ghostscript`
 ---|---|---|---|
 Get XMP metadata | **Yes** | **No** | **No**
-Set XMP metadata | **Yes** | **No** | **Poor**: when documentation info metadata is set then as a side effect it seems the documentation info metadata will also be set as XMP metadata
+Set XMP metadata | **Yes** | **No** | **Bad**: as a side effect, setting documentation info or bookmark metadata replaces the *entire* existing XMP metadata packet with one regenerated from the documentation info dictionary, discarding any other existing XMP metadata
 Get PDF bookmarks | **No** | **Okay**: can only get Title, Page number, and Level | **No**
-Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but only action supported is to view a particular page
+Set PDF bookmarks | **No** | **Okay**: can only set Title, Page number, and Level | **Good**: supports most bookmarks features including color and font face but the only action supported is to view a particular page.
 Get PDF documentation info | **Good**: may "widen" datetimes which are less than "second" precision | **Yes** | **No**
-Set PDF documentation info | **Yes** | **Good**: may not handle entries with newlines in them | **Yes**: as a side effect when documentation info metadata is set then it seems will also be set as XMP metadata
+Set PDF documentation info | **Yes** | **Good**: may not handle entries with newlines in them | **Yes**
 Concatenate PDF files | **No** | **Yes** | **Yes**
 
 Known limitations:
 
 * `get_bookmarks_pdftk()` doesn't report information about bookmarks color, font face, and whether the bookmarks
   should start open or closed.
-* `get_bookmarks_pdftools()`'s doesn't report information about bookmarks pages, color, font face, and whether the bookmarks
+* `get_bookmarks_pdftools()`'s doesn't report information about bookmarks pages, color, and font face
 * `get_docinfo_exiftool()` "widens" datetimes to second precision.  An hour-only UTC offset will be "widened" to minute precision.
+* `get_docinfo_exiftool()` reports arbitrary (non-standard) info dictionary keys under a
+  "sanitized" name rather than their literal name in the pdf, since `exiftool` itself
+  rewrites any character it doesn't allow in a tag name to `_`
+  (e.g. a literal key `PTEX.Fullbanner` is reported as `PTEX_Fullbanner`)
+  and prepends `Tag` to a key that doesn't start with a letter
+  (e.g. a literal key `1Key` is reported as `Tag1Key`).
+  Writing this "sanitized" key back out (with any backend, including `set_docinfo_exiftool()`)
+  creates a new entry under the sanitized name rather than updating the original one.
 * `get_docinfo_pdftools()`'s datetimes may not accurately reflect the embedded datetimes.
-* `set_bookmarks_gs()` supports most bookmarks features including color and font face but only action supported is to view a particular page.
+* `set_bookmarks_gs()` supports most bookmarks features including color and font face but the only action supported is to view a particular page.
 * `set_bookmarks_pdftk()` only supports setting the title, page number, and level of bookmarks.
 * `set_docinfo_pdftk()` may not handle entries with newlines in them.
 * `set_bookmarks_pdftk()` and `set_docinfo_pdftk()` may not successfully write Unicode metadata in a non-Unicode locale.
-* As a side effect `set_docinfo_gs()` seems to also update any matching XPN metadata
-  while `set_docinfo_exiftool()` and `set_docinfo_pdftk()` don't update
-  any previously set matching XPN metadata.
-  Some pdf viewers will preferentially use the previously set document title from XPN metadata
-  if it exists instead of using the title set in documentation info dictionary entry.
-  Consider also manually setting this XPN metadata using `set_xmp()`
+* In general arbitrary (non-standard) info dictionary keys can start with a letter and otherwise contain only letters, digits, underscores, and hyphens.
+
+  + `set_docinfo_exiftool()` only allows these.
+  + `set_docinfo_gs()` also allows periods.
+  + `set_docinfo_pdftk()` is the most permissive: any Latin-1-representable key without control characters (e.g. a newline) is allowed.
+
+* Whenever `ghostscript`'s `pdfwrite` device is used to write a pdf it
+  regenerates the *entire* XMP metadata packet from the current documentation info dictionary,
+  discarding any existing XMP metadata that isn't one of the eight standard documentation info
+  entries (e.g. Creative Commons or IPTC XMP tags set via `set_xmp()` will be silently erased,
+  not merely left alone or updated).  This affects `set_docinfo_gs()` and `set_bookmarks_gs()`.
+  If you need both custom XMP metadata and `set_docinfo_gs()`/`set_bookmarks_gs()`, call `set_xmp()`
+  *after* them, never before.
+*  Some pdf viewers will preferentially use the previously set document title from XMP metadata
+   if it exists instead of using the title set in documentation info dictionary entry.
+   Consider also manually setting this XMP metadata using `set_xmp()`.
 * Old metadata information is usually not deleted from the files by these
   operations (i.e. these operations are often theoretically reversible).
   If deleting the old metadata is important one may want to consider calling

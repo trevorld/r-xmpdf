@@ -94,6 +94,8 @@ color, and fontface.
 \item \code{get_bookmarks_augmented()} doesn't report information about bookmarks color and fontface.
 \item \code{set_bookmarks_gs()} supports most bookmarks features including color and font face but
 only action supported is to view a particular page.
+\item \code{set_bookmarks_gs()} has a destructive side effect on any existing XMP metadata,
+since it uses \code{ghostscript}'s \code{pdfwrite} device.  See \code{\link[=edit_docinfo]{edit_docinfo()}} for details.
 \item \code{set_bookmarks_pdftk()} only supports setting the title, page number, and level of bookmarks.
 }
 }

@@ -215,17 +215,81 @@ test_that("docinfo_exiftool", {
 	expect_equal(di_get$get_item("WeirdKey"), "value with a 'quote' and a \\backslash")
 })
 
+test_that("get_docinfo_exiftool() sanitizes arbitrary key names", {
+	# Pins down a current `exiftool` quirk (not our own validation logic), so skip on
+	# CRAN in case a future `exiftool` release changes this tag-name sanitization behavior.
+	skip_on_cran()
+	skip_if_not(supports_exiftool())
+	skip_if_not(supports_pdftk())
+
+	f3 <- tempfile(fileext = ".pdf")
+	on.exit(unlink(f3), add = TRUE)
+
+	# non-word characters become `_`, and a leading non-letter gets a `Tag` prefix.
+	di_set <- docinfo()
+	di_set$set_item("PTEX.Fullbanner", "dot value")
+	di_set$set_item("1LeadingDigit", "digit value")
+	set_docinfo_pdftk(di_set, f1, f3) # pdftk writes these keys verbatim
+	di_get <- get_docinfo_exiftool(f3)[[1]]
+	expect_equal(di_get$get_item("PTEX_Fullbanner"), "dot value")
+	expect_equal(di_get$get_item("Tag1LeadingDigit"), "digit value")
+	expect_false("PTEX.Fullbanner" %in% di_get$arbitrary_keys())
+	expect_false("1LeadingDigit" %in% di_get$arbitrary_keys())
+})
+
 test_that("docinfo() positional arguments", {
 	d <- docinfo("John Doe")
 	expect_equal(d$author, "John Doe")
 })
 
-test_that("docinfo() rejects invalid arbitrary keys", {
+test_that("docinfo() skips (with a warning) arbitrary keys unsupported by a backend", {
 	d <- docinfo()
 	d$set_item("My Key", "val")
-	expect_error(d$pdfmark())
-	expect_error(d$pdftk())
-	expect_error(d$exiftool_tags())
+	expect_warning(pm <- d$pdfmark(), class = "rlang_warning")
+	expect_false(grepl("My Key", pm, fixed = TRUE))
+	expect_warning(tags <- d$exiftool_tags(), class = "rlang_warning")
+	expect_false("PDF:My Key" %in% names(tags))
+
+	# `pdftk` is much more permissive: spaces (and most other punctuation) are fine
+	expect_no_warning(tags <- d$pdftk())
+	expect_true(any(grepl("My Key", tags, fixed = TRUE)))
+})
+
+test_that("docinfo() rejects keys with embedded control characters for pdftk", {
+	d <- docinfo()
+	d$set_item("Key\nWithNewline", "val")
+	expect_warning(pm <- d$pdfmark(), class = "rlang_warning")
+	expect_false(grepl("WithNewline", pm, fixed = TRUE))
+	expect_warning(tags <- d$exiftool_tags(), class = "rlang_warning")
+	expect_false(any(grepl("WithNewline", names(tags), fixed = TRUE)))
+	expect_warning(tags <- d$pdftk(), class = "rlang_warning")
+	expect_false(any(grepl("WithNewline", tags, fixed = TRUE)))
+})
+
+test_that("docinfo() rejects non-Latin-1 keys for pdftk (silent corruption risk)", {
+	d <- docinfo()
+	d$set_item("K€y", "val") # K€y contains U+20AC EURO SIGN
+	expect_warning(tags <- d$pdftk(), class = "rlang_warning")
+	expect_false(any(grepl("K€y", tags, fixed = TRUE)))
+})
+
+test_that("docinfo() allows hyphens in arbitrary keys", {
+	d <- docinfo()
+	d$set_item("My-Key", "val")
+	expect_no_warning(d$pdfmark())
+	expect_no_warning(d$pdftk())
+	expect_no_warning(d$exiftool_tags())
+})
+
+test_that("docinfo() allows dots in arbitrary keys for pdftk/gs but not exiftool", {
+	d <- docinfo()
+	d$set_item("PTEX.Fullbanner", "val")
+	expect_no_warning(pm <- d$pdfmark())
+	expect_true(grepl("PTEX.Fullbanner", pm, fixed = TRUE))
+	expect_no_warning(tags <- d$pdftk())
+	expect_true(any(grepl("PTEX.Fullbanner", tags, fixed = TRUE)))
+	expect_warning(tags <- d$exiftool_tags(), class = "rlang_warning")
+	expect_false("PDF:PTEX.Fullbanner" %in% names(tags))
 })
 
 test_that("docinfo()", {

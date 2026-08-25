@@ -232,7 +232,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags[["PDF:ModifyDate"]] <- to_date_pdfmark_exiftool(self$mod_date)
 			}
-			for (key in private$validated_arbitrary_keys()) {
+			for (key in private$validated_arbitrary_keys("exiftool")) {
 				tags[[stri_join("PDF:", key)]] <- private$val$arbitrary[[key]]
 			}
 			tags
@@ -273,7 +273,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, entry_pdftk("ModDate", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in private$validated_arbitrary_keys()) {
+			for (key in private$validated_arbitrary_keys("pdftk")) {
 				tags <- append(tags, entry_pdftk(key, private$val$arbitrary[[key]]))
 			}
 			tags
@@ -404,7 +404,7 @@ DocInfo <- R6Class(
 			if (!is.null(self$mod_date)) {
 				tags <- append(tags, sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date)))
 			}
-			for (key in private$validated_arbitrary_keys()) {
+			for (key in private$validated_arbitrary_keys("gs")) {
 				tags <- append(tags, sprintf(" /%s (%s)\n", key, private$val$arbitrary[[key]]))
 			}
 			tags <- append(tags, " /DOCINFO pdfmark\n")
@@ -442,7 +442,7 @@ DocInfo <- R6Class(
 				mod_date <- sprintf(" /ModDate (%s)\n", to_date_pdfmark(self$mod_date))
 				tags <- append(tags, iconv(mod_date, to = "latin1", toRaw = TRUE)[[1]])
 			}
-			for (key in private$validated_arbitrary_keys()) {
+			for (key in private$validated_arbitrary_keys("gs")) {
 				tags <- append(
 					tags,
 					raw_pdfmark_entry(sprintf(" /%s (", key), private$val$arbitrary[[key]], ")\n")
@@ -451,12 +451,20 @@ DocInfo <- R6Class(
 			tags <- append(tags, iconv(" /DOCINFO pdfmark\n", to = "latin1", toRaw = TRUE)[[1]])
 			tags
 		},
-		validated_arbitrary_keys = function() {
+		validated_arbitrary_keys = function(backend) {
 			keys <- names(private$val$arbitrary)
-			for (key in keys) {
-				assert_valid_docinfo_key(key)
+			valid <- vapply(keys, is_valid_docinfo_key, logical(1), backend = backend)
+			bad <- keys[!valid]
+			if (length(bad)) {
+				warn(c(
+					sprintf(
+						"Arbitrary info dictionary key(s) not supported by the %s backend will be skipped:",
+						sQuote(backend)
+					),
+					structure(sQuote(bad), names = rep_len("*", length(bad)))
+				))
 			}
-			keys
+			keys[valid]
 		}
 	)
 )
@@ -508,15 +516,22 @@ docinfo_known_keys <- function() {
 	)
 }
 
-# Arbitrary info dictionary keys are written as literal PDF names / exiftool tag names
-# by the various backends, so restrict them to a safe, portable character set.
-assert_valid_docinfo_key <- function(key) {
-	if (!grepl("^[A-Za-z][A-Za-z0-9_]*$", key)) {
-		abort(c(
-			sprintf("Invalid (arbitrary) info dictionary key: %s", sQuote(key)),
-			"i" = "Keys must start with a letter and contain only letters, digits, and underscores."
-		))
-	}
+# Arbitrary info dictionary keys are written as literal PDF names / exiftool tag names,
+# and each backend tolerates a different (empirically determined) character set:
+# * `exiftool` tag names must match `[-\w]+` (its own internal validation regex).
+# * `pdftk` treats `InfoKey` as a single line of plain text, so almost any
+#   Latin-1-representable character is fine, but embedded control characters
+#   (e.g. a newline) break its one-key-per-line format, and non-Latin-1
+#   characters (e.g. CJK text, emoji) get silently corrupted rather than rejected.
+# * `gs`'s `pdfmark` writes keys as literal PostScript names, which tolerate `.`
+#   but not e.g. whitespace or parentheses (these break PostScript's tokenizer).
+is_valid_docinfo_key <- function(key, backend) {
+	switch(
+		backend,
+		exiftool = grepl("^[A-Za-z][A-Za-z0-9_-]*$", key),
+		pdftk = nzchar(key) && !grepl("[[:cntrl:]]", key) && !is.na(iconv(key, to = "latin1")),
+		grepl("^[A-Za-z][A-Za-z0-9_.-]*$", key) # gs
+	)
 }
 
 #' @export
