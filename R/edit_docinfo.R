@@ -153,7 +153,7 @@ get_docinfo_exiftool_helper <- function(filename) {
 set_docinfo_exiftool <- function(docinfo, input, output = input) {
 	docinfo <- as_docinfo(docinfo)
 	tags <- docinfo$exiftool_tags()
-	config <- exiftool_config_pdf_info(docinfo$arbitrary_keys())
+	config <- exiftool_config_pdf_info(docinfo$arbitrary_keys("exiftool", warn = FALSE))
 	if (!is.null(config)) {
 		on.exit(unlink(config), add = TRUE)
 	}
@@ -260,8 +260,9 @@ set_docinfo_gs <- function(docinfo, input, output = input) {
 	pmc <- docinfo$pdfmark(raw = FALSE)
 	pmc_l1 <- iconv(pmc, to = "latin1")
 	if (is.na(pmc_l1)) {
-		# Has non-Latin-1 characters
-		writeBin(docinfo$pdfmark(raw = TRUE), metafile, endian = "big")
+		# Has non-Latin-1 characters; re-generate as raw bytes without re-warning
+		# about arbitrary keys (already warned about by the `pdfmark(raw = FALSE)` call above)
+		writeBin(docinfo$pdfmark(raw = TRUE, warn = FALSE), metafile, endian = "big")
 	} else {
 		# Just Latin-1 characters
 		f <- file(metafile, encoding = "latin1")
