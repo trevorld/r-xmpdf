@@ -17,6 +17,9 @@
 #'
 #' * `supports_exiftool()` detects support for the command-line tool `exiftool` which is
 #'   required for [get_docinfo_exiftool()], [get_xmp_exiftool()], [set_xmp_exiftool()], and [n_pages_exiftool()].
+#'   Since detection via `exiftoolr::configure_exiftoolr()` is relatively slow a successful
+#'   detection is cached for the rest of the session
+#'   (the cache is keyed on the `ET_EXIFTOOL_PATH` and `ET_PERL_PATH` environment variables).
 #' * `supports_gs()` detects support for the command-line tool `ghostscript` which is
 #'   required for [set_docinfo_gs()], [set_bookmarks_gs()], [cat_pages_gs()], and [n_pages_gs()].
 #' * `supports_pdftk()` detects support for the command-line tool `pdftk` which is
@@ -97,25 +100,72 @@ supports_n_pages <- function() {
 #' @rdname supports
 #' @export
 supports_exiftool <- function() {
-	as.logical(find_exiftool_cmd() != "")
+	cmd_found(find_exiftool_cmd())
 }
 
 #' @rdname supports
 #' @export
 supports_gs <- function() {
-	as.logical(find_gs_cmd() != "")
+	cmd_found(find_gs_cmd())
 }
 
 #' @rdname supports
 #' @export
 supports_pdftk <- function() {
-	as.logical(find_pdftk_cmd() != "")
+	cmd_found(find_pdftk_cmd())
 }
 
+# Whether a `find_*_cmd()` result is a (non-empty) command (note `nzchar(NA)` is `TRUE`).
+# `cmd` may have two elements (e.g. `c("/path/to/perl", "/path/to/exiftool")`)
+# when `exiftoolr` falls back to running the `exiftool` perl script via `perl`
+cmd_found <- function(cmd) {
+	length(cmd) > 0L && !anyNA(cmd) && all(nzchar(cmd))
+}
+
+# Best-effort resolved path of a detected command's executable/script (its last element)
+# so later cache hits can cheaply check it hasn't since been uninstalled.
+# `NULL` if it can't be resolved (in which case we skip that check).
+cmd_path <- function(cmd) {
+	target <- cmd[length(cmd)]
+	path <- if (file.exists(target)) target else unname(Sys.which(target))
+	if (nzchar(path)) path else NULL
+}
+
+# Value of environment variable `var` unless unset or empty, in which case `default`
+env_or <- function(var, default) {
+	value <- Sys.getenv(var, "")
+	if (nzchar(value)) value else default
+}
+
+# Session-level cache for command-line tool detection.
+.xmpdf_cache <- new.env(parent = emptyenv())
+
+# `exiftoolr::configure_exiftoolr()` spawns `perl` and `exiftool -ver` subprocesses
+# on every call so we cache successful detections for the rest of the session
+# rather than re-detecting on each `supports_exiftool()` / `exiftool()` call.
+# Failed detections are not cached so a later install is still picked up.
 find_exiftool_cmd <- function() {
 	if (getOption("xmpdf_disable_exiftool", FALSE)) {
-		""
-	} else if (requireNamespace("exiftoolr", quietly = TRUE)) {
+		return("")
+	}
+	key <- Sys.getenv(c("ET_EXIFTOOL_PATH", "ET_PERL_PATH"), names = FALSE)
+	cached <- .xmpdf_cache$exiftool
+	if (
+		!is.null(cached) &&
+			identical(cached$key, key) &&
+			(is.null(cached$path) || file.exists(cached$path))
+	) {
+		return(cached$cmd)
+	}
+	cmd <- find_exiftool_cmd_uncached()
+	if (cmd_found(cmd)) {
+		.xmpdf_cache$exiftool <- list(key = key, cmd = cmd, path = cmd_path(cmd))
+	}
+	cmd
+}
+
+find_exiftool_cmd_uncached <- function() {
+	if (requireNamespace("exiftoolr", quietly = TRUE)) {
 		cmd <- try(exiftoolr::configure_exiftoolr(quiet = TRUE), silent = TRUE)
 		if (inherits(cmd, "try-error")) {
 			""
@@ -123,7 +173,7 @@ find_exiftool_cmd <- function() {
 			cmd
 		}
 	} else {
-		Sys.which(Sys.getenv("ET_EXIFTOOL_PATH", "exiftool"))
+		Sys.which(env_or("ET_EXIFTOOL_PATH", "exiftool"))
 	}
 }
 
@@ -139,8 +189,8 @@ find_pdftk_cmd <- function() {
 	if (getOption("xmpdf_disable_pdftk", FALSE)) {
 		""
 	} else {
-		cmd <- Sys.which(Sys.getenv("PDFTK_PATH", "pdftk"))
-		if (cmd == "") {
+		cmd <- Sys.which(env_or("PDFTK_PATH", "pdftk"))
+		if (!cmd_found(cmd)) {
 			cmd <- Sys.which("pdftk-java")
 		}
 		cmd
@@ -175,7 +225,7 @@ get_cmd <- function(
 	msg_fn = function() install_cmd_str(name)
 ) {
 	cmd <- cmd_fn()
-	if (cmd == "") {
+	if (!cmd_found(cmd)) {
 		abort(msg_fn(), class = "xmpdf_suggested_package")
 	}
 	cmd
