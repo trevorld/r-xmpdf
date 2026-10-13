@@ -55,6 +55,9 @@ detects support for the command-line tools
 \itemize{
 \item \code{supports_exiftool()} detects support for the command-line tool \code{exiftool} which is
 required for \code{\link[=get_docinfo_exiftool]{get_docinfo_exiftool()}}, \code{\link[=get_xmp_exiftool]{get_xmp_exiftool()}}, \code{\link[=set_xmp_exiftool]{set_xmp_exiftool()}}, and \code{\link[=n_pages_exiftool]{n_pages_exiftool()}}.
+Since detection via \code{exiftoolr::configure_exiftoolr()} is relatively slow a successful
+detection is cached for the rest of the session
+(the cache is keyed on the \code{ET_EXIFTOOL_PATH} and \code{ET_PERL_PATH} environment variables).
 \item \code{supports_gs()} detects support for the command-line tool \code{ghostscript} which is
 required for \code{\link[=set_docinfo_gs]{set_docinfo_gs()}}, \code{\link[=set_bookmarks_gs]{set_bookmarks_gs()}}, \code{\link[=cat_pages_gs]{cat_pages_gs()}}, and \code{\link[=n_pages_gs]{n_pages_gs()}}.
 \item \code{supports_pdftk()} detects support for the command-line tool \code{pdftk} which is

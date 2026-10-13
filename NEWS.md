@@ -1,3 +1,25 @@
+xmpdf 0.3.2 (development)
+=========================
+
+Bug fixes and minor improvements
+--------------------------------
+
+* `exiftool` detection is now cached for the rest of the session after the first
+  successful detection rather than being repeated by every `supports_exiftool()` call
+  and every internal `exiftool` invocation.
+  Previously `exiftoolr::configure_exiftoolr()` (which spawns `perl` and `exiftool`
+  subprocesses) was re-run several times per `set_xmp()`/`set_docinfo()` call and
+  could account for most of their runtime.
+  The cache still honors the `xmpdf_disable_exiftool` option, is invalidated
+  if the `ET_EXIFTOOL_PATH` or `ET_PERL_PATH` environment variables change,
+  and is bypassed if the cached command no longer exists.
+* `supports_exiftool()` now returns a scalar when `exiftoolr` detects `exiftool`
+  as a two-element `perl` + script command.
+  Previously `exiftool`-backed functions could error with "the condition has length > 1".
+* `exiftool` detection (when `exiftoolr` is not installed) and `pdftk` detection now treat
+  an `ET_EXIFTOOL_PATH` / `PDFTK_PATH` environment variable that is set but empty as unset
+  and fall back to looking for the tool on the `PATH`.
+
 xmpdf 0.3.1
 ===========
 
