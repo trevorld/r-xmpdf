@@ -8,6 +8,7 @@ test_that("`cmd_found()`", {
 })
 
 test_that("`find_exiftool_cmd()` caches successful detections", {
+	skip_if_not_installed("withr")
 	fake <- withr::local_tempfile(lines = character())
 	cmd <- c("/usr/bin/perl", fake) # i.e. `perl` + script command
 	n <- 0L
